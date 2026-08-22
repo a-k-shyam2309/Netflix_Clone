@@ -1,26 +1,8 @@
-/* CivicBuzz Admin Portal - all dashboard interactions live in this file. */
+/* CivicBuzz Admin Portal - live synchronized grievance management and real dynamic metrics. */
 
 const userId = "USR10245";
 const $ = (selector, parent = document) => parent.querySelector(selector);
 const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
-
-const chartSets = {
-  week: {
-    labels: ["May 8", "May 9", "May 10", "May 11", "May 12", "May 13", "May 14"],
-    reported: [111, 105, 80, 57, 94, 72, 53],
-    resolved: [142, 135, 134, 112, 133, 115, 104],
-  },
-  month: {
-    labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Today"],
-    reported: [125, 97, 117, 71, 89, 46, 61],
-    resolved: [158, 126, 145, 109, 116, 88, 99],
-  },
-  quarter: {
-    labels: ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    reported: [140, 116, 128, 91, 79, 62, 48],
-    resolved: [172, 144, 149, 127, 111, 84, 72],
-  },
-};
 
 let toastTimer;
 
@@ -685,85 +667,316 @@ function showToast(message) {
   );
 }
 
-function updateTrendChart(range) {
-  const data = chartSets[range];
+function getTimeAgo(timestamp) {
+  const diffMs = Date.now() - new Date(timestamp).getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHrs = Math.floor(diffMin / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  return `${diffDays}d ago`;
+}
 
-  if (!data) {
+function getTrendDataFromStore(range = "week") {
+  if (window.CivicBuzzAPI?.store?.getTrendData) {
+    return window.CivicBuzzAPI.store.getTrendData(range);
+  }
+  const complaints = window.CivicBuzzAPI?.store?.getAll ? window.CivicBuzzAPI.store.getAll() : [];
+  const now = new Date();
+
+  if (range === "week") {
+    const labels = [];
+    const reported = [];
+    const resolved = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 86400000);
+      const dayStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      labels.push(i === 0 ? "Today" : dayStr);
+
+      const dStart = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0).getTime();
+      const dEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59).getTime();
+
+      const repCount = complaints.filter((c) => {
+        const t = new Date(c.created_at || Date.now()).getTime();
+        return t >= dStart && t <= dEnd;
+      }).length;
+
+      const resCount = complaints.filter((c) => {
+        const isRes = (c.status || "").toUpperCase() === "RESOLVED" || (c.status || "").toUpperCase() === "VERIFIED";
+        if (!isRes) return false;
+        const t = new Date(c.resolved_at || c.created_at || Date.now()).getTime();
+        return t >= dStart && t <= dEnd;
+      }).length;
+
+      reported.push(repCount);
+      resolved.push(resCount);
+    }
+    return { labels, reported, resolved };
+  }
+
+  return { labels: ["Day 1", "Day 2", "Day 3", "Today"], reported: [0, 0, 0, 0], resolved: [0, 0, 0, 0] };
+}
+
+function updateTrendChart(range = "week") {
+  const data = getTrendDataFromStore(range);
+  if (!data || !data.labels || data.labels.length === 0) {
     return;
   }
 
-  const toPoints = (values) =>
-    values
-      .map((value, index) => {
-        const x =
-          index === 0
-            ? 10
-            : index === values.length - 1
-              ? 720
-              : 10 + (710 / (values.length - 1)) * index;
+  const N = data.labels.length;
+  const maxVal = Math.max(...data.reported, ...data.resolved, 0);
 
-        return `${x.toFixed(1)},${value}`;
-      })
-      .join(" ");
+  let gridMax = 4;
+  if (maxVal > 16) gridMax = Math.ceil(maxVal / 5) * 5;
+  else if (maxVal > 8) gridMax = 16;
+  else if (maxVal > 4) gridMax = 8;
+  else if (maxVal > 0) gridMax = Math.max(4, maxVal);
 
-  const addPoints = (groupId, values, className) => {
-    const group = $(groupId);
+  const yTicks = [
+    gridMax,
+    Math.round(gridMax * 0.75),
+    Math.round(gridMax * 0.5),
+    Math.round(gridMax * 0.25),
+    0
+  ];
 
-    if (!group) {
-      return;
-    }
+  const yAxisEl = $("#trendYAxis");
+  if (yAxisEl) {
+    yAxisEl.innerHTML = yTicks.map((val) => `<span>${val}</span>`).join("");
+  }
 
-    group.innerHTML = values
-      .map((value, index) => {
-        const x =
-          index === 0
-            ? 10
-            : index === values.length - 1
-              ? 720
-              : 10 + (710 / (values.length - 1)) * index;
+  const getX = (i) => (N <= 1 ? 365 : 10 + (710 / (N - 1)) * i);
+  const getY = (v) => 180 - (Math.min(v, gridMax) / gridMax) * 168;
 
-        return `<circle class="${className}" cx="${x.toFixed(
-          1
-        )}" cy="${value}" r="4.3"></circle>`;
-      })
-      .join("");
-  };
+  const repPointsStr = data.reported.map((v, i) => `${getX(i).toFixed(1)},${getY(v).toFixed(1)}`).join(" ");
+  const resPointsStr = data.resolved.map((v, i) => `${getX(i).toFixed(1)},${getY(v).toFixed(1)}`).join(" ");
 
   const reportedLine = $("#reportedLine");
   const resolvedLine = $("#resolvedLine");
 
   if (reportedLine) {
-    reportedLine.setAttribute(
-      "points",
-      toPoints(data.reported)
-    );
+    reportedLine.setAttribute("points", repPointsStr);
   }
 
   if (resolvedLine) {
-    resolvedLine.setAttribute(
-      "points",
-      toPoints(data.resolved)
-    );
+    resolvedLine.setAttribute("points", resPointsStr);
   }
 
-  addPoints(
-    "#reportedPoints",
-    data.reported,
-    "reported-point"
-  );
+  const reportedGroup = $("#reportedPoints");
+  const resolvedGroup = $("#resolvedPoints");
+  const tooltip = $("#chartTooltip");
+  const chartWrap = $(".chart-wrap");
 
-  addPoints(
-    "#resolvedPoints",
-    data.resolved,
-    "resolved-point"
-  );
+  if (reportedGroup) {
+    reportedGroup.innerHTML = data.reported.map((v, i) => {
+      const cx = getX(i).toFixed(1);
+      const cy = getY(v).toFixed(1);
+      return `<circle class="reported-point" cx="${cx}" cy="${cy}" r="4.5" data-idx="${i}" data-val="${v}" data-date="${data.labels[i]}" data-type="Reported"></circle>`;
+    }).join("");
+  }
+
+  if (resolvedGroup) {
+    resolvedGroup.innerHTML = data.resolved.map((v, i) => {
+      const cx = getX(i).toFixed(1);
+      const cy = getY(v).toFixed(1);
+      return `<circle class="resolved-point" cx="${cx}" cy="${cy}" r="4.5" data-idx="${i}" data-val="${v}" data-date="${data.labels[i]}" data-type="Resolved"></circle>`;
+    }).join("");
+  }
+
+  // Bind interactive tooltips
+  if (chartWrap && tooltip) {
+    $$(".reported-point, .resolved-point", chartWrap).forEach((pt) => {
+      pt.addEventListener("mouseenter", () => {
+        const idx = parseInt(pt.getAttribute("data-idx") || "0", 10);
+        const dateStr = data.labels[idx] || "";
+        const repVal = data.reported[idx] || 0;
+        const resVal = data.resolved[idx] || 0;
+
+        tooltip.innerHTML = `
+          <div class="tt-date">${dateStr}</div>
+          <div class="tt-row"><span class="tt-dot blue"></span> Reported: <b>${repVal}</b></div>
+          <div class="tt-row"><span class="tt-dot green"></span> Resolved: <b>${resVal}</b></div>
+        `;
+
+        const ptRect = pt.getBoundingClientRect();
+        const wrapRect = chartWrap.getBoundingClientRect();
+
+        tooltip.style.left = `${ptRect.left - wrapRect.left + ptRect.width / 2}px`;
+        tooltip.style.top = `${ptRect.top - wrapRect.top - 8}px`;
+        tooltip.style.display = "block";
+      });
+
+      pt.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
+    });
+  }
 
   const labelRow = $("#chartLabels");
-
   if (labelRow) {
     labelRow.innerHTML = data.labels
       .map((label) => `<span>${t(label)}</span>`)
       .join("");
+  }
+}
+
+function animateCounter(el, newVal) {
+  if (!el) return;
+  const currentVal = parseInt(el.textContent.replace(/,/g, "") || "0", 10);
+  if (isNaN(currentVal) || currentVal === newVal) {
+    el.textContent = newVal.toLocaleString();
+    return;
+  }
+
+  el.classList.add("metric-bump");
+  setTimeout(() => el.classList.remove("metric-bump"), 600);
+
+  const duration = 400;
+  const start = performance.now();
+  const diff = newVal - currentVal;
+
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(currentVal + diff * eased);
+    el.textContent = current.toLocaleString();
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = newVal.toLocaleString();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function renderRealMetricsAndStats() {
+  const metrics = window.CivicBuzzAPI?.store?.getMetrics
+    ? window.CivicBuzzAPI.store.getMetrics()
+    : {
+        total_reported: 0,
+        total_resolved: 0,
+        total_open: 0,
+        total_overdue: 0,
+        resolution_rate_percent: 0,
+      };
+
+  const repEl = $("#metricReported");
+  const resEl = $("#metricResolved");
+  const openEl = $("#metricOpen");
+  const ovEl = $("#metricOverdue");
+
+  animateCounter(repEl, metrics.total_reported);
+  animateCounter(resEl, metrics.total_resolved);
+  animateCounter(openEl, metrics.total_open);
+  animateCounter(ovEl, metrics.total_overdue);
+
+  const repSub = $("#metricReportedSub");
+  const resSub = $("#metricResolvedSub");
+  const openSub = $("#metricOpenSub");
+  const ovSub = $("#metricOverdueSub");
+
+  if (repSub) repSub.innerHTML = `● <em>${metrics.total_reported} total submitted</em>`;
+  if (resSub) resSub.innerHTML = `● <em>${metrics.resolution_rate_percent}% resolution rate</em>`;
+  if (openSub) openSub.innerHTML = `● <em>${metrics.total_open} active in queue</em>`;
+  if (ovSub) ovSub.innerHTML = `● <em>${metrics.total_overdue} urgent attention</em>`;
+
+  // Update Donut Resolution Rate
+  const donutText = $("#donutRateText");
+  const donutRes = $("#donutResolvedSummary");
+  const donutPend = $("#donutPendingSummary");
+  const donutVisual = $("#donutVisual");
+
+  if (donutText) donutText.textContent = `${metrics.resolution_rate_percent}%`;
+  if (donutRes) donutRes.innerHTML = `<i></i> ${metrics.total_resolved} resolved`;
+  if (donutPend) donutPend.innerHTML = `<i></i> ${metrics.total_open} open`;
+  if (donutVisual) {
+    donutVisual.style.background = `conic-gradient(#10b981 0% ${metrics.resolution_rate_percent}%, #d9e1ec ${metrics.resolution_rate_percent}% 100%)`;
+  }
+
+  // Update Priority Alerts in Overview panel
+  const alertList = $(".alert-list");
+  if (alertList && window.CivicBuzzAPI?.store?.getAll) {
+    const all = window.CivicBuzzAPI.store.getAll();
+    const urgentItems = all.filter(
+      (c) => (c.is_overdue || ["CRITICAL", "HIGH"].includes((c.priority_level || c.priority?.level || "").toUpperCase())) && c.status !== "RESOLVED"
+    ).slice(0, 4);
+
+    if (urgentItems.length > 0) {
+      alertList.innerHTML = urgentItems.map((c) => {
+        const catIcons = {
+          roads_potholes: { icon: "⌁", cls: "road" },
+          road: { icon: "⌁", cls: "road" },
+          garbage_sanitation: { icon: "♜", cls: "garbage" },
+          garbage: { icon: "♜", cls: "garbage" },
+          water_supply: { icon: "◒", cls: "water" },
+          water: { icon: "◒", cls: "water" },
+          streetlights: { icon: "☼", cls: "street" },
+          drainage: { icon: "🌊", cls: "water" },
+        };
+        const catInfo = catIcons[c.category] || { icon: "!", cls: "road" };
+        const pr = (c.priority_level || "HIGH").toLowerCase();
+        const timeAgo = getTimeAgo(c.created_at || Date.now());
+
+        return `
+          <article class="alert-item">
+            <span class="alert-icon ${catInfo.cls}">${catInfo.icon}</span>
+            <div>
+              <h3>${c.title}</h3>
+              <p>${c.location?.address || c.location?.ward_name || "Bhubaneswar"}</p>
+            </div>
+            <span class="status-pill ${c.is_overdue ? 'overdue' : 'attention'}">${c.is_overdue ? 'Overdue' : pr.toUpperCase()}</span>
+            <time>${timeAgo}</time>
+          </article>
+        `;
+      }).join("");
+    }
+  }
+
+  // Update AI routing table in Overview panel
+  const routingTable = $(".routing-table");
+  if (routingTable && window.CivicBuzzAPI?.store?.getAll) {
+    const all = window.CivicBuzzAPI.store.getAll();
+    const pendingItems = all.filter((c) => ["SUBMITTED", "PENDING"].includes((c.status || "").toUpperCase())).slice(0, 4);
+
+    if (pendingItems.length > 0) {
+      const head = `
+        <div class="table-head" role="row">
+          <span>Issue</span>
+          <span>Priority</span>
+          <span>Suggested department</span>
+        </div>
+      `;
+      const rows = pendingItems.map((c) => {
+        const catIcons = {
+          roads_potholes: { icon: "⌁", cls: "pothole-thumb" },
+          garbage_sanitation: { icon: "♜", cls: "garbage-thumb" },
+          water_supply: { icon: "◒", cls: "water-thumb" },
+          streetlights: { icon: "☼", cls: "street-thumb" },
+          drainage: { icon: "🌊", cls: "water-thumb" },
+        };
+        const catInfo = catIcons[c.category] || { icon: "●", cls: "pothole-thumb" };
+        const pr = (c.priority_level || "HIGH").toLowerCase();
+
+        return `
+          <div class="table-row" role="row">
+            <div class="issue-name">
+              <span class="issue-thumb ${catInfo.cls}">${catInfo.icon}</span>
+              <span>
+                <b>${c.title}</b>
+                <small>${c.location?.ward_name || 'Ward'} · #${c.complaint_id}</small>
+              </span>
+            </div>
+            <strong class="match ${pr === 'critical' || pr === 'high' ? 'high' : 'medium'}">${(c.priority_level || 'HIGH').toUpperCase()}</strong>
+            <button class="department-chip" data-toast="Department: ${c.department_name}">
+              ${c.department_name || 'Municipal Dept'} <i>⌄</i>
+            </button>
+          </div>
+        `;
+      }).join("");
+      routingTable.innerHTML = head + rows;
+    }
   }
 }
 
@@ -1125,6 +1338,8 @@ function setupIssueQueue() {
     }
     showToast("Assigned issue to recommended department.");
     closeIssueDetails();
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
@@ -1136,6 +1351,8 @@ function setupIssueQueue() {
     }
     showToast("Issue marked as rejected.");
     closeIssueDetails();
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
@@ -1152,6 +1369,8 @@ function setupIssueQueue() {
       verRep.className = "ver-badge verified";
     }
     closeIssueDetails();
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
@@ -1159,8 +1378,8 @@ function setupIssueQueue() {
     if (!window.CivicBuzzAPI) return;
     try {
       const res = await window.CivicBuzzAPI.public.listComplaints();
-      if (res && res.data && res.data.length > 0) {
-        const comps = res.data;
+      if (res && res.data) {
+        const comps = Array.isArray(res.data) ? res.data : [];
         const totalCount = comps.length;
         const totalCountEl = $("#queueTotalCount");
         if (totalCountEl) totalCountEl.textContent = totalCount;
@@ -1170,14 +1389,19 @@ function setupIssueQueue() {
         let pendingCount = 0;
         let progressCount = 0;
         let resolvedCount = 0;
+        let priorityCount = 0;
 
         let rowsHtml = "";
         comps.forEach((c) => {
           const catIcons = {
             roads_potholes: "🛣️ Road",
+            road: "🛣️ Road",
             streetlights: "💡 Electricity",
+            electricity: "💡 Electricity",
             water_supply: "🚰 Water",
+            water: "🚰 Water",
             garbage_sanitation: "🗑️ Garbage",
+            garbage: "🗑️ Garbage",
             drainage: "🌊 Drainage",
           };
           const catLabel = catIcons[c.category] || `📍 ${c.category || "General"}`;
@@ -1188,6 +1412,8 @@ function setupIssueQueue() {
           if (rawSt.includes("subm") || rawSt.includes("pend")) pendingCount++;
           else if (rawSt.includes("prog") || rawSt.includes("assign")) progressCount++;
           else if (rawSt.includes("resolv") || rawSt.includes("verif")) resolvedCount++;
+
+          if (pr === "critical" || pr === "high") priorityCount++;
 
           rowsHtml += `
             <tr data-status="${st}" data-priority="${pr}" data-category="${c.category || 'road'}">
@@ -1211,9 +1437,11 @@ function setupIssueQueue() {
         const qPending = $("#queuePendingCount");
         const qProg = $("#queueProgressCount");
         const qRes = $("#queueResolvedCount");
-        if (qPending && pendingCount > 0) qPending.textContent = pendingCount;
-        if (qProg && progressCount > 0) qProg.textContent = progressCount;
-        if (qRes && resolvedCount > 0) qRes.textContent = resolvedCount;
+        const qPriority = $("#queuePriorityCount");
+        if (qPending) qPending.textContent = pendingCount;
+        if (qProg) qProg.textContent = progressCount;
+        if (qRes) qRes.textContent = resolvedCount;
+        if (qPriority) qPriority.textContent = priorityCount;
       }
     } catch (_) {}
   }
@@ -1710,6 +1938,8 @@ function initialiseDashboard() {
 
   setupLanguage();
 
+  renderRealMetricsAndStats();
+
   updateTrendChart("week");
 
   setupNavigation();
@@ -1741,26 +1971,23 @@ function initialiseDashboard() {
     }).catch((_) => {});
   }
 
-  // Load live stats if API available
-  if (window.CivicBuzzAPI) {
-    window.CivicBuzzAPI.public.getStats().then((res) => {
-      if (res && res.data) {
-        const s = res.data;
-        if (s.total_reported !== undefined) {
-          const el = $("#metricReported");
-          if (el) el.textContent = `${s.total_reported}`;
-        }
-        if (s.total_resolved !== undefined) {
-          const el = $("#metricResolved");
-          if (el) el.textContent = `${s.total_resolved}`;
-        }
-        if (s.active_reports !== undefined) {
-          const el = $("#metricOpen");
-          if (el) el.textContent = `${s.active_reports}`;
-        }
-      }
-    }).catch((_) => {});
-  }
+  // Real-time synchronization listeners for instant cross-tab and client complaint updates
+  const refreshAllLiveViews = () => {
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
+  };
+
+  window.addEventListener("civicbuzz_data_updated", refreshAllLiveViews);
+  window.addEventListener("storage", (e) => {
+    if (e.key === "civicbuzz_complaints" || e.key === "civicbuzz_complaints_tick") {
+      refreshAllLiveViews();
+    }
+  });
+
+  // Background polling to ensure seamless live sync
+  setInterval(() => {
+    renderRealMetricsAndStats();
+  }, 3000);
 
   $("#trendRange")?.addEventListener("change", (event) => {
     updateTrendChart(event.target.value);

@@ -113,19 +113,21 @@ async def get_public_stats(
     total_reported = await mongo_db.complaints.count_documents({})
     total_resolved = await mongo_db.complaints.count_documents({"status": "RESOLVED"})
     active_reports = await mongo_db.complaints.count_documents({"status": {"$in": ["SUBMITTED", "ASSIGNED", "IN_PROGRESS", "READY_FOR_CITIZEN_VERIFICATION"]}})
+    overdue_reports = await mongo_db.complaints.count_documents({"$or": [{"is_overdue": True}, {"priority.level": "CRITICAL", "status": {"$ne": "RESOLVED"}}]})
 
     # Aggregate total citizens
     stmt_users = select(func.count(User.id))
     res_users = await db.execute(stmt_users)
-    citizen_count = res_users.scalar() or 247
+    citizen_count = res_users.scalar() or 0
 
     return APIResponse(data={
-        "total_reported": total_reported or 12480,
-        "total_resolved": total_resolved or 8240,
-        "active_reports": active_reports or 1162,
+        "total_reported": total_reported,
+        "total_resolved": total_resolved,
+        "active_reports": active_reports,
+        "overdue_reports": overdue_reports,
         "active_citizens": citizen_count,
         "communities_count": 50,
-        "resolution_rate_percent": round((total_resolved / (total_reported or 1)) * 100.0, 1) if total_reported else 78.0,
+        "resolution_rate_percent": round((total_resolved / (total_reported or 1)) * 100.0, 1) if total_reported else 0.0,
     })
 
 

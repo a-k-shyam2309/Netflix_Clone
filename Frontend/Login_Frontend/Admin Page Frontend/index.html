@@ -158,9 +158,9 @@
 					<article class="metric-card blue-card">
 						<div class="metric-icon">▤</div>
 						<div>
-							<p>Issues Reported</p>
-							<h2 id="metricReported">12,480</h2>
-							<small class="positive">↑ 12.5% <em>vs last month</em></small>
+							<p data-i18n="Issues Reported">Issues Reported</p>
+							<h2 id="metricReported">0</h2>
+							<small class="positive" id="metricReportedSub">● <em>Live tracker</em></small>
 						</div>
 						<span class="metric-menu">•••</span>
 					</article>
@@ -168,9 +168,9 @@
 					<article class="metric-card green-card">
 						<div class="metric-icon">✓</div>
 						<div>
-							<p>Issues Resolved</p>
-							<h2 id="metricResolved">8,240</h2>
-							<small class="positive">↑ 15.3% <em>vs last month</em></small>
+							<p data-i18n="Issues Resolved">Issues Resolved</p>
+							<h2 id="metricResolved">0</h2>
+							<small class="positive" id="metricResolvedSub">● <em>Resolution rate</em></small>
 						</div>
 						<span class="metric-menu">•••</span>
 					</article>
@@ -178,9 +178,9 @@
 					<article class="metric-card amber-card">
 						<div class="metric-icon">◷</div>
 						<div>
-							<p>Open Issues</p>
-							<h2 id="metricOpen">1,162</h2>
-							<small class="negative">↓ 6.8% <em>vs last month</em></small>
+							<p data-i18n="Open Issues">Open Issues</p>
+							<h2 id="metricOpen">0</h2>
+							<small class="negative" id="metricOpenSub">● <em>Active in queue</em></small>
 						</div>
 						<span class="metric-menu">•••</span>
 					</article>
@@ -188,9 +188,9 @@
 					<article class="metric-card red-card">
 						<div class="metric-icon">!</div>
 						<div>
-							<p>Overdue</p>
-							<h2 id="metricOverdue">94</h2>
-							<small class="negative">↓ 8.2% <em>vs last month</em></small>
+							<p data-i18n="Overdue">Overdue</p>
+							<h2 id="metricOverdue">0</h2>
+							<small class="negative" id="metricOverdueSub">● <em>Urgent attention</em></small>
 						</div>
 						<span class="metric-menu">•••</span>
 					</article>
@@ -215,11 +215,11 @@
 						</div>
 
 						<div class="chart-wrap">
-							<div class="y-axis">
-								<span>2K</span>
-								<span>1.5K</span>
-								<span>1K</span>
-								<span>500</span>
+							<div class="y-axis" id="trendYAxis">
+								<span>0</span>
+								<span>0</span>
+								<span>0</span>
+								<span>0</span>
 								<span>0</span>
 							</div>
 
@@ -234,23 +234,18 @@
 								</g>
 
 								<polyline id="reportedLine" class="reported-line"
-									points="10,111 124,105 238,80 352,57 466,94 580,72 720,53" />
+									points="10,180 720,180" />
 								<polyline id="resolvedLine" class="resolved-line"
-									points="10,142 124,135 238,134 352,112 466,133 580,115 720,104" />
+									points="10,180 720,180" />
 
 								<g id="reportedPoints" class="reported-points"></g>
 								<g id="resolvedPoints" class="resolved-points"></g>
 							</svg>
 
 							<div class="x-axis" id="chartLabels">
-								<span>May 8</span>
-								<span>May 9</span>
-								<span>May 10</span>
-								<span>May 11</span>
-								<span>May 12</span>
-								<span>May 13</span>
-								<span>May 14</span>
 							</div>
+
+							<div id="chartTooltip" class="chart-tooltip" style="display: none;"></div>
 						</div>
 					</article>
 
@@ -412,18 +407,18 @@
 							<button class="icon-ellipsis" aria-label="Resolution menu">•••</button>
 						</div>
 
-						<div class="donut" aria-label="78 percent of issues resolved">
+						<div class="donut" id="donutVisual" aria-label="Resolution rate donut chart">
 							<div>
-								<strong>78%</strong>
+								<strong id="donutRateText">0%</strong>
 								<span>Resolved</span>
 							</div>
 						</div>
 
-						<p class="positive">↑ 6.4% <span>vs last month</span></p>
+						<p class="positive" id="donutTrendText">● <span>Live performance</span></p>
 
 						<div class="rate-summary">
-							<span><i></i> 8,240 resolved</span>
-							<span><i></i> 2,335 pending</span>
+							<span id="donutResolvedSummary"><i></i> 0 resolved</span>
+							<span id="donutPendingSummary"><i></i> 0 open</span>
 						</div>
 					</article>
 				</section>
@@ -497,7 +492,7 @@
 						<div class="summary-icon">📋</div>
 						<div class="summary-content">
 							<span>Total Issues</span>
-							<strong id="queueTotalCount">128</strong>
+							<strong id="queueTotalCount">0</strong>
 							<small>All reported issues</small>
 						</div>
 					</div>
@@ -506,7 +501,7 @@
 						<div class="summary-icon">◷</div>
 						<div class="summary-content">
 							<span>Pending</span>
-							<strong id="queuePendingCount">42</strong>
+							<strong id="queuePendingCount">0</strong>
 							<small>Awaiting action</small>
 						</div>
 					</div>
@@ -515,7 +510,7 @@
 						<div class="summary-icon">↻</div>
 						<div class="summary-content">
 							<span>In Progress</span>
-							<strong id="queueProgressCount">31</strong>
+							<strong id="queueProgressCount">0</strong>
 							<small>Under work</small>
 						</div>
 					</div>
@@ -524,7 +519,7 @@
 						<div class="summary-icon">✓</div>
 						<div class="summary-content">
 							<span>Resolved</span>
-							<strong id="queueResolvedCount">55</strong>
+							<strong id="queueResolvedCount">0</strong>
 							<small>Awaiting verification</small>
 						</div>
 					</div>
@@ -533,7 +528,7 @@
 						<div class="summary-icon">!</div>
 						<div class="summary-content">
 							<span>High Priority</span>
-							<strong id="queuePriorityCount">12</strong>
+							<strong id="queuePriorityCount">0</strong>
 							<small>Requires attention</small>
 						</div>
 					</div>
