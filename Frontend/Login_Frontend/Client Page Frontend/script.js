@@ -332,15 +332,63 @@
 	});
 
 	// =====================================================
-	// IMAGE ERROR HANDLING
+	// DYNAMIC RECENT COMPLAINTS & METRICS LOADER
 	// =====================================================
+	async function loadHomeComplaints() {
+		if (!window.CivicBuzzAPI) return;
+		try {
+			const res = await window.CivicBuzzAPI.public.listComplaints();
+			const complaints = res.data;
+			if (!complaints || !complaints.length) return;
 
-	const images = document.querySelectorAll("img");
-	images.forEach((image) => {
-		image.addEventListener("error", () => {
-			image.classList.add("image-load-error");
-		});
-	});
+			// Update Summary Counts
+			const totalEl = document.querySelector(".summary-card:nth-child(1) .summary-number");
+			const progEl = document.querySelector(".summary-card:nth-child(2) .summary-number");
+			const resEl = document.querySelector(".summary-card:nth-child(3) .summary-number");
+			const pendEl = document.querySelector(".summary-card:nth-child(4) .summary-number");
+
+			const total = complaints.length;
+			const prog = complaints.filter(c => ["IN_PROGRESS", "PROGRESS", "ASSIGNED"].includes(c.status)).length;
+			const resolved = complaints.filter(c => ["RESOLVED", "VERIFIED"].includes(c.status)).length;
+			const pending = complaints.filter(c => ["SUBMITTED", "PENDING"].includes(c.status)).length;
+
+			if (totalEl) totalEl.textContent = total;
+			if (progEl) progEl.textContent = prog;
+			if (resEl) resEl.textContent = resolved;
+			if (pendEl) pendEl.textContent = pending;
+
+			// Populate Recent Complaints Table
+			const tableBody = document.querySelector(".complaints-table tbody");
+			if (tableBody) {
+				tableBody.innerHTML = complaints.slice(0, 5).map(c => {
+					const cid = c.complaint_id || "CB-1024";
+					const statusClass = c.status === "RESOLVED" || c.status === "VERIFIED" ? "status-resolved" : (c.status === "IN_PROGRESS" ? "status-progress" : "status-pending");
+					const statusLabel = c.status === "READY_FOR_CITIZEN_VERIFICATION" ? "Ready for Verification" : (c.status || "Submitted").replace(/_/g, " ");
+					const dateStr = (c.created_at || "18 Aug 2026").slice(0, 10);
+					const loc = c.location?.ward_name || c.approximate_location || c.ward || "Janpath, Ward 12";
+
+					return `
+						<tr>
+							<td><strong>#${cid}</strong></td>
+							<td>${c.title}</td>
+							<td><span class="location-text">📍 ${loc}</span></td>
+							<td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+							<td>${dateStr}</td>
+							<td>
+								<button class="view-complaint-button" type="button" data-issue="${cid}" aria-label="View #${cid}" onclick="window.location.href='Track_complaints_Frontend/index.html'">
+									👁
+								</button>
+							</td>
+						</tr>
+					`;
+				}).join('');
+			}
+		} catch (err) {
+			console.warn("Home complaints load note:", err.message);
+		}
+	}
+
+	loadHomeComplaints();
 
 	console.log("CivicBuzz Client Dashboard loaded successfully.");
 

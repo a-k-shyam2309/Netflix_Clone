@@ -1357,17 +1357,35 @@ function setupIssueQueue() {
     if (pAss) pAss.textContent = issueData.dept || "Roads & Potholes Department";
     if (pDesc) pDesc.textContent = issueData.desc || "Reported civic issue awaiting verification and triage.";
 
+    // Populate AI Triage Audit Fields
+    const pAiSummary = $("#panelAiSummary");
+    const pAiUrgency = $("#panelAiUrgencyChip");
+    const pAiSla = $("#panelAiSla");
+    const pAiPbBadge = $("#panelAiPbBadge");
+
+    let matchDoc = null;
+    if (window.ComplaintStore?.getAll) {
+      const allComps = window.ComplaintStore.getAll();
+      matchDoc = allComps.find(c => (c.complaint_id || "").replace("#", "") === currentActiveIssueId);
+    }
+
+    if (pAiSummary) {
+      pAiSummary.textContent = matchDoc?.ai_summary || issueData.desc || "AI-standardized canonical summary for municipal dispatch.";
+    }
+    if (pAiUrgency) {
+      const score = matchDoc?.urgency_score || (issueData.priority === "Critical" ? 92 : 85);
+      pAiUrgency.textContent = `Urgency: ${score}/100`;
+    }
+    if (pAiSla) {
+      pAiSla.textContent = `⏱️ SLA: ${matchDoc?.sla_hours || 48}h Resolution Guarantee`;
+    }
+    if (pAiPbBadge) {
+      pAiPbBadge.style.display = matchDoc?.is_pb_candidate ? "inline-block" : "none";
+    }
+
     // Dynamic Image Evidence Rendering
     const imageContainer = $("#panelImageContainer");
-    let imageUrl = issueData.image_url || issueData.image || null;
-    
-    if (!imageUrl && window.ComplaintStore?.getAll) {
-      const allComps = window.ComplaintStore.getAll();
-      const match = allComps.find(c => (c.complaint_id || "").replace("#", "") === currentActiveIssueId);
-      if (match && match.image_url) {
-        imageUrl = match.image_url;
-      }
-    }
+    let imageUrl = issueData.image_url || issueData.image || (matchDoc ? matchDoc.image_url : null);
 
     if (imageContainer) {
       if (imageUrl) {

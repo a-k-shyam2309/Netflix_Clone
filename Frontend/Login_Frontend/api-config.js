@@ -224,15 +224,24 @@ const ComplaintStore = {
     const cleanCategory = (complaintData.category || "roads_potholes").toLowerCase().replace(/[^a-z_]/g, "");
     const deptName = categoryNames[cleanCategory] || "Municipal Administration";
 
+    const urgencyScore = complaintData.urgency_score || (complaintData.severity === "CRITICAL" ? 92 : 85);
+
     const newDoc = {
       complaint_id: id,
       title: complaintData.title || (complaintData.description ? complaintData.description.slice(0, 50) + (complaintData.description.length > 50 ? "…" : "") : "Citizen Reported Grievance"),
       description: complaintData.description || "",
+      ai_summary: complaintData.ai_summary || complaintData.description || "",
       category: cleanCategory,
-      sub_category: complaintData.sub_category || "general",
+      sub_category: complaintData.sub_category || "pothole",
       severity: complaintData.severity || "HIGH",
       priority_level: complaintData.priority_level || "HIGH",
-      priority: { level: complaintData.priority_level || "HIGH", score: 85 },
+      priority: { level: complaintData.priority_level || "HIGH", score: urgencyScore },
+      urgency_score: urgencyScore,
+      sla_hours: complaintData.sla_hours || 48,
+      is_pb_candidate: complaintData.is_pb_candidate || false,
+      language: complaintData.language || "en",
+      is_anonymous: complaintData.is_anonymous !== undefined ? complaintData.is_anonymous : true,
+      upvotes: 1,
       status: complaintData.status || "SUBMITTED",
       is_overdue: false,
       image_url: complaintData.image_url || complaintData.media_url || null,
@@ -248,10 +257,10 @@ const ComplaintStore = {
       user_uid: complaintData.user_uid || "CIT-1001",
       timeline: [
         {
-          step: "Reported by Citizen",
+          step: "Reported & AI Triaged",
           status: "SUBMITTED",
           timestamp: now,
-          notes: "Issue reported via citizen portal and automatically routed to AI triage."
+          notes: `Grievance registered. AI Urgency Score: ${urgencyScore}/100. Target SLA: ${complaintData.sla_hours || 48}h.`
         }
       ]
     };
@@ -259,6 +268,25 @@ const ComplaintStore = {
     list.unshift(newDoc);
     this.saveAll(list);
     return newDoc;
+  },
+
+  upvote(complaintId) {
+    const list = this.getAll();
+    const item = list.find((c) => c.complaint_id === complaintId || c.complaint_id === `#${complaintId}` || c.complaint_id?.replace("#", "") === complaintId?.replace("#", ""));
+    if (!item) return null;
+
+    item.upvotes = (item.upvotes || 1) + 1;
+    item.urgency_score = Math.min(100, (item.urgency_score || 80) + 3);
+    if (!item.timeline) item.timeline = [];
+    item.timeline.push({
+      step: `Community Upvote & Merge (+1)`,
+      status: item.status,
+      timestamp: new Date().toISOString(),
+      notes: `Citizen merged duplicate report and elevated urgency to ${item.urgency_score}/100.`
+    });
+
+    this.saveAll(list);
+    return item;
   },
 
   updateStatus(complaintId, newStatus, notes = "") {
@@ -1560,6 +1588,15 @@ const CivicBuzzAPI = {
         if (res && res.data) return res;
       } catch (_) {}
       return { data: localDoc, message: "Complaint created successfully." };
+    },
+    async upvote(complaintId) {
+      const updated = ComplaintStore.upvote(complaintId);
+      try {
+        await CivicBuzzAPI.request(`/complaints/${complaintId}/upvote`, {
+          method: "POST",
+        });
+      } catch (_) {}
+      return { data: updated, message: "Upvote recorded." };
     },
     async getMyComplaints() {
       try {
