@@ -388,11 +388,10 @@ export const LocationMapPicker = ({
           <button
             type="button"
             onClick={() => setMapMode('drop_pin')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              mapMode === 'drop_pin'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${mapMode === 'drop_pin'
                 ? 'bg-white text-emerald-700 shadow-xs border border-emerald-400/50'
                 : 'text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
             <span>Drop Pin Mode</span>
@@ -400,11 +399,10 @@ export const LocationMapPicker = ({
           <button
             type="button"
             onClick={() => setMapMode('pan_zoom')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              mapMode === 'pan_zoom'
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${mapMode === 'pan_zoom'
                 ? 'bg-white text-slate-900 shadow-xs border border-slate-300'
                 : 'text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             <Hand className="w-3.5 h-3.5" />
             <span>Pan / Zoom Map</span>
@@ -415,9 +413,8 @@ export const LocationMapPicker = ({
       {/* Interactive Google Map Canvas */}
       <div className="px-4">
         <div
-          className={`relative w-full h-[400px] sm:h-[460px] rounded-2xl overflow-hidden border-2 border-slate-300 shadow-inner group ${
-            mapMode === 'drop_pin' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'
-          }`}
+          className={`relative w-full h-[400px] sm:h-[460px] rounded-2xl overflow-hidden border-2 border-slate-300 shadow-inner group ${mapMode === 'drop_pin' ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'
+            }`}
         >
           {/* Leaflet Google Map Container */}
           <div ref={mapContainerRef} className="w-full h-full z-0" />
@@ -571,11 +568,10 @@ export const LocationMapPicker = ({
                 key={ward.name}
                 type="button"
                 onClick={() => handleSelectWardPreset(ward)}
-                className={`px-3 py-1.5 text-xs rounded-xl border transition-all cursor-pointer ${
-                  isSelected
+                className={`px-3 py-1.5 text-xs rounded-xl border transition-all cursor-pointer ${isSelected
                     ? 'bg-emerald-600 border-emerald-600 text-white font-bold shadow-md ring-2 ring-emerald-500/20'
                     : 'bg-white border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-400 font-medium'
-                }`}
+                  }`}
               >
                 {ward.name}
               </button>

@@ -1616,3 +1616,252 @@ body.dark-mode .leaflet-tile-pane {
   gap: 10px;
   margin-top: 8px;
 }
+
+/* =========================================================
+   GOOGLE MAPS ENHANCEMENTS & PINS
+   ========================================================= */
+
+.bhubaneswar-map-canvas {
+  background-color: #e5e3df !important;
+}
+
+.leaflet-container {
+  background-color: #e5e3df !important;
+  font-family: inherit;
+}
+
+/* Google Maps Bottom Attribution Bar */
+.google-attribution-bar {
+  position: absolute;
+  bottom: 0;
+  inset-x: 0;
+  z-index: 390;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 3px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: #475569;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  user-select: none;
+  pointer-events: auto;
+}
+
+body.dark-mode .google-attribution-bar {
+  background: rgba(15, 23, 42, 0.88);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.google-logo-text {
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+}
+
+.g-blue { color: #4285F4; }
+.g-red { color: #EA4335; }
+.g-yellow { color: #FBBC05; }
+.g-green { color: #34A853; }
+
+.google-terms-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 9.5px;
+  color: #64748b;
+}
+
+body.dark-mode .google-terms-links {
+  color: #94a3b8;
+}
+
+.terms-link {
+  cursor: pointer;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .terms-hide-sm { display: none; }
+}
+
+/* Google Maps Category Pins */
+.leaflet-custom-civic-pin {
+  background: transparent !important;
+  border: none !important;
+}
+
+.google-category-pin-wrapper {
+  position: relative;
+  width: 38px;
+  height: 46px;
+  cursor: pointer;
+  transform-origin: bottom center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.google-category-pin-wrapper:hover {
+  transform: scale(1.15) translateY(-4px);
+  z-index: 9999 !important;
+}
+
+.google-category-pin-wrapper.is-selected {
+  transform: scale(1.22) translateY(-6px);
+  z-index: 10000 !important;
+}
+
+/* Radar Pulse on Issue Markers */
+.pin-radar-pulse {
+  position: absolute;
+  left: 19px;
+  top: 44px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.pulse-ring-outer {
+  position: absolute;
+  left: -20px;
+  top: -20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  animation: radarWave 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.pulse-ring-inner {
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  opacity: 0.5;
+}
+
+@keyframes radarWave {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Category Glow Colors */
+.pin-glow-roads .pulse-ring-outer { background: rgba(234, 88, 12, 0.35); }
+.pin-glow-roads .pulse-ring-inner { background: rgba(234, 88, 12, 0.45); }
+.pin-glow-lighting .pulse-ring-outer { background: rgba(234, 179, 8, 0.35); }
+.pin-glow-lighting .pulse-ring-inner { background: rgba(234, 179, 8, 0.45); }
+.pin-glow-sanitation .pulse-ring-outer { background: rgba(16, 185, 129, 0.35); }
+.pin-glow-sanitation .pulse-ring-inner { background: rgba(16, 185, 129, 0.45); }
+.pin-glow-water .pulse-ring-outer { background: rgba(6, 182, 212, 0.35); }
+.pin-glow-water .pulse-ring-inner { background: rgba(6, 182, 212, 0.45); }
+.pin-glow-parks .pulse-ring-outer { background: rgba(132, 204, 22, 0.35); }
+.pin-glow-parks .pulse-ring-inner { background: rgba(132, 204, 22, 0.45); }
+.pin-glow-infra .pulse-ring-outer { background: rgba(139, 92, 246, 0.35); }
+.pin-glow-infra .pulse-ring-inner { background: rgba(139, 92, 246, 0.45); }
+.pin-glow-user .pulse-ring-outer { background: rgba(234, 67, 53, 0.45); }
+.pin-glow-user .pulse-ring-inner { background: rgba(234, 67, 53, 0.6); }
+
+/* Google Marker Pin SVG */
+.google-pin-svg-card {
+  width: 38px;
+  height: 46px;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.32));
+}
+
+/* User Submitted Marker Badge */
+.user-reported-tag {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ea4335;
+  color: #ffffff;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 6px rgba(234,67,53,0.4);
+  border: 1px solid #ffffff;
+}
+
+/* Popup styling matching Google Maps */
+.leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.25) !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  padding: 4px !important;
+}
+
+body.dark-mode .leaflet-popup-content-wrapper {
+  background: #102646 !important;
+  color: #f1f5f9 !important;
+  border-color: #1b3154 !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}
+
+body.dark-mode .leaflet-popup-tip {
+  background: #102646 !important;
+}
+
+.map-popup-card {
+  padding: 8px 10px 4px;
+}
+
+.popup-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.popup-title {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+
+.popup-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--secondary);
+  margin-bottom: 10px;
+}
+
+.popup-action-btn {
+  width: 100%;
+  padding: 8px 12px;
+  background: #246bfd;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.popup-action-btn:hover {
+  background: #1558df;
+}
+

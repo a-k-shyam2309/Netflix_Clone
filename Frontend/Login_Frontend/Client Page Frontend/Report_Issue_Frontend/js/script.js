@@ -56,6 +56,30 @@
       },
       image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80'
     },
+    pothole_hi: {
+      text: 'जनपथ रोड पर राम मंदिर के पास एक बड़ा 2 फीट गहरा गड्ढा है जिससे गाड़ियाँ टकरा रही हैं और बड़ा हादसा होने का खतरा है।',
+      lang: 'hi',
+      category: 'road',
+      sub_category: 'pothole',
+      severity: 'CRITICAL',
+      urgency: 92,
+      sla: '24-Hour Urgent Safety SLA',
+      dept: 'Roads & Potholes Dept.',
+      ward: 'Ward 12 Infrastructure Cell',
+      elements: ['Asphalt Defect', 'High Traffic Corridor', 'Immediate Collision Risk'],
+      auth: '98% Real Civic Defect',
+      conf: 98,
+      canonical: 'Deep 2-foot road crater on Janpath corridor creating immediate collision and pedestrian safety hazard.',
+      is_pb: true,
+      pb_text: 'Multiple road structural complaints filed in Ward 12. Flagged for Participatory Budget road rehabilitation proposal.',
+      dup_match: {
+        id: '#CB-0142',
+        title: 'Large pothole near college gate',
+        desc: 'Reported 3 hours ago · Ward 12 (Janpath)',
+        score: '91% Match Found'
+      },
+      image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80'
+    },
     garbage_en: {
       text: 'Community waste bins overflowing near Saheed Nagar market with foul odor and waste spilling across pedestrian walkways.',
       lang: 'en',
@@ -196,13 +220,9 @@
   // --- Language Detection & Heuristic AI Triage Parser ---
   function detectLanguage(text) {
     if (!text) return 'en';
-    // Hindi / Devanagari Unicode range
     if (/[\u0900-\u097F]/.test(text)) return 'hi';
-    // Odia Unicode range
     if (/[\u0B00-\u0B7F]/.test(text)) return 'or';
-    // Bengali Unicode range
     if (/[\u0980-\u09FF]/.test(text)) return 'bn';
-    // Tamil Unicode range
     if (/[\u0B80-\u0BFF]/.test(text)) return 'ta';
     return 'en';
   }

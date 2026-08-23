@@ -5,6 +5,11 @@
 *.env
 backend/.env
 frontend/.env
+.venv/
+backend/.venv/
+venv/
+env/
+.venv*
 
 # Python
 __pycache__/
@@ -12,7 +17,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
+
 build/
 develop-eggs/
 dist/

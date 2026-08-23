@@ -280,15 +280,11 @@
           
           <!-- Base Map Layer Switcher -->
           <div class="map-control-group glass-panel">
-            <button class="map-btn active" id="btnLayerStreet" type="button" title="Standard Street Map View">
+            <button class="map-btn active" id="btnLayerStreet" type="button" title="Standard Google Street Map View">
               <i class="fa-solid fa-map"></i>
               <span class="tooltip">Street View</span>
             </button>
-            <button class="map-btn" id="btnLayerDark" type="button" title="Dark Matter High-Contrast View">
-              <i class="fa-solid fa-moon"></i>
-              <span class="tooltip">Dark Mode</span>
-            </button>
-            <button class="map-btn" id="btnLayerSatellite" type="button" title="Satellite Imagery View">
+            <button class="map-btn" id="btnLayerSatellite" type="button" title="Google Satellite Imagery View">
               <i class="fa-solid fa-satellite"></i>
               <span class="tooltip">Satellite</span>
             </button>
@@ -324,13 +320,6 @@
 
         </div>
 
-        <!-- PIN DROP HELPER BANNER (Appears when drop pin mode is active) -->
-        <div class="pin-drop-banner" id="pinDropBanner" hidden>
-          <i class="fa-solid fa-hand-pointer"></i>
-          <span><strong>Pin Drop Active:</strong> Click anywhere on the Bhubaneswar map to report a civic issue at that exact spot.</span>
-          <button class="banner-close-btn" id="cancelPinDrop" type="button">Cancel</button>
-        </div>
-
         <!-- MAP LEGEND -->
         <div class="map-legend glass-panel">
           <div class="legend-header">
@@ -346,6 +335,19 @@
             <div class="legend-item"><span class="legend-color legend-water"></span> <span>Water & Drainage</span></div>
             <div class="legend-item"><span class="legend-color legend-parks"></span> <span>Parks & Greenery</span></div>
             <div class="legend-item"><span class="legend-color legend-infra"></span> <span>Encroachment</span></div>
+          </div>
+        </div>
+
+        <!-- Google Maps Bottom Attribution Footer Bar -->
+        <div class="google-attribution-bar">
+          <div class="google-logo-text">
+            <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
+          </div>
+          <div class="google-terms-links">
+            <span class="terms-hide-sm">Keyboard shortcuts</span>
+            <span>Map data &copy;2026</span>
+            <span class="terms-link">Terms</span>
+            <span class="terms-link">Report a map error</span>
           </div>
         </div>
 
