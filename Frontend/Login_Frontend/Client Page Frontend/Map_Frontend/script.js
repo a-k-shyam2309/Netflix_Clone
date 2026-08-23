@@ -1,5 +1,5 @@
 /* =========================================================
-   CIVICBUZZ - BHUBANESWAR LIVE CIVIC MAP DASHBOARD
+   CIVICBUZZ - BHUBANESWAR LIVE CIVIC GOOGLE MAPS DASHBOARD
    SCRIPT.JS
    ========================================================= */
 
@@ -7,8 +7,7 @@
   "use strict";
 
   /* =========================================================
-     1. MODULAR CITY GEOSPATIAL CONFIGURATION
-     (Easily adaptable for other cities in the future)
+     1. BHUBANESWAR GEOSPATIAL CONFIGURATION
      ========================================================= */
   const CITY_CONFIG = {
     activeCityKey: "bhubaneswar",
@@ -21,10 +20,10 @@
         center: [20.2961, 85.8245],
         defaultZoom: 13,
         minZoom: 11,
-        maxZoom: 19,
+        maxZoom: 20,
         bounds: [
-          [20.1800, 85.7000], // Southwest
-          [20.4100, 85.9300]  // Northeast
+          [20.1800, 85.7000],
+          [20.4100, 85.9300]
         ],
         wards: [
           { id: 1, name: "Patia & KIIT Area", zone: "North", center: [20.3553, 85.8189], radius: 1200 },
@@ -77,41 +76,59 @@
   // Upvote local cache
   const upvotedIssues = new Set(JSON.parse(localStorage.getItem("civicbuzz_upvotes") || "[]"));
 
-  /* Category Icons & Color Mapping */
+  /* Category Icons, Colors & Google Pin Configurations */
   const categoryConfig = {
-    ROADS: { label: "Roads & Potholes", icon: "fa-solid fa-road", class: "category-roads", color: "#ea580c", tagClass: "tag-roads" },
-    LIGHTING: { label: "Street Lighting", icon: "fa-solid fa-lightbulb", class: "category-lighting", color: "#eab308", tagClass: "tag-lighting" },
-    SANITATION: { label: "Waste & Sanitation", icon: "fa-solid fa-trash-can", class: "category-sanitation", color: "#10b981", tagClass: "tag-sanitation" },
-    WATER: { label: "Water & Drainage", icon: "fa-solid fa-faucet-drip", class: "category-water", color: "#06b6d4", tagClass: "tag-water" },
-    PARKS: { label: "Parks & Trees", icon: "fa-solid fa-tree", class: "category-parks", color: "#84cc16", tagClass: "tag-parks" },
-    INFRASTRUCTURE: { label: "Encroachment", icon: "fa-solid fa-building-shield", class: "category-infra", color: "#8b5cf6", tagClass: "tag-infra" }
+    ROADS: { label: "Roads & Potholes", icon: "fa-solid fa-road", class: "category-roads", color: "#EA580C", glowClass: "pin-glow-roads", tagClass: "tag-roads" },
+    LIGHTING: { label: "Street Lighting", icon: "fa-solid fa-lightbulb", class: "category-lighting", color: "#EAB308", glowClass: "pin-glow-lighting", tagClass: "tag-lighting" },
+    SANITATION: { label: "Waste & Sanitation", icon: "fa-solid fa-trash-can", class: "category-sanitation", color: "#10B981", glowClass: "pin-glow-sanitation", tagClass: "tag-sanitation" },
+    WATER: { label: "Water & Drainage", icon: "fa-solid fa-faucet-drip", class: "category-water", color: "#06B6D4", glowClass: "pin-glow-water", tagClass: "tag-water" },
+    PARKS: { label: "Parks & Trees", icon: "fa-solid fa-tree", class: "category-parks", color: "#84CC16", glowClass: "pin-glow-parks", tagClass: "tag-parks" },
+    INFRASTRUCTURE: { label: "Encroachment", icon: "fa-solid fa-building-shield", class: "category-infra", color: "#8B5CF6", glowClass: "pin-glow-infra", tagClass: "tag-infra" }
   };
 
+  // Normalize Category string
+  function normalizeCategory(raw) {
+    if (!raw) return "ROADS";
+    const u = String(raw).toUpperCase();
+    if (u.includes("ROAD") || u.includes("POTHOLE")) return "ROADS";
+    if (u.includes("LIGHT") || u.includes("ELECTRIC") || u.includes("LAMP")) return "LIGHTING";
+    if (u.includes("SANIT") || u.includes("GARBAGE") || u.includes("WASTE") || u.includes("DUMP") || u.includes("CLEAN")) return "SANITATION";
+    if (u.includes("WATER") || u.includes("DRAIN") || u.includes("SEW") || u.includes("PIPE") || u.includes("FLOOD")) return "WATER";
+    if (u.includes("PARK") || u.includes("TREE") || u.includes("GARDEN") || u.includes("FOREST")) return "PARKS";
+    if (u.includes("ENCROACH") || u.includes("INFRA") || u.includes("BUILD") || u.includes("ILLEGAL")) return "INFRASTRUCTURE";
+    return "ROADS";
+  }
+
   /* =========================================================
-     3. MAP INITIALIZATION & BASE TILES
+     3. MAP INITIALIZATION & GOOGLE MAPS TILES
      ========================================================= */
   function initMap() {
     const mapElement = document.getElementById("bhubaneswarMap");
-    if (!mapElement) return;
+    if (!mapElement || !window.L) return;
 
-    // Initialize Leaflet
+    // Initialize Leaflet Map
     map = L.map("bhubaneswarMap", {
       center: currentCity.center,
       zoom: currentCity.defaultZoom,
       minZoom: currentCity.minZoom,
       maxZoom: currentCity.maxZoom,
-      zoomControl: false, // Customized controls
+      zoomControl: false,
       attributionControl: false
     });
 
-    // Attribution control in bottom right
-    L.control.attribution({ position: "bottomright", prefix: "CivicBuzz GIS • Bhubaneswar" }).addTo(map);
-    L.control.zoom({ position: "bottomright" }).addTo(map);
+    // Custom Google Maps Tile Layers
+    tileLayers.street = L.tileLayer("https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20,
+      detectRetina: true,
+      attribution: "Map data &copy; Google"
+    });
 
-    // Tile Layers
-    tileLayers.street = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-      subdomains: "abcd",
-      maxZoom: 19
+    tileLayers.satellite = L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20,
+      detectRetina: true,
+      attribution: "Imagery &copy; Google"
     });
 
     tileLayers.dark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
@@ -119,13 +136,8 @@
       maxZoom: 19
     });
 
-    tileLayers.satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 19
-    });
-
-    // Detect initial theme
-    const isDark = document.documentElement.classList.contains("dark-mode") || document.body.classList.contains("dark-mode");
-    currentTileLayerKey = isDark ? "dark" : "street";
+    // Default to Google Street Roadmap
+    currentTileLayerKey = "street";
     tileLayers[currentTileLayerKey].addTo(map);
 
     // Layer groups for markers & wards
@@ -135,13 +147,16 @@
     // Render municipal ward overlay boundaries
     renderWardBoundaries();
 
-    // Map click listeners
+    // Map click listener for Pin Drop mode
     map.on("click", handleMapClick);
 
-    // Re-adjust size after loading
+    // Initial complaints load & live sync setup
+    loadComplaintsData();
+    setupLiveStorageSync();
+
     setTimeout(() => {
       map.invalidateSize();
-    }, 200);
+    }, 250);
   }
 
   /* Switch Base Map Tile Layer */
@@ -170,21 +185,19 @@
     currentCity.wards.forEach((ward) => {
       const circle = L.circle(ward.center, {
         radius: ward.radius,
-        color: "#246bfd",
+        color: "#EA4335",
         weight: 1.5,
-        opacity: 0.6,
-        fillColor: "#246bfd",
-        fillOpacity: 0.05,
-        dashArray: "4, 6"
+        opacity: 0.5,
+        fillColor: "#EA4335",
+        fillOpacity: 0.03,
+        dashArray: "5, 6"
       });
 
-      // Ward tooltip on hover
       circle.bindTooltip(`<strong>Ward ${ward.id}:</strong> ${ward.name} (${ward.zone} Zone)`, {
         direction: "top",
         className: "ward-map-tooltip"
       });
 
-      // Filter on click
       circle.on("click", (e) => {
         L.DomEvent.stopPropagation(e);
         const wardSelect = document.getElementById("wardSelect");
@@ -200,26 +213,76 @@
   }
 
   /* =========================================================
-     4. DATA FETCHING (Complaints & Wards)
+     4. DATA FETCHING & LIVE SYNC
      ========================================================= */
   async function loadComplaintsData() {
+    let complaintsList = [];
+
+    // 1. Fetch from backend API if available
     try {
-      if (window.CivicBuzzAPI) {
-        const res = await window.CivicBuzzAPI.complaints.getNearby(currentCity.center[0], currentCity.center[1], 15000);
+      if (window.CivicBuzzAPI && window.CivicBuzzAPI.complaints) {
+        const res = await window.CivicBuzzAPI.complaints.getNearby(currentCity.center[0], currentCity.center[1], 20000);
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-          allComplaints = res.data;
-        } else {
-          allComplaints = getFallbackComplaints();
+          complaintsList = res.data;
         }
-      } else {
-        allComplaints = getFallbackComplaints();
       }
     } catch (err) {
-      console.warn("CivicBuzz map data load note:", err.message);
-      allComplaints = getFallbackComplaints();
+      console.warn("API complaints fetch note:", err.message);
     }
 
+    // 2. If API was empty, use realistic pre-seeded Bhubaneswar complaints
+    if (complaintsList.length === 0) {
+      complaintsList = getFallbackComplaints();
+    }
+
+    // 3. Merge locally registered complaints from localStorage (submitted by user)
+    try {
+      const localStored = JSON.parse(localStorage.getItem("civicbuzz_registered_complaints") || "[]");
+      if (Array.isArray(localStored) && localStored.length > 0) {
+        // Prepend user-registered issues without duplicate IDs
+        const existingIds = new Set(complaintsList.map(c => c.complaint_id));
+        localStored.forEach(item => {
+          if (!existingIds.has(item.complaint_id)) {
+            complaintsList.unshift(item);
+            existingIds.add(item.complaint_id);
+          }
+        });
+      }
+    } catch (err) {
+      console.warn("Local storage parse note:", err);
+    }
+
+    // Normalize categories on all records
+    allComplaints = complaintsList.map(c => ({
+      ...c,
+      category: normalizeCategory(c.category)
+    }));
+
     applyFiltersAndRender();
+  }
+
+  /* Cross-tab and in-page live sync listener */
+  function setupLiveStorageSync() {
+    window.addEventListener("storage", (e) => {
+      if (e.key === "civicbuzz_registered_complaints") {
+        loadComplaintsData();
+      }
+    });
+
+    window.addEventListener("civicbuzz:complaint_created", (e) => {
+      if (e.detail) {
+        const newComplaint = {
+          ...e.detail,
+          category: normalizeCategory(e.detail.category)
+        };
+        const exists = allComplaints.some(c => c.complaint_id === newComplaint.complaint_id);
+        if (!exists) {
+          allComplaints.unshift(newComplaint);
+          applyFiltersAndRender();
+          selectIssue(newComplaint.complaint_id, true);
+        }
+      }
+    });
   }
 
   function getFallbackComplaints() {
@@ -440,16 +503,16 @@
       return true;
     });
 
-    // Update Category Counts
+    // Update Category Counts in sidebar chips
     updateCategoryPillCounts();
 
     // Update Statistics HUD
     updateStatisticsHUD();
 
-    // Render Markers on Map
+    // Render Markers on Google Map Canvas
     renderMapMarkers();
 
-    // Render Cards in Sidebar
+    // Render Cards in Sidebar Feed
     renderSidebarIssueCards();
   }
 
@@ -457,18 +520,27 @@
   function updateCategoryPillCounts() {
     const counts = { ALL: allComplaints.length, ROADS: 0, LIGHTING: 0, SANITATION: 0, WATER: 0, PARKS: 0, INFRASTRUCTURE: 0 };
     allComplaints.forEach((c) => {
-      if (counts[c.category] !== undefined) {
-        counts[c.category]++;
+      const cat = c.category || "ROADS";
+      if (counts[cat] !== undefined) {
+        counts[cat]++;
       }
     });
 
-    document.getElementById("countCatAll").textContent = counts.ALL;
-    document.getElementById("countCatRoads").textContent = counts.ROADS;
-    document.getElementById("countCatLighting").textContent = counts.LIGHTING;
-    document.getElementById("countCatSanitation").textContent = counts.SANITATION;
-    document.getElementById("countCatWater").textContent = counts.WATER;
-    document.getElementById("countCatParks").textContent = counts.PARKS;
-    document.getElementById("countCatInfra").textContent = counts.INFRASTRUCTURE;
+    const elAll = document.getElementById("countCatAll");
+    const elRoads = document.getElementById("countCatRoads");
+    const elLighting = document.getElementById("countCatLighting");
+    const elSanitation = document.getElementById("countCatSanitation");
+    const elWater = document.getElementById("countCatWater");
+    const elParks = document.getElementById("countCatParks");
+    const elInfra = document.getElementById("countCatInfra");
+
+    if (elAll) elAll.textContent = counts.ALL;
+    if (elRoads) elRoads.textContent = counts.ROADS;
+    if (elLighting) elLighting.textContent = counts.LIGHTING;
+    if (elSanitation) elSanitation.textContent = counts.SANITATION;
+    if (elWater) elWater.textContent = counts.WATER;
+    if (elParks) elParks.textContent = counts.PARKS;
+    if (elInfra) elInfra.textContent = counts.INFRASTRUCTURE;
   }
 
   /* Update Statistics HUD */
@@ -483,10 +555,10 @@
     const elProg = document.getElementById("statInProgress");
     const elRes = document.getElementById("statResolved");
 
-    if (elActive) elActive.textContent = activeHotspots || 24;
-    if (elCrit) elCrit.textContent = criticalCount || 7;
-    if (elProg) elProg.textContent = inProgressCount || 11;
-    if (elRes) elRes.textContent = resolvedCount ? (resolvedCount + 40) : 48;
+    if (elActive) elActive.textContent = activeHotspots || 8;
+    if (elCrit) elCrit.textContent = criticalCount || 3;
+    if (elProg) elProg.textContent = inProgressCount || 4;
+    if (elRes) elRes.textContent = (resolvedCount || 2) + 40;
 
     const feedCountBadge = document.getElementById("feedCountBadge");
     if (feedCountBadge) feedCountBadge.textContent = filteredComplaints.length;
@@ -496,28 +568,53 @@
   }
 
   /* =========================================================
-     6. RENDER MAP MARKERS & POPUPS
+     6. RENDER GOOGLE MAPS PINS & POPUPS
      ========================================================= */
   function renderMapMarkers() {
     if (!hotspotMarkersGroup) return;
     hotspotMarkersGroup.clearLayers();
 
     filteredComplaints.forEach((item) => {
-      const lat = item.location ? item.location.latitude : null;
-      const lng = item.location ? item.location.longitude : null;
+      const lat = item.location ? (item.location.latitude || item.location.lat) : null;
+      const lng = item.location ? (item.location.longitude || item.location.lng) : null;
       if (!lat || !lng) return;
 
       const catConf = categoryConfig[item.category] || categoryConfig.ROADS;
       const isCriticalOrHigh = item.priority === "CRITICAL" || item.priority === "HIGH";
       const isSelected = item.complaint_id === selectedComplaintId;
+      const isUserReported = item.is_user_submitted;
 
-      // Custom DivIcon HTML
-      const beaconClass = item.priority === "CRITICAL" ? "pin-beacon beacon-critical" : (item.priority === "HIGH" ? "pin-beacon beacon-high" : "");
+      const pinColor = isUserReported ? "#EA4335" : catConf.color;
+      const glowClass = isUserReported ? "pin-glow-user" : catConf.glowClass;
+
+      // Google Teardrop Pin with Inner White Circle & Icon
       const iconHtml = `
-        <div class="civic-map-marker ${isSelected ? "is-selected" : ""}" data-id="${item.complaint_id}">
-          ${isCriticalOrHigh && item.status !== "RESOLVED" ? `<div class="${beaconClass}"></div>` : ""}
-          <div class="pin-bubble ${catConf.class}">
-            <i class="${catConf.icon}"></i>
+        <div class="google-category-pin-wrapper ${isSelected ? "is-selected" : ""}" data-id="${item.complaint_id}">
+          ${isUserReported ? '<span class="user-reported-tag">YOUR REPORT</span>' : ''}
+          
+          <!-- Concentric Radar Wave around Pin Contact Point -->
+          ${isCriticalOrHigh && item.status !== "RESOLVED" ? `
+            <div class="pin-radar-pulse ${glowClass}">
+              <div class="pulse-ring-outer"></div>
+              <div class="pulse-ring-inner"></div>
+            </div>
+          ` : ""}
+
+          <!-- Google Maps Teardrop Marker SVG with Category Icon -->
+          <div class="google-pin-svg-card" style="position: relative; width: 38px; height: 46px;">
+            <svg width="38" height="46" viewBox="0 0 38 46" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+              <!-- Ground Shadow Base -->
+              <ellipse cx="19" cy="44.5" rx="7" ry="2.2" fill="rgba(0,0,0,0.3)" />
+              <!-- Red/Colored Pin Teardrop Body -->
+              <path d="M19 0C8.5 0 0 8.5 0 19C0 31 16.5 43.5 18.2 44.8C18.6 45.1 19.4 45.1 19.8 44.8C21.5 43.5 38 31 38 19C38 8.5 29.5 0 19 0Z" fill="${pinColor}"/>
+              <path d="M19 0.5C8.8 0.5 0.5 8.8 0.5 19C0.5 30.8 16.8 43.2 18.5 44.5C18.8 44.7 19.2 44.7 19.5 44.5C21.2 43.2 37.5 30.8 37.5 19C37.5 8.8 29.2 0.5 19 0.5Z" stroke="rgba(0,0,0,0.18)" stroke-width="1"/>
+              <!-- Inner White Circle Base -->
+              <circle cx="19" cy="18" r="9" fill="#FFFFFF"/>
+            </svg>
+            <!-- Category Icon Centered Inside the Pin Circle -->
+            <div style="position: absolute; top: 8px; left: 9px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; color: ${pinColor}; font-size: 11px;">
+              <i class="${catConf.icon}"></i>
+            </div>
           </div>
         </div>
       `;
@@ -525,14 +622,14 @@
       const customIcon = L.divIcon({
         html: iconHtml,
         className: "leaflet-custom-civic-pin",
-        iconSize: [38, 38],
-        iconAnchor: [19, 19],
-        popupAnchor: [0, -16]
+        iconSize: [38, 46],
+        iconAnchor: [19, 46], // Bottom center needle anchor
+        popupAnchor: [0, -42]
       });
 
       const marker = L.marker([lat, lng], { icon: customIcon });
 
-      // Custom popup HTML
+      // Custom Google Maps Popup HTML
       const popupContent = `
         <div class="map-popup-card">
           <div class="popup-topline">
@@ -541,11 +638,12 @@
           </div>
           <strong class="popup-title">${escapeHtml(item.title)}</strong>
           <div class="popup-location">
-            <i class="fa-solid fa-location-dot"></i>
-            <span>${escapeHtml(item.approximate_location || item.ward_name || "Bhubaneswar")}</span>
+            <i class="fa-solid fa-location-dot" style="color: #ea4335;"></i>
+            <span>${escapeHtml(item.approximate_location || item.ward_name || "Bhubaneswar, Odisha")}</span>
           </div>
           <button class="popup-action-btn" onclick="window.CivicBuzzMap.openIssueDrawer('${item.complaint_id}')">
-            View Grievance Details &rarr;
+            <span>View Grievance Details</span>
+            <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
       `;
@@ -572,7 +670,7 @@
         <div class="feed-empty-state">
           <i class="fa-solid fa-map-location-dot" style="font-size: 32px; color: var(--muted);"></i>
           <strong>No matching civic issues found</strong>
-          <span>Try adjusting your filters or searching for a different ward or landmark in Bhubaneswar.</span>
+          <span>Try adjusting your category filter or searching for a different ward in Bhubaneswar.</span>
         </div>
       `;
       return;
@@ -592,14 +690,14 @@
               <span class="category-tag ${catConf.tagClass}">${catConf.label}</span>
               <span class="priority-tag ${prioClass}">${item.priority || "NORMAL"}</span>
             </div>
-            <span class="card-distance">${item.distance_meters ? item.distance_meters + 'm away' : '# ' + item.complaint_id}</span>
+            <span class="card-distance">${item.distance_meters ? item.distance_meters + 'm away' : '#' + item.complaint_id}</span>
           </div>
 
           <h3 class="card-title">${escapeHtml(item.title)}</h3>
 
           <div class="card-meta">
             <div class="card-location">
-              <i class="fa-solid fa-location-dot" style="color: var(--blue);"></i>
+              <i class="fa-solid fa-location-dot" style="color: #ea4335;"></i>
               <span>${escapeHtml(item.approximate_location || item.ward_name || "Bhubaneswar")}</span>
             </div>
             <div class="card-status-pill ${statusClass}">
@@ -618,15 +716,6 @@
         selectIssue(id, true);
         openIssueDrawer(id);
       });
-
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          const id = card.getAttribute("data-id");
-          selectIssue(id, true);
-          openIssueDrawer(id);
-        }
-      });
     });
   }
 
@@ -634,7 +723,7 @@
   function selectIssue(complaintId, flyTo = true) {
     selectedComplaintId = complaintId;
 
-    // Highlight card
+    // Highlight card in sidebar
     document.querySelectorAll(".issue-card").forEach((card) => {
       card.classList.toggle("active-selected", card.getAttribute("data-id") === complaintId);
     });
@@ -642,8 +731,11 @@
     const item = allComplaints.find((c) => c.complaint_id === complaintId);
     if (!item) return;
 
-    if (flyTo && map && item.location) {
-      map.flyTo([item.location.latitude, item.location.longitude], 16, {
+    const lat = item.location ? (item.location.latitude || item.location.lat) : null;
+    const lng = item.location ? (item.location.longitude || item.location.lng) : null;
+
+    if (flyTo && map && lat && lng) {
+      map.flyTo([lat, lng], 16, {
         duration: 1.2
       });
     }
@@ -664,7 +756,6 @@
 
     const catConf = categoryConfig[item.category] || categoryConfig.ROADS;
 
-    // Populate drawer elements
     document.getElementById("drawerCategoryBadge").textContent = catConf.label.toUpperCase();
     document.getElementById("drawerCategoryBadge").className = `category-pill ${catConf.class}`;
 
@@ -689,8 +780,8 @@
     document.getElementById("drawerLocation").textContent = item.approximate_location || "Bhubaneswar";
     document.getElementById("drawerWard").textContent = (item.ward_name || "Ward 1") + " • Bhubaneswar Municipal Corp";
 
-    const lat = item.location ? item.location.latitude.toFixed(4) : "20.2961";
-    const lng = item.location ? item.location.longitude.toFixed(4) : "85.8245";
+    const lat = item.location ? Number(item.location.latitude || item.location.lat).toFixed(4) : "20.2961";
+    const lng = item.location ? Number(item.location.longitude || item.location.lng).toFixed(4) : "85.8245";
     document.getElementById("drawerCoords").textContent = `${lat}° N, ${lng}° E`;
 
     // Department & Time
@@ -716,7 +807,7 @@
     // Directions link
     const directionsBtn = document.getElementById("btnGetDirections");
     if (directionsBtn && item.location) {
-      directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${item.location.latitude},${item.location.longitude}`;
+      directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
     }
 
     // Share button
@@ -734,7 +825,6 @@
       };
     }
 
-    // Show drawer
     backdrop.classList.add("is-visible");
     drawer.classList.add("is-open");
     drawer.setAttribute("aria-hidden", "false");
@@ -754,7 +844,7 @@
     const trackerContainer = document.getElementById("drawerTracker");
     if (!trackerContainer) return;
 
-    let stepIndex = 1; // 1 = reported, 2 = verified, 3 = in progress, 4 = resolved
+    let stepIndex = 1;
     if (status === "IN_PROGRESS") stepIndex = 3;
     if (status === "RESOLVED") stepIndex = 4;
 
@@ -809,16 +899,13 @@
      ========================================================= */
   function togglePinDropMode() {
     isPinDropModeActive = !isPinDropModeActive;
-    const banner = document.getElementById("pinDropBanner");
     const btn = document.getElementById("btnDropPinMode");
 
     if (isPinDropModeActive) {
-      if (banner) banner.hidden = false;
       if (btn) btn.classList.add("active");
       if (map) map.getContainer().style.cursor = "crosshair";
-      showToast("Click anywhere on the map to pinpoint an issue location.");
+      showToast("Pin Drop Mode active: Click anywhere on the map to pinpoint an issue.");
     } else {
-      if (banner) banner.hidden = true;
       if (btn) btn.classList.remove("active");
       if (map) map.getContainer().style.cursor = "";
       if (tempDropPinMarker && map) {
@@ -834,27 +921,32 @@
     const lat = e.latlng.lat;
     const lng = e.latlng.lng;
 
-    // Place temporary animated marker
+    // Place temporary animated Google Red Pin marker
     if (tempDropPinMarker && map) {
       map.removeLayer(tempDropPinMarker);
     }
 
     tempDropPinMarker = L.marker([lat, lng], {
       icon: L.divIcon({
-        className: "temp-drop-pin",
-        html: `<div style="font-size: 24px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));">📍</div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30]
+        className: "google-maps-custom-pin-wrapper",
+        html: `
+          <div style="position: relative; width: 36px; height: 48px; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.4));">
+            <svg width="36" height="48" viewBox="0 0 36 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="18" cy="46.5" rx="6" ry="2.2" fill="rgba(0,0,0,0.3)"/>
+              <path d="M18 0C8.06 0 0 8.06 0 18C0 29.5 15.8 45.2 17.2 46.5C17.6 46.9 18.4 46.9 18.8 46.5C20.2 45.2 36 29.5 36 18C36 8.06 27.94 0 18 0Z" fill="#EA4335"/>
+              <path d="M18 0.5C8.33 0.5 0.5 8.33 0.5 18C0.5 29.3 16.0 44.8 17.5 46.2C17.8 46.4 18.2 46.4 18.5 46.2C20.0 44.8 35.5 29.3 35.5 18C35.5 8.33 27.67 0.5 18 0.5Z" stroke="#B31412" stroke-width="1"/>
+              <circle cx="18" cy="17" r="7" fill="#FFFFFF"/>
+              <circle cx="18" cy="17" r="4" fill="#EA4335"/>
+            </svg>
+          </div>
+        `,
+        iconSize: [36, 48],
+        iconAnchor: [18, 48]
       })
     }).addTo(map);
 
-    // Resolve closest ward in Bhubaneswar
     const closestWard = findClosestWard(lat, lng);
-
-    // Open Quick Report Modal with pre-filled coordinates
     openQuickReportModal(lat, lng, closestWard);
-
-    // Turn off pin drop mode
     togglePinDropMode();
   }
 
@@ -902,7 +994,7 @@
     e.preventDefault();
 
     const form = document.getElementById("quickReportForm");
-    const category = form.category.value;
+    const category = normalizeCategory(form.category.value);
     const title = form.title.value.trim();
     const description = form.description.value.trim();
     const ward = form.ward.value;
@@ -936,8 +1028,19 @@
       approximate_location: `${ward}, Bhubaneswar`,
       location: { latitude: lat, longitude: lng },
       created_at: new Date().toISOString(),
-      upvotes: 1
+      upvotes: 1,
+      is_user_submitted: true
     };
+
+    // Save to localStorage for instant cross-tab & page sync
+    try {
+      const stored = JSON.parse(localStorage.getItem("civicbuzz_registered_complaints") || "[]");
+      stored.unshift(newComplaint);
+      localStorage.setItem("civicbuzz_registered_complaints", JSON.stringify(stored));
+      window.dispatchEvent(new CustomEvent("civicbuzz:complaint_created", { detail: newComplaint }));
+    } catch (err) {
+      console.warn("Storage save note:", err);
+    }
 
     if (window.CivicBuzzAPI) {
       try {
@@ -965,7 +1068,7 @@
 
     form.reset();
     closeQuickReportModal();
-    showToast(`Grievance #${newComplaint.complaint_id} reported successfully in ${ward}!`);
+    showToast(`Grievance #${newComplaint.complaint_id} reported and pinned on map in ${ward}!`);
 
     // Pan map to new pin
     selectIssue(newComplaint.complaint_id, true);
@@ -994,8 +1097,8 @@
 
           userLocationCircle = L.circle([lat, lng], {
             radius: accuracy,
-            color: "#246bfd",
-            fillColor: "#246bfd",
+            color: "#4285F4",
+            fillColor: "#4285F4",
             fillOpacity: 0.15,
             weight: 1
           }).addTo(map);
@@ -1003,13 +1106,13 @@
           userLocationMarker = L.circleMarker([lat, lng], {
             radius: 8,
             color: "#ffffff",
-            fillColor: "#246bfd",
+            fillColor: "#4285F4",
             fillOpacity: 1,
             weight: 3
           }).addTo(map).bindPopup("<strong>You are here</strong>").openPopup();
 
           map.flyTo([lat, lng], 15, { duration: 1.2 });
-          showToast("Centered on your current location.");
+          showToast("Centered on your current GPS location.");
         }
       },
       (err) => {
@@ -1099,12 +1202,16 @@
       });
     }
 
-    // Dropdowns
+    // Advanced Select Filters
     const wardSelect = document.getElementById("wardSelect");
     if (wardSelect) {
       wardSelect.addEventListener("change", () => {
         filters.ward = wardSelect.value;
         applyFiltersAndRender();
+        if (filters.ward !== "ALL") {
+          const w = currentCity.wards.find((x) => String(x.id) === String(filters.ward));
+          if (w && map) map.flyTo(w.center, 15);
+        }
       });
     }
 
@@ -1124,91 +1231,85 @@
       });
     }
 
-    // Header buttons
-    document.getElementById("openReportSpotModal")?.addEventListener("click", () => openQuickReportModal());
+    // Base Tile Layer Switchers
+    document.getElementById("btnLayerStreet")?.addEventListener("click", () => setBaseTileLayer("street"));
+    document.getElementById("btnLayerSatellite")?.addEventListener("click", () => setBaseTileLayer("satellite"));
+
+    // Overlays toggle
+    const btnToggleWards = document.getElementById("btnToggleWards");
+    if (btnToggleWards) {
+      btnToggleWards.addEventListener("click", () => {
+        if (!map || !wardLayersGroup) return;
+        if (map.hasLayer(wardLayersGroup)) {
+          map.removeLayer(wardLayersGroup);
+          btnToggleWards.classList.remove("active");
+        } else {
+          map.addLayer(wardLayersGroup);
+          btnToggleWards.classList.add("active");
+        }
+      });
+    }
+
+    const btnToggleHotspots = document.getElementById("btnToggleHotspots");
+    if (btnToggleHotspots) {
+      btnToggleHotspots.addEventListener("click", () => {
+        if (!map || !hotspotMarkersGroup) return;
+        if (map.hasLayer(hotspotMarkersGroup)) {
+          map.removeLayer(hotspotMarkersGroup);
+          btnToggleHotspots.classList.remove("active");
+        } else {
+          map.addLayer(hotspotMarkersGroup);
+          btnToggleHotspots.classList.add("active");
+        }
+      });
+    }
+
+    // Geolocation / Navigation
     document.getElementById("btnLocateMeHeader")?.addEventListener("click", locateUserPosition);
     document.getElementById("btnLocateMeFloat")?.addEventListener("click", locateUserPosition);
 
-    document.getElementById("btnResetViewHeader")?.addEventListener("click", () => {
+    const resetBounds = () => {
       if (map) map.flyTo(currentCity.center, currentCity.defaultZoom);
-    });
-    document.getElementById("btnResetBoundsFloat")?.addEventListener("click", () => {
-      if (map) map.flyTo(currentCity.center, currentCity.defaultZoom);
-    });
+    };
+    document.getElementById("btnResetViewHeader")?.addEventListener("click", resetBounds);
+    document.getElementById("btnResetBoundsFloat")?.addEventListener("click", resetBounds);
 
-    // Floating map toolbars
-    document.getElementById("btnLayerStreet")?.addEventListener("click", () => setBaseTileLayer("street"));
-    document.getElementById("btnLayerDark")?.addEventListener("click", () => setBaseTileLayer("dark"));
-    document.getElementById("btnLayerSatellite")?.addEventListener("click", () => setBaseTileLayer("satellite"));
-
-    // Ward Boundaries toggle
-    document.getElementById("btnToggleWards")?.addEventListener("click", function () {
-      this.classList.toggle("active");
-      if (map.hasLayer(wardLayersGroup)) {
-        map.removeLayer(wardLayersGroup);
-      } else {
-        map.addLayer(wardLayersGroup);
-      }
-    });
-
-    // Hotspot Radar toggle
-    document.getElementById("btnToggleHotspots")?.addEventListener("click", function () {
-      this.classList.toggle("active");
-      if (map.hasLayer(hotspotMarkersGroup)) {
-        map.removeLayer(hotspotMarkersGroup);
-      } else {
-        map.addLayer(hotspotMarkersGroup);
-      }
-    });
-
-    // Pin drop mode
+    // Pin Drop Mode
+    document.getElementById("openReportSpotModal")?.addEventListener("click", togglePinDropMode);
     document.getElementById("btnDropPinMode")?.addEventListener("click", togglePinDropMode);
-    document.getElementById("cancelPinDrop")?.addEventListener("click", togglePinDropMode);
 
-    // Drawer close buttons
+    // Drawer closing
     document.getElementById("closeIssueDrawer")?.addEventListener("click", closeIssueDrawer);
     document.getElementById("issueDrawerBackdrop")?.addEventListener("click", closeIssueDrawer);
 
-    // Quick report modal
+    // Quick Report Modal
     document.getElementById("closeReportModal")?.addEventListener("click", closeQuickReportModal);
     document.getElementById("cancelReportForm")?.addEventListener("click", closeQuickReportModal);
     document.getElementById("quickReportForm")?.addEventListener("submit", handleReportSubmit);
 
-    // Mobile sidebar collapse toggle
+    // Mobile sidebar toggle
     const mobileToggle = document.getElementById("sidebarMobileToggle");
     const sidebar = document.getElementById("dashboardSidebar");
     if (mobileToggle && sidebar) {
       mobileToggle.addEventListener("click", () => {
-        const isExpanded = mobileToggle.getAttribute("aria-expanded") === "true";
-        mobileToggle.setAttribute("aria-expanded", String(!isExpanded));
-        mobileToggle.querySelector(".fa-chevron-up")?.classList.toggle("fa-chevron-down", isExpanded);
-        sidebar.querySelector(".sidebar-inner").style.display = isExpanded ? "none" : "flex";
+        sidebar.classList.toggle("mobile-collapsed");
+        const isCollapsed = sidebar.classList.contains("mobile-collapsed");
+        mobileToggle.setAttribute("aria-expanded", String(!isCollapsed));
       });
     }
 
     // Legend toggle
-    document.getElementById("legendToggleBtn")?.addEventListener("click", function () {
-      const body = document.getElementById("legendBody");
-      if (body) {
-        const isHidden = body.style.display === "none";
-        body.style.display = isHidden ? "flex" : "none";
-        this.querySelector("i")?.classList.toggle("fa-chevron-up", isHidden);
-      }
-    });
+    const legendToggleBtn = document.getElementById("legendToggleBtn");
+    const legendBody = document.getElementById("legendBody");
+    if (legendToggleBtn && legendBody) {
+      legendToggleBtn.addEventListener("click", () => {
+        legendBody.classList.toggle("collapsed");
+        legendToggleBtn.querySelector("i")?.classList.toggle("fa-chevron-up");
+        legendToggleBtn.querySelector("i")?.classList.toggle("fa-chevron-down");
+      });
+    }
 
-    // Listen for dark mode toggle from navbar
-    const themeObserver = new MutationObserver(() => {
-      const isDark = document.documentElement.classList.contains("dark-mode") || document.body.classList.contains("dark-mode");
-      if (isDark && currentTileLayerKey === "street") {
-        setBaseTileLayer("dark");
-      } else if (!isDark && currentTileLayerKey === "dark") {
-        setBaseTileLayer("street");
-      }
-    });
-    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    themeObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
-
-    // Keyboard ESC listener
+    // Keyboard ESC to close drawers/modals
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeIssueDrawer();
@@ -1218,27 +1319,20 @@
     });
   }
 
-  /* Initialize on DOM Ready */
-  document.addEventListener("DOMContentLoaded", () => {
-    initMap();
-    setupEventListeners();
-    loadComplaintsData();
-  });
-
-  // Expose methods for popup onclick actions
+  // Expose global namespace for inline onclick handlers
   window.CivicBuzzMap = {
     openIssueDrawer,
     selectIssue,
-    setCity: (cityKey) => {
-      if (CITY_CONFIG.cities[cityKey]) {
-        currentCity = CITY_CONFIG.cities[cityKey];
-        if (map) {
-          map.setView(currentCity.center, currentCity.defaultZoom);
-          renderWardBoundaries();
-          loadComplaintsData();
-        }
-      }
-    }
+    locateUserPosition,
+    togglePinDropMode,
+    applyFiltersAndRender,
+    loadComplaintsData
   };
+
+  // Initialize on DOM load
+  document.addEventListener("DOMContentLoaded", () => {
+    initMap();
+    setupEventListeners();
+  });
 
 })();

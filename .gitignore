@@ -13,11 +13,6 @@ __pycache__/
 *.so
 .Python
 env/
-.venv/
-venv/
-backend/.venv/
-Frontend/node_modules/
-Frontend/dist/
 build/
 develop-eggs/
 dist/
