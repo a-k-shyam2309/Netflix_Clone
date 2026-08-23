@@ -1,5 +1,4 @@
 /**
-<<<<<<< HEAD
  * CivicBuzz Frontend Universal API Integration & Live Data Synchronization Client
  * Connects all frontend modules to the FastAPI backend and maintains a synchronized
  * local data store for realtime cross-tab metrics, triage, and live charts.
@@ -7,7 +6,7 @@
 
 var API_CONFIG = window.API_CONFIG || {
   BASE_URL: "http://localhost:8000/api/v1",
-  TIMEOUT_MS: 1200,
+  TIMEOUT_MS: 3000,
 };
 window.API_CONFIG = API_CONFIG;
 
@@ -944,27 +943,6 @@ if (typeof window !== "undefined") {
   window.TenderStore = TenderStore;
 }
 
-// =========================================================================
-// UNIVERSAL API CLIENT
-// =========================================================================
-
-const CivicBuzzAPI = {
-  // Direct access to synchronized local stores
-  store: ComplaintStore,
-  deptStore: DepartmentStore,
-  tenderStore: TenderStore,
-
-=======
- * CivicBuzz Frontend Universal API Integration Client
- * Provides seamless connection between existing HTML/CSS/JS frontend modules and the FastAPI backend.
- * Gracefully falls back to local simulation if backend is offline.
- */
-
-const API_CONFIG = {
-  BASE_URL: "http://localhost:8000/api/v1",
-  TIMEOUT_MS: 3000,
-};
-
 // --------------------------------------------------------------------------
 // Local Offline Simulation Storage & Engine
 // --------------------------------------------------------------------------
@@ -1434,8 +1412,16 @@ const CivicBuzzSimulation = {
   },
 };
 
+// =========================================================================
+// UNIVERSAL API CLIENT
+// =========================================================================
+
 const CivicBuzzAPI = {
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
+  // Direct access to synchronized local stores
+  store: ComplaintStore,
+  deptStore: DepartmentStore,
+  tenderStore: TenderStore,
+
   // Token & Session Management
   getToken: () => localStorage.getItem("civicbuzz_token"),
   setToken: (token) => localStorage.setItem("civicbuzz_token", token),
@@ -1452,11 +1438,7 @@ const CivicBuzzAPI = {
   },
   setUser: (user) => localStorage.setItem("civicbuzz_user", JSON.stringify(user)),
 
-<<<<<<< HEAD
-  // Generic Request Helper with quick timeout & fallback
-=======
   // Generic Request Helper with Auto-Fallback
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
   async request(endpoint, options = {}) {
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
     const headers = {
@@ -1469,29 +1451,17 @@ const CivicBuzzAPI = {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-<<<<<<< HEAD
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT_MS);
-=======
-    // Set timeout to avoid hanging if backend server is unreachable
     const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
     const timeoutId = controller ? setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT_MS) : null;
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
 
     try {
       const response = await fetch(url, {
         ...options,
         headers,
-<<<<<<< HEAD
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-=======
         signal: controller ? controller.signal : undefined,
       });
 
       if (timeoutId) clearTimeout(timeoutId);
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
 
       const json = await response.json();
       if (!response.ok) {
@@ -1499,9 +1469,6 @@ const CivicBuzzAPI = {
       }
       return json;
     } catch (err) {
-<<<<<<< HEAD
-      clearTimeout(timeoutId);
-=======
       if (timeoutId) clearTimeout(timeoutId);
 
       const msg = (err.message || "").toLowerCase();
@@ -1517,12 +1484,10 @@ const CivicBuzzAPI = {
         Boolean(err.cause);
 
       if (isNetworkError) {
-        // Gracefully use local offline simulation
         return CivicBuzzSimulation.handle(endpoint, options);
       }
 
       console.warn(`CivicBuzz API call to ${endpoint} note:`, err.message);
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
       throw err;
     }
   },
@@ -1530,12 +1495,6 @@ const CivicBuzzAPI = {
   // 1. Auth Module
   auth: {
     async register(data) {
-<<<<<<< HEAD
-      return CivicBuzzAPI.request("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-=======
       const res = await CivicBuzzAPI.request("/auth/register", {
         method: "POST",
         body: JSON.stringify(data),
@@ -1545,7 +1504,6 @@ const CivicBuzzAPI = {
         CivicBuzzAPI.setUser(res.data);
       }
       return res;
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
     },
     async login(email, password, role = "citizen") {
       const res = await CivicBuzzAPI.request("/auth/login", {
@@ -1590,46 +1548,37 @@ const CivicBuzzAPI = {
     },
   },
 
-<<<<<<< HEAD
   // 2. Complaints Module (Guaranteed local sync + backend persistence)
   complaints: {
     async create(data) {
-      // 1. Save to local store immediately for instant cross-tab UI update
       const localDoc = ComplaintStore.add(data);
-
-      // 2. Persist to backend if online
       try {
         const res = await CivicBuzzAPI.request("/complaints", {
           method: "POST",
           body: JSON.stringify(data),
         });
-        if (res.data) {
-          return res;
-        }
-      } catch (err) {
-        // Backend offline or unreachable, local store handles it
-      }
-
+        if (res && res.data) return res;
+      } catch (_) {}
       return { data: localDoc, message: "Complaint created successfully." };
     },
     async getMyComplaints() {
       try {
         const res = await CivicBuzzAPI.request("/complaints/my/list");
-        if (res.data) return res;
+        if (res && res.data) return res;
       } catch (_) {}
       return { data: ComplaintStore.getAll() };
     },
     async getNearby(lat, lng, radiusMeters = 1000) {
       try {
         const res = await CivicBuzzAPI.request(`/complaints/nearby/search?lat=${lat}&lng=${lng}&radius_meters=${radiusMeters}`);
-        if (res.data) return res;
+        if (res && res.data) return res;
       } catch (_) {}
       return { data: ComplaintStore.getAll() };
     },
     async getDetail(id) {
       try {
         const res = await CivicBuzzAPI.request(`/complaints/${id}`);
-        if (res.data) return res;
+        if (res && res.data) return res;
       } catch (_) {}
       const doc = ComplaintStore.getAll().find((c) => c.complaint_id === id || c.complaint_id === `#${id}`);
       return { data: doc };
@@ -1651,34 +1600,6 @@ const CivicBuzzAPI = {
         });
       } catch (_) {}
       return { message: "Resolution disputed and reopened." };
-=======
-  // 2. Complaints Module
-  complaints: {
-    async create(data) {
-      return CivicBuzzAPI.request("/complaints", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    },
-    async getMyComplaints() {
-      return CivicBuzzAPI.request("/complaints/my/list");
-    },
-    async getNearby(lat, lng, radiusMeters = 1000) {
-      return CivicBuzzAPI.request(`/complaints/nearby/search?lat=${lat}&lng=${lng}&radius_meters=${radiusMeters}`);
-    },
-    async getDetail(id) {
-      return CivicBuzzAPI.request(`/complaints/${id}`);
-    },
-    async verifyResolution(id, rating, comments = "") {
-      return CivicBuzzAPI.request(`/complaints/${id}/verify-resolution?rating=${rating}&comments=${encodeURIComponent(comments)}`, {
-        method: "POST",
-      });
-    },
-    async rejectResolution(id, reason) {
-      return CivicBuzzAPI.request(`/complaints/${id}/reject-resolution?reason=${encodeURIComponent(reason)}`, {
-        method: "POST",
-      });
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
     },
   },
 
@@ -1695,7 +1616,6 @@ const CivicBuzzAPI = {
   // 4. Tenders Module
   tenders: {
     async list(category = "all") {
-<<<<<<< HEAD
       try {
         const res = await CivicBuzzAPI.request(`/tenders?category=${encodeURIComponent(category)}`);
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
@@ -1712,12 +1632,6 @@ const CivicBuzzAPI = {
         if (res && res.data) return res;
       } catch (_) {}
       return { data: TenderStore.getById(id) };
-=======
-      return CivicBuzzAPI.request(`/tenders?category=${category}`);
-    },
-    async getDetail(id) {
-      return CivicBuzzAPI.request(`/tenders/${id}`);
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
     },
   },
 
@@ -1725,15 +1639,11 @@ const CivicBuzzAPI = {
   projects: {
     async list(wardId = null) {
       const q = wardId ? `?ward_id=${wardId}` : "";
-<<<<<<< HEAD
       try {
         return await CivicBuzzAPI.request(`/projects${q}`);
       } catch (_) {
         return { data: [] };
       }
-=======
-      return CivicBuzzAPI.request(`/projects${q}`);
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
     },
     async vote(projectId) {
       return CivicBuzzAPI.request(`/projects/${projectId}/vote`, {
@@ -1765,7 +1675,6 @@ const CivicBuzzAPI = {
     },
   },
 
-<<<<<<< HEAD
   // 8. Public Transparency & Live Stats
   public: {
     async getStats() {
@@ -1792,25 +1701,12 @@ const CivicBuzzAPI = {
       } catch (_) {
         return { data: [] };
       }
-=======
-  // 8. Public Transparency & Stats
-  public: {
-    async getStats() {
-      return CivicBuzzAPI.request("/public/stats");
-    },
-    async listComplaints() {
-      return CivicBuzzAPI.request("/public/complaints");
-    },
-    async listClusters() {
-      return CivicBuzzAPI.request("/public/clusters");
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
     },
   },
 
   // 9. Administrator & Database Operations
   admin: {
     async getDashboardMetrics() {
-<<<<<<< HEAD
       try {
         const res = await CivicBuzzAPI.request("/admin/dashboard");
         if (res && res.data && res.data.total_reported !== undefined) {
@@ -1953,46 +1849,6 @@ const CivicBuzzAPI = {
       } catch (_) {
         return { message: `Complaint ${action} completed.` };
       }
-=======
-      return CivicBuzzAPI.request("/admin/dashboard");
-    },
-    async getRoutingQueue() {
-      return CivicBuzzAPI.request("/admin/queue");
-    },
-    async listDepartments() {
-      return CivicBuzzAPI.request("/admin/departments");
-    },
-    async createDepartment(data) {
-      return CivicBuzzAPI.request("/admin/departments", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    },
-    async createTender(data) {
-      return CivicBuzzAPI.request("/admin/tenders", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    },
-    async updateTender(tenderId, data) {
-      return CivicBuzzAPI.request(`/admin/tenders/${tenderId}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
-    },
-    async reassignComplaint(complaintId, newDepartmentCode, notes = "") {
-      return CivicBuzzAPI.request(`/admin/complaints/${complaintId}/reassign?new_department_code=${encodeURIComponent(newDepartmentCode)}&notes=${encodeURIComponent(notes)}`, {
-        method: "POST",
-      });
-    },
-    async complaintAction(complaintId, action, departmentCode = null, notes = "") {
-      let q = `/admin/complaints/${complaintId}/action?action=${encodeURIComponent(action)}`;
-      if (departmentCode) q += `&department_code=${encodeURIComponent(departmentCode)}`;
-      if (notes) q += `&notes=${encodeURIComponent(notes)}`;
-      return CivicBuzzAPI.request(q, {
-        method: "POST",
-      });
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
     },
   },
 };
@@ -2000,10 +1856,7 @@ const CivicBuzzAPI = {
 // Make globally accessible across all frontend scripts
 if (typeof window !== "undefined") {
   window.CivicBuzzAPI = CivicBuzzAPI;
-<<<<<<< HEAD
   window.ComplaintStore = ComplaintStore;
   window.DepartmentStore = DepartmentStore;
   window.TenderStore = TenderStore;
-=======
->>>>>>> 8cb9545994a95111c00e8cd8b915d64252c9f5f2
 }
