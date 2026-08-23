@@ -29,7 +29,11 @@
 			path.includes("/Contact Us Frontend/") ||
 			path.includes("/Contact%20Us%20Frontend/") ||
 			path.endsWith("/Contact Us Frontend") ||
-			path.endsWith("/Contact%20Us%20Frontend")
+			path.endsWith("/Contact%20Us%20Frontend") ||
+			path.includes("/Map_Frontend/") ||
+			path.includes("/Map_Frontend") ||
+			path.includes("/Map/") ||
+			path.endsWith("/Map")
 		) {
 			basePath = "../";
 		}
@@ -42,6 +46,8 @@
 			activeNav = "tender";
 		} else if (path.includes("Contact Us Frontend") || path.includes("Contact%20Us%20Frontend")) {
 			activeNav = "contact";
+		} else if (path.includes("Map_Frontend") || path.includes("/Map/") || path.endsWith("/Map")) {
+			activeNav = "map";
 		} else if (window.location.hash === "#map" || window.location.hash === "#nearbyMap") {
 			activeNav = "map";
 		} else if (window.location.hash === "#help" || window.location.hash === "#faq" || window.location.hash === "#support") {
@@ -399,7 +405,55 @@
 		"Our Office": "हमारा कार्यालय",
 		"Phone Number": "फ़ोन नंबर",
 		"Email Address": "ईमेल पता",
-		"Working Hours": "काम के घंटे"
+		"Working Hours": "काम के घंटे",
+
+		// --- MAP DASHBOARD PAGE ---
+		"CIVIC GEOLOCATION & HOTSPOTS": "नागरिक भू-स्थान और हॉटस्पॉट",
+		"Bhubaneswar Live Civic Map": "भुवनेश्वर लाइव नागरिक मानचित्र",
+		"Interactive geographic dashboard of reported civic issues, real-time hotspot clusters, and ward resolution progress across Bhubaneswar.": "भुवनेश्वर भर में दर्ज नागरिक समस्याओं, लाइव हॉटस्पॉट और वार्ड समाधान प्रगति का इंटरैक्टिव भौगोलिक डैशबोर्ड।",
+		"Report Issue Here": "यहाँ समस्या दर्ज करें",
+		"Locate Me": "मेरा स्थान",
+		"Reset View": "व्यू रीसेट करें",
+		"Active Hotspots": "सक्रिय हॉटस्पॉट",
+		"Critical Attention": "अति गंभीर समस्याएं",
+		"In Progress": "कार्य प्रगति पर",
+		"Resolved (7 Days)": "हल की गई (7 दिन)",
+		"Search issues, landmarks, wards...": "समस्याएं, स्थल, वार्ड खोजें...",
+		"Category Filter": "श्रेणी फ़िल्टर",
+		"All Categories": "सभी श्रेणियां",
+		"Roads & Potholes": "सड़कें और गड्ढे",
+		"Street Lighting": "स्ट्रीट लाइट",
+		"Waste & Sanitation": "कचरा और स्वच्छता",
+		"Water & Drainage": "पानी और जल निकासी",
+		"Parks & Trees": "पार्क और वृक्ष",
+		"Encroachment": "अतिक्रमण और ढांचा",
+		"Ward Filter": "वार्ड फ़िल्टर",
+		"All Bhubaneswar Wards": "भुवनेश्वर के सभी वार्ड",
+		"Status Filter": "स्थिति फ़िल्टर",
+		"All Statuses": "सभी स्थितियां",
+		"Reported": "दर्ज किया गया",
+		"Resolved": "समाधान हो गया",
+		"Priority": "प्राथमिकता",
+		"All Priorities": "सभी प्राथमिकताएं",
+		"Critical": "अति गंभीर",
+		"High": "उच्च",
+		"Medium": "मध्यम",
+		"Low": "सामान्य",
+		"Live Grievance Feed": "लाइव शिकायत फ़ीड",
+		"Click on any marker or card to inspect details": "विवरण देखने के लिए किसी भी पिन या कार्ड पर क्लिक करें",
+		"Issue Details": "समस्या विवरण",
+		"Responsible Department": "जिम्मेदार विभाग",
+		"Community Support": "समुदायिक समर्थन",
+		"Upvote Issue": "समर्थन दें (Upvote)",
+		"Upvoted": "समर्थन दिया गया",
+		"Get Directions": "दिशा-निर्देश प्राप्त करें",
+		"Share Grievance": "शिकायत साझा करें",
+		"Quick Report at this Spot": "इस स्थान पर त्वरित रिपोर्ट",
+		"Satellite View": "सैटेलाइट व्यू",
+		"Street View": "स्ट्रीट व्यू",
+		"Dark Matter": "डार्क व्यू",
+		"Ward Boundaries": "वार्ड सीमाएं",
+		"Heatmap Density": "हॉटस्पॉट डेंसिटी"
 	};
 
 	const originalTextMap = new WeakMap();
@@ -457,7 +511,7 @@
 			<span data-i18n="trackIssue">Track Issue</span>
 		</a>
 
-		<a href="${basePath}index.html#nearbyMap" class="nav-link ${activeNav === "map" ? "active" : ""}" data-nav="map">
+		<a href="${basePath}Map_Frontend/index.html" class="nav-link ${activeNav === "map" ? "active" : ""}" data-nav="map">
 			<i class="fa-solid fa-location-dot"></i>
 			<span data-i18n="map">Map</span>
 		</a>

@@ -107,7 +107,7 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
 
 
 /* Page header */
-.page-head { position: relative; z-index: 5; max-width: 1080px; margin: 0 auto; padding: 44px 40px 30px; }
+.page-head { position: relative; z-index: 5; max-width: 1080px; margin: 0 auto; padding: 24px 40px 20px; }
 
 .eyebrow {
   font-family: 'IBM Plex Mono', monospace;

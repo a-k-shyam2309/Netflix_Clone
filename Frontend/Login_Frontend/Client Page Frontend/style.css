@@ -511,7 +511,7 @@ body.dark-mode .theme-switch span {
 .client-dashboard {
 	width: min(1440px, calc(100% - 48px));
 	margin: 0 auto;
-	padding: 24px 0 40px;
+	padding: 0 0 40px;
 }
 
 /* =========================================================

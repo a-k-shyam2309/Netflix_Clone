@@ -87,7 +87,7 @@ a {
 /* Main section */
 
 .contact-page {
-	min-height: 100vh;
+	min-height: calc(100vh - 72px);
 	display: flex;
 	align-items: center;
 	background:
@@ -98,7 +98,7 @@ a {
 
 .contact-section {
 	width: 100%;
-	padding: 70px 24px;
+	padding: 36px 24px;
 }
 
 .contact-container {
