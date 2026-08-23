@@ -32,3 +32,10 @@
 .card-hover {
   @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300;
 }
+
+/* Leaflet Google Maps Custom Marker Overrides */
+.google-maps-custom-pin-wrapper {
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+}
