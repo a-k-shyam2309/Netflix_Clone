@@ -8,15 +8,59 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  // Ensure user always views the main Admin Portal integrated Budgeting & Tenders design
+  if (window.location.pathname.endsWith("/Budgeting/index.html") || window.location.pathname.endsWith("/Budgeting/")) {
+    window.location.replace("../index.html#budgeting");
+  }
+</script>
 </head>
 <body>
+<div class="app-shell">
+  <!-- Sidebar Navigation (Same as Admin Portal) -->
+  <aside class="sidebar" id="sidebar" aria-label="Admin navigation">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="../Assets/Logo.png" alt="CivicBuzz Logo">
+      </div>
+      <span class="brand-name">CivicBuzz</span>
+    </div>
 
-<!-- Admin navigation -->
-<nav class="navbar">
-  <a href="../index.html#dashboard" class="brand" style="text-decoration:none;color:inherit;"><span>← CivicBuzz Admin Dashboard</span></a>
-</nav>
+    <nav class="main-nav">
+      <a class="nav-link" href="../index.html#dashboard" data-section="Dashboard">
+        <span>⌂</span> <span data-i18n="Dashboard">Dashboard</span>
+      </a>
+      <a class="nav-link" href="../index.html#issue-queue" data-section="Issue Queue">
+        <span>☷</span> <span data-i18n="Issue Queue">Issue Queue</span> <b class="nav-count" id="sidebarIssueCount">16</b>
+      </a>
+      <a class="nav-link" href="../Map & Hotspots/index.html" data-section="Map & Hotspots">
+        <span>⌖</span> <span data-i18n="Map & Hotspots">Map &amp; Hotspots</span>
+      </a>
+      <a class="nav-link" href="../departments/index.html" data-section="Departments">
+        <span>♜</span> <span data-i18n="Departments">Departments</span>
+      </a>
+      <a class="nav-link active" href="index.html" data-section="Budgeting">
+        <span>◴</span> <span data-i18n="Budgeting">Budgeting</span>
+      </a>
+      <a class="nav-link" href="../Analytics/index.html" data-section="Analytics">
+        <span>◫</span> <span data-i18n="Analytics">Analytics</span>
+      </a>
+    </nav>
 
-<main class="page-container">
+    <div class="sidebar-bottom">
+      <div class="admin-mini">
+        <span class="avatar-small">AK</span>
+        <span>
+          <strong>Aditya Kumar Shyam</strong>
+          <small>Super Administrator</small>
+        </span>
+        <button class="more-button" aria-label="Account options">⋯</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <main class="page-container">
   <!-- Header -->
   <header class="page-header">
     <div>
@@ -29,10 +73,10 @@
 
   <!-- Overview -->
   <section class="stats-grid">
-    <div class="stat-card"><span>Open tenders</span><strong>18</strong><small>Currently published</small></div>
-    <div class="stat-card"><span>Draft tenders</span><strong>06</strong><small>Awaiting publication</small></div>
-    <div class="stat-card"><span>Allocated budget</span><strong>₹42L</strong><small>Across active projects</small></div>
-    <div class="stat-card"><span>In progress</span><strong>09</strong><small>Work currently tracked</small></div>
+    <div class="stat-card"><span>Open tenders</span><strong id="statOpenTenders">2</strong><small>Currently published</small></div>
+    <div class="stat-card"><span>Draft tenders</span><strong id="statDraftTenders">1</strong><small>Awaiting publication</small></div>
+    <div class="stat-card"><span>Allocated budget</span><strong id="statAllocatedBudget">₹1.80 Cr</strong><small>Across active projects</small></div>
+    <div class="stat-card"><span>In progress</span><strong id="statProgressTenders">2</strong><small>Work currently tracked</small></div>
   </section>
 
   <!-- Dashboard 1: Tender management -->
@@ -100,34 +144,6 @@
     </div>
   </section>
 
-  <!-- Dashboard 2: Lifecycle -->
-  <section class="dashboard-section">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">PROJECT LIFECYCLE</p>
-        <h2>Tender workflow</h2>
-        <p>One simple status flow from verification to the public QR trail.</p>
-      </div>
-      <span class="info-badge">Selected: CB-T-0015</span>
-    </div>
-
-    <div class="lifecycle-track" aria-label="Tender lifecycle">
-      <div class="lifecycle-step complete"><b>✓</b><strong>Verified</strong><small>Issue cluster confirmed</small></div>
-      <i class="lifecycle-line complete"></i>
-      <div class="lifecycle-step complete"><b>✓</b><strong>Draft Created</strong><small>Scope and budget prepared</small></div>
-      <i class="lifecycle-line complete"></i>
-      <div class="lifecycle-step complete"><b>✓</b><strong>Published</strong><small>Visible to contractors</small></div>
-      <i class="lifecycle-line active"></i>
-      <div class="lifecycle-step active"><b>●</b><strong>Contractor Awarded</strong><small>Selection completed</small></div>
-      <i class="lifecycle-line"></i>
-      <div class="lifecycle-step"><b>○</b><strong>Work in Progress</strong><small>Evidence being uploaded</small></div>
-      <i class="lifecycle-line"></i>
-      <div class="lifecycle-step"><b>○</b><strong>Completed</strong><small>Official verification</small></div>
-      <i class="lifecycle-line"></i>
-      <div class="lifecycle-step"><b>○</b><strong>QR Trail</strong><small>Public project record</small></div>
-    </div>
-  </section>
-
   <!-- Activity -->
   <section class="activity-panel">
     <div class="section-heading">
@@ -139,8 +155,9 @@
       <div class="activity-row"><span class="dot purple"></span><div><strong>Contractor awarded</strong><p>CB-T-0012 · BrightGrid Ltd.</p></div><time>Yesterday</time></div>
       <div class="activity-row"><span class="dot green"></span><div><strong>Project completed</strong><p>CB-T-0009 · QR trail generated</p></div><time>2 days ago</time></div>
     </div>
-  </section>
-</main>
+    </main>
+  </div>
+</div>
 
 <!-- Add Tender modal -->
 <div class="modal-overlay" id="tenderModal" hidden>

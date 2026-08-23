@@ -10,22 +10,57 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="css/style.css" />
+<script>
+  // Ensure user always views the main Admin Portal integrated Department Directory design
+  if (window.location.pathname.endsWith("/departments/index.html") || window.location.pathname.endsWith("/departments/")) {
+    window.location.replace("../index.html#departments");
+  }
+</script>
 </head>
 <body>
 
-<!-- =====================================================
-     Global Navbar
-     =====================================================
-     This page no longer has its own sidebar/topbar — it uses
-     the site's global navbar instead. Nothing renders here
-     until that navbar is wired in.
-     See "How to add the global navbar" in the project README
-     (or ask the person who owns navbar.html) for the exact steps.
-     ===================================================== -->
-<div style="padding: 16px 24px 0;"><a href="../index.html#dashboard" style="text-decoration:none;font-weight:600;color:#2f6ee8;display:inline-flex;align-items:center;gap:6px;">← Back to Main Admin Dashboard</a></div>
-<div id="global-navbar"></div>
-
 <div class="app-shell">
+  <!-- Sidebar Navigation (Same as Admin Portal) -->
+  <aside class="sidebar" id="sidebar" aria-label="Admin navigation">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="../Assets/Logo.png" alt="CivicBuzz Logo">
+      </div>
+      <span class="brand-name">CivicBuzz</span>
+    </div>
+
+    <nav class="main-nav">
+      <a class="nav-link" href="../index.html#dashboard" data-section="Dashboard">
+        <span>⌂</span> <span data-i18n="Dashboard">Dashboard</span>
+      </a>
+      <a class="nav-link" href="../index.html#issue-queue" data-section="Issue Queue">
+        <span>☷</span> <span data-i18n="Issue Queue">Issue Queue</span> <b class="nav-count" id="sidebarIssueCount">16</b>
+      </a>
+      <a class="nav-link" href="../Map & Hotspots/index.html" data-section="Map & Hotspots">
+        <span>⌖</span> <span data-i18n="Map & Hotspots">Map &amp; Hotspots</span>
+      </a>
+      <a class="nav-link active" href="index.html" data-section="Departments">
+        <span>♜</span> <span data-i18n="Departments">Departments</span>
+      </a>
+      <a class="nav-link" href="../Budgeting/index.html" data-section="Budgeting">
+        <span>◴</span> <span data-i18n="Budgeting">Budgeting</span>
+      </a>
+      <a class="nav-link" href="../Analytics/index.html" data-section="Analytics">
+        <span>◫</span> <span data-i18n="Analytics">Analytics</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="admin-mini">
+        <span class="avatar-small">AK</span>
+        <span>
+          <strong>Aditya Kumar Shyam</strong>
+          <small>Super Administrator</small>
+        </span>
+        <button class="more-button" aria-label="Account options">⋯</button>
+      </div>
+    </div>
+  </aside>
 
   <!-- ===================== Main content ===================== -->
   <div class="main-content">
@@ -79,10 +114,13 @@
             <h2>Department directory</h2>
             <p>Contact details and current workload per department.</p>
           </div>
-          <label class="search-box" for="departmentSearch">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input id="departmentSearch" type="search" placeholder="Search departments..." autocomplete="off" />
-          </label>
+          <div class="search-box-wrapper" style="position:relative;">
+            <label class="search-box" for="departmentSearch">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input id="departmentSearch" type="search" placeholder="Search departments, heads..." autocomplete="off" />
+            </label>
+            <div class="dept-search-suggestions" id="deptSearchSuggestions" hidden></div>
+          </div>
         </div>
 
         <div class="horizontal-track department-track" id="departmentTrack" tabindex="0">
@@ -232,6 +270,7 @@
   </div>
 </div>
 
+<script src="../../api-config.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

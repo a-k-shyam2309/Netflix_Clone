@@ -1,26 +1,8 @@
-/* CivicBuzz Admin Portal - all dashboard interactions live in this file. */
+/* CivicBuzz Admin Portal - live synchronized grievance management and real dynamic metrics. */
 
 const userId = "USR10245";
 const $ = (selector, parent = document) => parent.querySelector(selector);
 const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
-
-const chartSets = {
-  week: {
-    labels: ["May 8", "May 9", "May 10", "May 11", "May 12", "May 13", "May 14"],
-    reported: [111, 105, 80, 57, 94, 72, 53],
-    resolved: [142, 135, 134, 112, 133, 115, 104],
-  },
-  month: {
-    labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Today"],
-    reported: [125, 97, 117, 71, 89, 46, 61],
-    resolved: [158, 126, 145, 109, 116, 88, 99],
-  },
-  quarter: {
-    labels: ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    reported: [140, 116, 128, 91, 79, 62, 48],
-    resolved: [172, 144, 149, 127, 111, 84, 72],
-  },
-};
 
 let toastTimer;
 
@@ -177,6 +159,9 @@ const translations = {
   "Description": "विवरण",
   "Street light has been flickering and completely off for the last 3 days causing safety concerns near the junction.": "स्ट्रीट लाइट पिछले 3 दिनों से झिलमिला रही है और पूरी तरह बंद है जिससे चौराहे के पास सुरक्षा संबंधी चिंताएं बढ़ गई हैं।",
   "Citizen Verification Status": "नागरिक सत्यापन स्थिति",
+  "Attached Image / Media Evidence": "संलग्न फोटो / मीडिया साक्ष्य",
+  "Image not uploaded": "फोटो अपलोड नहीं की गई",
+  "No visual media was attached by the citizen with this complaint.": "इस शिकायत के लिए नागरिक द्वारा कोई फोटो संलग्न नहीं की गई है।",
   "Original Reporter": "मूल रिपोर्टकर्ता",
   "Nearby Citizen 1": "निकटवर्ती नागरिक 1",
   "Nearby Citizen 2": "निकटवर्ती नागरिक 2",
@@ -193,31 +178,34 @@ const translations = {
   "Registered in system": "सिस्टम में पंजीकृत",
   "Active Departments": "सक्रिय विभाग",
   "Taking assignments": "कार्यभार ले रहे हैं",
+  "Municipal Field Staff": "नगरपालिका फील्ड स्टाफ",
+  "Engineers & field crew": "इंजीनियर और फील्ड कर्मी",
   "Open Issues Assigned": "आवंटित खुली समस्याएं",
   "Across all wards": "सभी वार्डों में",
   "Avg. Resolution Time": "औसत समाधान समय",
   "Department Workload & Contacts": "विभाग कार्यभार और संपर्क",
   "Active": "सक्रिय",
   "Understaffed": "कर्मचारियों की कमी",
-  "Roads & Potholes": "सड़कें और गड्ढे",
-  "Road surface repairs, potholes, asphalt resurfacing, and pavement maintenance.": "सड़क मरम्मत, गड्ढे, डामरीकरण और फुटपाथ रखरखाव।",
-  "Head:": "प्रमुख:",
-  "Email:": "ईमेल:",
-  "Phone:": "फोन:",
-  "open issues": "खुली समस्याएं",
-  "3.1d avg": "3.1 दिन औसत",
-  "Street Lighting": "स्ट्रीट लाइटिंग",
-  "Broken light poles, LED replacements, timer failures, and dark spot coverage.": "टूटे हुए लाइट पोल, एलईडी प्रतिस्थापन, टाइमर विफलता और अंधेरे स्थानों का समाधान।",
-  "2.4d avg": "2.4 दिन औसत",
-  "Sanitation & Waste": "स्वच्छता और कचरा प्रबंधन",
-  "Garbage collection route monitoring, bin clearing, and illegal dumping remediation.": "कचरा संग्रहण निगरानी, डस्टबिन सफाई और अवैध कचरा निवारण।",
-  "1.8d avg": "1.8 दिन औसत",
-  "Water Supply & Drainage": "जल आपूर्ति और जल निकासी",
-  "Pipe leaks, low water pressure, contaminated water, stormwater drainage, and sewage overflow.": "पाइप रिसाव, कम पानी का दबाव, दूषित पानी, जल निकासी और सीवेज ओवरफ्लो।",
-  "4.9d avg": "4.9 दिन औसत",
-  "Parks & Urban Greenery": "पार्क और शहरी हरियाली",
-  "Park upkeep, playground maintenance, fallen tree removal, and roadside tree trimming.": "पार्क का रखरखाव, खेल के मैदान, गिरे हुए पेड़ों को हटाना और छंटाई।",
-  "2.2d avg": "2.2 दिन औसत",
+  "Standby": "रिजर्व / स्टैंडबाय",
+  "Add Department": "विभाग जोड़ें",
+  "Edit Department": "विभाग संपादित करें",
+  "Department Name": "विभाग का नाम",
+  "Category Code / Key": "श्रेणी कोड",
+  "Icon / Emoji": "आइकन",
+  "Operational Status": "परिचालन स्थिति",
+  "Department Head": "विभाग प्रमुख",
+  "Designation": "पद / पदनाम",
+  "Official Email": "आधिकारिक ईमेल",
+  "Contact Phone": "संपर्क फोन",
+  "Field Staff Count": "फील्ड स्टाफ संख्या",
+  "SLA Target (Hours)": "एसएलए लक्ष्य (घंटे)",
+  "Allocated Budget": "आवंटित बजट",
+  "Ward Coverage": "वार्ड कवरेज क्षेत्राधिकार",
+  "Responsibility / Scope": "दायरा और जिम्मेदारियां",
+  "Save Department": "विभाग सहेजें",
+  "Cancel": "रद्द करें",
+  "No matching departments found": "कोई मेल खाता विभाग नहीं मिला",
+  "Try adjusting your search query or status filter.": "कृपया अपना खोज शब्द या स्थिति फ़िल्टर बदलें।",
 
   // Budgeting & Tenders Section
   "ADMIN • PARTICIPATORY BUDGETING": "एडमिन • सहभागी बजट",
@@ -355,6 +343,51 @@ const translations = {
   Oct: "अक्टूबर",
   Nov: "नवंबर",
   Dec: "दिसंबर",
+
+  // Search & Suggestions
+  "Track ID & Grievances": "ट्रैक आईडी और शिकायतें",
+  "Track ID": "ट्रैक आईडी",
+  "Grievances": "शिकायतें",
+  "Locations & Wards": "स्थान और वार्ड",
+  "High Activity Hotspot": "उच्च गतिविधि हॉटस्पॉट",
+  "No matches found for": "के लिए कोई परिणाम नहीं मिला",
+  "Use ↑ ↓ to navigate · ↵ Enter to select": "↑ ↓ नेविगेट करें · ↵ Enter चुनें",
+  "ESC to close": "ESC बंद करें",
+  "Ward 12": "वार्ड 12",
+  "Ward 15": "वार्ड 15",
+  "Ward 8": "वार्ड 8",
+  "Ward 4": "वार्ड 4",
+  "Ward 6": "वार्ड 6",
+  "Ward 7": "वार्ड 7",
+  "Ward 14": "वार्ड 14",
+  "Ward 9": "वार्ड 9",
+  "Ward 10": "वार्ड 10",
+  "Janpath Corridor, Bhubaneswar": "जनपथ कॉरिडोर, भुवनेश्वर",
+  "Near Metro Station, MG Road": "मेट्रो स्टेशन के पास, एमजी रोड",
+  "Sector 15, Nehru Park": "सेक्टर 15, नेहरू पार्क",
+  "Block A, Green View Apartments": "ब्लॉक A, ग्रीन व्यू अपार्टमेंट",
+  "Sector 4, Main Market": "सेक्टर 4, मुख्य बाजार",
+  "5th Main Street": "5वीं मेन स्ट्रीट",
+  "School Road": "स्कूल रोड",
+  "Shastri Nagar": "शास्त्री नगर",
+  "Flyover Junction": "फ्लाईओवर जंक्शन",
+  "Dangerous Pothole on Flyover": "फ्लाईओवर पर खतरनाक गड्ढा",
+  "Drainage Overflow & Waterlogging": "जल निकासी ओवरफ्लो और जलभराव",
+  "Roads & Potholes Department": "सड़क और गड्ढे विभाग",
+  "Street Lighting & Electricity": "स्ट्रीट लाइटिंग और बिजली विभाग",
+  "Sanitation & Solid Waste": "स्वच्छता और ठोस अपशिष्ट प्रबंधन",
+  "Water Supply & Drainage": "जल आपूर्ति और जल निकासी विभाग",
+  "Parks & Urban Greenery": "पार्क और शहरी हरियाली विभाग",
+  "Critical": "गंभीर",
+  "Urgent": "तत्काल",
+  "High": "उच्च",
+  "Medium": "मध्यम",
+  "Low": "कम",
+  "Submitted": "प्रस्तुत",
+  "Pending": "लंबित",
+  "In Progress": "प्रगति पर",
+  "Resolved": "हल किया गया",
+  "Citizen Verified": "नागरिक सत्यापित",
 };
 
 const attributeTranslations = {
@@ -685,85 +718,316 @@ function showToast(message) {
   );
 }
 
-function updateTrendChart(range) {
-  const data = chartSets[range];
+function getTimeAgo(timestamp) {
+  const diffMs = Date.now() - new Date(timestamp).getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHrs = Math.floor(diffMin / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  return `${diffDays}d ago`;
+}
 
-  if (!data) {
+function getTrendDataFromStore(range = "week") {
+  if (window.CivicBuzzAPI?.store?.getTrendData) {
+    return window.CivicBuzzAPI.store.getTrendData(range);
+  }
+  const complaints = window.CivicBuzzAPI?.store?.getAll ? window.CivicBuzzAPI.store.getAll() : [];
+  const now = new Date();
+
+  if (range === "week") {
+    const labels = [];
+    const reported = [];
+    const resolved = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 86400000);
+      const dayStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      labels.push(i === 0 ? "Today" : dayStr);
+
+      const dStart = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0).getTime();
+      const dEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59).getTime();
+
+      const repCount = complaints.filter((c) => {
+        const t = new Date(c.created_at || Date.now()).getTime();
+        return t >= dStart && t <= dEnd;
+      }).length;
+
+      const resCount = complaints.filter((c) => {
+        const isRes = (c.status || "").toUpperCase() === "RESOLVED" || (c.status || "").toUpperCase() === "VERIFIED";
+        if (!isRes) return false;
+        const t = new Date(c.resolved_at || c.created_at || Date.now()).getTime();
+        return t >= dStart && t <= dEnd;
+      }).length;
+
+      reported.push(repCount);
+      resolved.push(resCount);
+    }
+    return { labels, reported, resolved };
+  }
+
+  return { labels: ["Day 1", "Day 2", "Day 3", "Today"], reported: [0, 0, 0, 0], resolved: [0, 0, 0, 0] };
+}
+
+function updateTrendChart(range = "week") {
+  const data = getTrendDataFromStore(range);
+  if (!data || !data.labels || data.labels.length === 0) {
     return;
   }
 
-  const toPoints = (values) =>
-    values
-      .map((value, index) => {
-        const x =
-          index === 0
-            ? 10
-            : index === values.length - 1
-              ? 720
-              : 10 + (710 / (values.length - 1)) * index;
+  const N = data.labels.length;
+  const maxVal = Math.max(...data.reported, ...data.resolved, 0);
 
-        return `${x.toFixed(1)},${value}`;
-      })
-      .join(" ");
+  let gridMax = 4;
+  if (maxVal > 16) gridMax = Math.ceil(maxVal / 5) * 5;
+  else if (maxVal > 8) gridMax = 16;
+  else if (maxVal > 4) gridMax = 8;
+  else if (maxVal > 0) gridMax = Math.max(4, maxVal);
 
-  const addPoints = (groupId, values, className) => {
-    const group = $(groupId);
+  const yTicks = [
+    gridMax,
+    Math.round(gridMax * 0.75),
+    Math.round(gridMax * 0.5),
+    Math.round(gridMax * 0.25),
+    0
+  ];
 
-    if (!group) {
-      return;
-    }
+  const yAxisEl = $("#trendYAxis");
+  if (yAxisEl) {
+    yAxisEl.innerHTML = yTicks.map((val) => `<span>${val}</span>`).join("");
+  }
 
-    group.innerHTML = values
-      .map((value, index) => {
-        const x =
-          index === 0
-            ? 10
-            : index === values.length - 1
-              ? 720
-              : 10 + (710 / (values.length - 1)) * index;
+  const getX = (i) => (N <= 1 ? 365 : 10 + (710 / (N - 1)) * i);
+  const getY = (v) => 180 - (Math.min(v, gridMax) / gridMax) * 168;
 
-        return `<circle class="${className}" cx="${x.toFixed(
-          1
-        )}" cy="${value}" r="4.3"></circle>`;
-      })
-      .join("");
-  };
+  const repPointsStr = data.reported.map((v, i) => `${getX(i).toFixed(1)},${getY(v).toFixed(1)}`).join(" ");
+  const resPointsStr = data.resolved.map((v, i) => `${getX(i).toFixed(1)},${getY(v).toFixed(1)}`).join(" ");
 
   const reportedLine = $("#reportedLine");
   const resolvedLine = $("#resolvedLine");
 
   if (reportedLine) {
-    reportedLine.setAttribute(
-      "points",
-      toPoints(data.reported)
-    );
+    reportedLine.setAttribute("points", repPointsStr);
   }
 
   if (resolvedLine) {
-    resolvedLine.setAttribute(
-      "points",
-      toPoints(data.resolved)
-    );
+    resolvedLine.setAttribute("points", resPointsStr);
   }
 
-  addPoints(
-    "#reportedPoints",
-    data.reported,
-    "reported-point"
-  );
+  const reportedGroup = $("#reportedPoints");
+  const resolvedGroup = $("#resolvedPoints");
+  const tooltip = $("#chartTooltip");
+  const chartWrap = $(".chart-wrap");
 
-  addPoints(
-    "#resolvedPoints",
-    data.resolved,
-    "resolved-point"
-  );
+  if (reportedGroup) {
+    reportedGroup.innerHTML = data.reported.map((v, i) => {
+      const cx = getX(i).toFixed(1);
+      const cy = getY(v).toFixed(1);
+      return `<circle class="reported-point" cx="${cx}" cy="${cy}" r="4.5" data-idx="${i}" data-val="${v}" data-date="${data.labels[i]}" data-type="Reported"></circle>`;
+    }).join("");
+  }
+
+  if (resolvedGroup) {
+    resolvedGroup.innerHTML = data.resolved.map((v, i) => {
+      const cx = getX(i).toFixed(1);
+      const cy = getY(v).toFixed(1);
+      return `<circle class="resolved-point" cx="${cx}" cy="${cy}" r="4.5" data-idx="${i}" data-val="${v}" data-date="${data.labels[i]}" data-type="Resolved"></circle>`;
+    }).join("");
+  }
+
+  // Bind interactive tooltips
+  if (chartWrap && tooltip) {
+    $$(".reported-point, .resolved-point", chartWrap).forEach((pt) => {
+      pt.addEventListener("mouseenter", () => {
+        const idx = parseInt(pt.getAttribute("data-idx") || "0", 10);
+        const dateStr = data.labels[idx] || "";
+        const repVal = data.reported[idx] || 0;
+        const resVal = data.resolved[idx] || 0;
+
+        tooltip.innerHTML = `
+          <div class="tt-date">${dateStr}</div>
+          <div class="tt-row"><span class="tt-dot blue"></span> Reported: <b>${repVal}</b></div>
+          <div class="tt-row"><span class="tt-dot green"></span> Resolved: <b>${resVal}</b></div>
+        `;
+
+        const ptRect = pt.getBoundingClientRect();
+        const wrapRect = chartWrap.getBoundingClientRect();
+
+        tooltip.style.left = `${ptRect.left - wrapRect.left + ptRect.width / 2}px`;
+        tooltip.style.top = `${ptRect.top - wrapRect.top - 8}px`;
+        tooltip.style.display = "block";
+      });
+
+      pt.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
+    });
+  }
 
   const labelRow = $("#chartLabels");
-
   if (labelRow) {
     labelRow.innerHTML = data.labels
       .map((label) => `<span>${t(label)}</span>`)
       .join("");
+  }
+}
+
+function animateCounter(el, newVal) {
+  if (!el) return;
+  const currentVal = parseInt(el.textContent.replace(/,/g, "") || "0", 10);
+  if (isNaN(currentVal) || currentVal === newVal) {
+    el.textContent = newVal.toLocaleString();
+    return;
+  }
+
+  el.classList.add("metric-bump");
+  setTimeout(() => el.classList.remove("metric-bump"), 600);
+
+  const duration = 400;
+  const start = performance.now();
+  const diff = newVal - currentVal;
+
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(currentVal + diff * eased);
+    el.textContent = current.toLocaleString();
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = newVal.toLocaleString();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function renderRealMetricsAndStats() {
+  const metrics = window.CivicBuzzAPI?.store?.getMetrics
+    ? window.CivicBuzzAPI.store.getMetrics()
+    : {
+        total_reported: 0,
+        total_resolved: 0,
+        total_open: 0,
+        total_overdue: 0,
+        resolution_rate_percent: 0,
+      };
+
+  const repEl = $("#metricReported");
+  const resEl = $("#metricResolved");
+  const openEl = $("#metricOpen");
+  const ovEl = $("#metricOverdue");
+
+  animateCounter(repEl, metrics.total_reported);
+  animateCounter(resEl, metrics.total_resolved);
+  animateCounter(openEl, metrics.total_open);
+  animateCounter(ovEl, metrics.total_overdue);
+
+  const repSub = $("#metricReportedSub");
+  const resSub = $("#metricResolvedSub");
+  const openSub = $("#metricOpenSub");
+  const ovSub = $("#metricOverdueSub");
+
+  if (repSub) repSub.innerHTML = `● <em>${metrics.total_reported} total submitted</em>`;
+  if (resSub) resSub.innerHTML = `● <em>${metrics.resolution_rate_percent}% resolution rate</em>`;
+  if (openSub) openSub.innerHTML = `● <em>${metrics.total_open} active in queue</em>`;
+  if (ovSub) ovSub.innerHTML = `● <em>${metrics.total_overdue} urgent attention</em>`;
+
+  // Update Donut Resolution Rate
+  const donutText = $("#donutRateText");
+  const donutRes = $("#donutResolvedSummary");
+  const donutPend = $("#donutPendingSummary");
+  const donutVisual = $("#donutVisual");
+
+  if (donutText) donutText.textContent = `${metrics.resolution_rate_percent}%`;
+  if (donutRes) donutRes.innerHTML = `<i></i> ${metrics.total_resolved} resolved`;
+  if (donutPend) donutPend.innerHTML = `<i></i> ${metrics.total_open} open`;
+  if (donutVisual) {
+    donutVisual.style.background = `conic-gradient(#10b981 0% ${metrics.resolution_rate_percent}%, #d9e1ec ${metrics.resolution_rate_percent}% 100%)`;
+  }
+
+  // Update Priority Alerts in Overview panel
+  const alertList = $(".alert-list");
+  if (alertList && window.CivicBuzzAPI?.store?.getAll) {
+    const all = window.CivicBuzzAPI.store.getAll();
+    const urgentItems = all.filter(
+      (c) => (c.is_overdue || ["CRITICAL", "HIGH"].includes((c.priority_level || c.priority?.level || "").toUpperCase())) && c.status !== "RESOLVED"
+    ).slice(0, 4);
+
+    if (urgentItems.length > 0) {
+      alertList.innerHTML = urgentItems.map((c) => {
+        const catIcons = {
+          roads_potholes: { icon: "⌁", cls: "road" },
+          road: { icon: "⌁", cls: "road" },
+          garbage_sanitation: { icon: "♜", cls: "garbage" },
+          garbage: { icon: "♜", cls: "garbage" },
+          water_supply: { icon: "◒", cls: "water" },
+          water: { icon: "◒", cls: "water" },
+          streetlights: { icon: "☼", cls: "street" },
+          drainage: { icon: "🌊", cls: "water" },
+        };
+        const catInfo = catIcons[c.category] || { icon: "!", cls: "road" };
+        const pr = (c.priority_level || "HIGH").toLowerCase();
+        const timeAgo = getTimeAgo(c.created_at || Date.now());
+
+        return `
+          <article class="alert-item">
+            <span class="alert-icon ${catInfo.cls}">${catInfo.icon}</span>
+            <div>
+              <h3>${c.title}</h3>
+              <p>${c.location?.address || c.location?.ward_name || "Bhubaneswar"}</p>
+            </div>
+            <span class="status-pill ${c.is_overdue ? 'overdue' : 'attention'}">${c.is_overdue ? 'Overdue' : pr.toUpperCase()}</span>
+            <time>${timeAgo}</time>
+          </article>
+        `;
+      }).join("");
+    }
+  }
+
+  // Update AI routing table in Overview panel
+  const routingTable = $(".routing-table");
+  if (routingTable && window.CivicBuzzAPI?.store?.getAll) {
+    const all = window.CivicBuzzAPI.store.getAll();
+    const pendingItems = all.filter((c) => ["SUBMITTED", "PENDING"].includes((c.status || "").toUpperCase())).slice(0, 4);
+
+    if (pendingItems.length > 0) {
+      const head = `
+        <div class="table-head" role="row">
+          <span>Issue</span>
+          <span>Priority</span>
+          <span>Suggested department</span>
+        </div>
+      `;
+      const rows = pendingItems.map((c) => {
+        const catIcons = {
+          roads_potholes: { icon: "⌁", cls: "pothole-thumb" },
+          garbage_sanitation: { icon: "♜", cls: "garbage-thumb" },
+          water_supply: { icon: "◒", cls: "water-thumb" },
+          streetlights: { icon: "☼", cls: "street-thumb" },
+          drainage: { icon: "🌊", cls: "water-thumb" },
+        };
+        const catInfo = catIcons[c.category] || { icon: "●", cls: "pothole-thumb" };
+        const pr = (c.priority_level || "HIGH").toLowerCase();
+
+        return `
+          <div class="table-row" role="row">
+            <div class="issue-name">
+              <span class="issue-thumb ${catInfo.cls}">${catInfo.icon}</span>
+              <span>
+                <b>${c.title}</b>
+                <small>${c.location?.ward_name || 'Ward'} · #${c.complaint_id}</small>
+              </span>
+            </div>
+            <strong class="match ${pr === 'critical' || pr === 'high' ? 'high' : 'medium'}">${(c.priority_level || 'HIGH').toUpperCase()}</strong>
+            <button class="department-chip" data-toast="Department: ${c.department_name}">
+              ${c.department_name || 'Municipal Dept'} <i>⌄</i>
+            </button>
+          </div>
+        `;
+      }).join("");
+      routingTable.innerHTML = head + rows;
+    }
   }
 }
 
@@ -823,6 +1087,12 @@ function setTheme(theme) {
 }
 
 function activateNav(link) {
+  const href = link.getAttribute("href");
+  if (href && href.includes(".html")) {
+    window.location.href = href;
+    return;
+  }
+
   $$(".nav-link").forEach((item) =>
     item.classList.remove("active")
   );
@@ -859,6 +1129,7 @@ function showSection(sectionName) {
   };
 
   const targetSelector = viewMap[normalized] || "#section-dashboard";
+  const isDashboardView = targetSelector === "#section-dashboard" && normalized !== "maphotspots" && normalized !== "map";
 
   $$(".admin-view").forEach((view) => {
     view.classList.add("hidden");
@@ -867,6 +1138,12 @@ function showSection(sectionName) {
   const targetView = $(targetSelector);
   if (targetView) {
     targetView.classList.remove("hidden");
+  }
+
+  // Footer is strictly visible only on Dashboard view
+  const siteFooter = $("#footer") || $(".site-footer");
+  if (siteFooter) {
+    siteFooter.style.display = isDashboardView ? "" : "none";
   }
 
   translatePage(currentLanguage());
@@ -1080,10 +1357,63 @@ function setupIssueQueue() {
     if (pAss) pAss.textContent = issueData.dept || "Roads & Potholes Department";
     if (pDesc) pDesc.textContent = issueData.desc || "Reported civic issue awaiting verification and triage.";
 
+    // Dynamic Image Evidence Rendering
+    const imageContainer = $("#panelImageContainer");
+    let imageUrl = issueData.image_url || issueData.image || null;
+    
+    if (!imageUrl && window.ComplaintStore?.getAll) {
+      const allComps = window.ComplaintStore.getAll();
+      const match = allComps.find(c => (c.complaint_id || "").replace("#", "") === currentActiveIssueId);
+      if (match && match.image_url) {
+        imageUrl = match.image_url;
+      }
+    }
+
+    if (imageContainer) {
+      if (imageUrl) {
+        imageContainer.innerHTML = `
+          <div class="issue-image-card" onclick="window.openImageLightbox('${imageUrl}')">
+            <img src="${imageUrl}" alt="${issueData.title || 'Attached Evidence'}" loading="lazy" />
+            <div class="image-card-caption">
+              <span>🔍 Click to enlarge</span>
+              <small>Citizen Uploaded Evidence</small>
+            </div>
+          </div>
+        `;
+      } else {
+        imageContainer.innerHTML = `
+          <div class="image-not-uploaded-box">
+            <div class="no-img-icon">📷</div>
+            <div class="no-img-text">
+              <strong data-i18n="Image not uploaded">Image not uploaded</strong>
+              <p data-i18n="No visual media was attached by the citizen with this complaint.">No visual media was attached by the citizen with this complaint.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
     sidePanel.classList.add("open");
     panelOverlay.classList.add("active");
     translatePage(currentLanguage());
   }
+
+  window.openImageLightbox = function(src) {
+    let lightbox = document.getElementById("civicbuzzImageLightbox");
+    if (!lightbox) {
+      lightbox = document.createElement("div");
+      lightbox.id = "civicbuzzImageLightbox";
+      lightbox.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;backdrop-filter:blur(4px);";
+      lightbox.onclick = function() { lightbox.style.display = "none"; };
+      lightbox.innerHTML = `<img id="lightboxImg" style="max-width:92vw;max-height:92vh;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.8);border:2px solid rgba(255,255,255,0.2);object-fit:contain;" />`;
+      document.body.appendChild(lightbox);
+    }
+    const img = lightbox.querySelector("#lightboxImg");
+    if (img) img.src = src;
+    lightbox.style.display = "flex";
+  };
+
+  window.openIssueDetails = openIssueDetails;
 
   function closeIssueDetails() {
     sidePanel?.classList.remove("open");
@@ -1125,6 +1455,8 @@ function setupIssueQueue() {
     }
     showToast("Assigned issue to recommended department.");
     closeIssueDetails();
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
@@ -1136,6 +1468,8 @@ function setupIssueQueue() {
     }
     showToast("Issue marked as rejected.");
     closeIssueDetails();
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
@@ -1152,6 +1486,8 @@ function setupIssueQueue() {
       verRep.className = "ver-badge verified";
     }
     closeIssueDetails();
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
@@ -1159,8 +1495,8 @@ function setupIssueQueue() {
     if (!window.CivicBuzzAPI) return;
     try {
       const res = await window.CivicBuzzAPI.public.listComplaints();
-      if (res && res.data && res.data.length > 0) {
-        const comps = res.data;
+      if (res && res.data) {
+        const comps = Array.isArray(res.data) ? res.data : [];
         const totalCount = comps.length;
         const totalCountEl = $("#queueTotalCount");
         if (totalCountEl) totalCountEl.textContent = totalCount;
@@ -1170,24 +1506,56 @@ function setupIssueQueue() {
         let pendingCount = 0;
         let progressCount = 0;
         let resolvedCount = 0;
+        let verifiedCount = 0;
+        let rejectedCount = 0;
+        let priorityCount = 0;
 
         let rowsHtml = "";
         comps.forEach((c) => {
           const catIcons = {
             roads_potholes: "🛣️ Road",
+            road: "🛣️ Road",
             streetlights: "💡 Electricity",
+            electricity: "💡 Electricity",
             water_supply: "🚰 Water",
+            water: "🚰 Water",
             garbage_sanitation: "🗑️ Garbage",
+            garbage: "🗑️ Garbage",
             drainage: "🌊 Drainage",
           };
           const catLabel = catIcons[c.category] || `📍 ${c.category || "General"}`;
           const pr = (c.priority_level || c.priority?.level || "MEDIUM").toLowerCase();
-          const rawSt = (c.status || "SUBMITTED").toLowerCase();
-          const st = rawSt.replace(/_/g, " ");
+          const rawSt = (c.status || "PENDING").toLowerCase();
+          let st = "pending";
+          let badgeCls = "pending";
 
-          if (rawSt.includes("subm") || rawSt.includes("pend")) pendingCount++;
-          else if (rawSt.includes("prog") || rawSt.includes("assign")) progressCount++;
-          else if (rawSt.includes("resolv") || rawSt.includes("verif")) resolvedCount++;
+          if (rawSt.includes("subm") || rawSt.includes("pend")) {
+            st = "pending";
+            badgeCls = "pending";
+            pendingCount++;
+          } else if (rawSt.includes("prog") || rawSt.includes("assign") || rawSt.includes("work")) {
+            st = "in progress";
+            badgeCls = "progress in-progress";
+            progressCount++;
+          } else if (rawSt.includes("resolv")) {
+            st = "resolved";
+            badgeCls = "resolved";
+            resolvedCount++;
+          } else if (rawSt.includes("verif") || rawSt.includes("close")) {
+            st = "verified";
+            badgeCls = "verified";
+            verifiedCount++;
+          } else if (rawSt.includes("reject")) {
+            st = "rejected";
+            badgeCls = "rejected";
+            rejectedCount++;
+          } else {
+            st = "pending";
+            badgeCls = "pending";
+            pendingCount++;
+          }
+
+          if (pr === "critical" || pr === "high") priorityCount++;
 
           rowsHtml += `
             <tr data-status="${st}" data-priority="${pr}" data-category="${c.category || 'road'}">
@@ -1197,7 +1565,7 @@ function setupIssueQueue() {
               <td><span class="category-chip">${catLabel}</span></td>
               <td><span class="priority-badge ${pr}">${pr}</span></td>
               <td>${new Date(c.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-              <td><span class="status-badge ${st}">${st}</span></td>
+              <td><span class="status-badge ${badgeCls}">${st}</span></td>
               <td><button class="view-issue-btn" type="button" data-issue-id="${c.complaint_id}" title="View Details">👁</button></td>
             </tr>
           `;
@@ -1211,9 +1579,15 @@ function setupIssueQueue() {
         const qPending = $("#queuePendingCount");
         const qProg = $("#queueProgressCount");
         const qRes = $("#queueResolvedCount");
-        if (qPending && pendingCount > 0) qPending.textContent = pendingCount;
-        if (qProg && progressCount > 0) qProg.textContent = progressCount;
-        if (qRes && resolvedCount > 0) qRes.textContent = resolvedCount;
+        const qVer = $("#queueVerifiedCount");
+        const qRej = $("#queueRejectedCount");
+        const qPriority = $("#queuePriorityCount");
+        if (qPending) qPending.textContent = pendingCount;
+        if (qProg) qProg.textContent = progressCount;
+        if (qRes) qRes.textContent = resolvedCount;
+        if (qVer) qVer.textContent = verifiedCount;
+        if (qRej) qRej.textContent = rejectedCount;
+        if (qPriority) qPriority.textContent = priorityCount;
       }
     } catch (_) {}
   }
@@ -1226,125 +1600,469 @@ function setupIssueQueue() {
 // =========================================================
 
 function setupDepartments() {
-  const searchInput = $("#departmentSearch");
   const deptGrid = $("#departmentGrid");
+  const searchInput = $("#departmentSearch");
+  const statusFilter = $("#deptStatusFilter");
+  const sortFilter = $("#deptSortFilter");
+  const openAddBtn = $("#openAddDepartment");
+
   const modal = $("#departmentModal");
-  const openBtn = $("#openAddDepartment");
   const closeBtn = $("#closeDeptModal");
   const cancelBtn = $("#cancelDeptModal");
   const form = $("#departmentForm");
 
-  searchInput?.addEventListener("input", () => {
-    const q = searchInput.value.trim().toLowerCase();
-    $$(".dept-card", deptGrid).forEach((card) => {
-      const text = card.textContent.toLowerCase();
-      card.hidden = !(!q || text.includes(q));
-    });
-  });
-
-  function openDeptModal() {
-    if (modal) modal.hidden = false;
+  // Open Add Modal
+  function openAddModal() {
+    if (!modal) return;
+    const editIdEl = $("#deptEditId");
+    if (editIdEl) editIdEl.value = "";
+    const titleEl = $("#deptModalTitle");
+    if (titleEl) titleEl.textContent = "Add Department";
+    const eyeEl = $("#deptModalEyebrow");
+    if (eyeEl) eyeEl.textContent = "NEW DEPARTMENT";
+    form?.reset();
+    if ($("#deptIcon")) $("#deptIcon").value = "🏛️";
+    if ($("#deptStatus")) $("#deptStatus").value = "ACTIVE";
+    if ($("#deptStaff")) $("#deptStaff").value = "25";
+    if ($("#deptSlaHours")) $("#deptSlaHours").value = "24";
+    if ($("#deptBudget")) $("#deptBudget").value = "₹30.0 L";
+    if ($("#deptCoverage")) $("#deptCoverage").value = "All 67 Wards";
+    modal.hidden = false;
   }
-  function closeDeptModal() {
+
+  // Open Edit Modal
+  window.openEditDepartmentModal = async function(deptId) {
+    if (!modal) return;
+    let dept = null;
+    if (window.CivicBuzzAPI?.deptStore?.getById) {
+      dept = window.CivicBuzzAPI.deptStore.getById(deptId);
+    }
+    if (!dept && window.DepartmentStore?.getById) {
+      dept = window.DepartmentStore.getById(deptId);
+    }
+    if (!dept) return;
+
+    if ($("#deptEditId")) $("#deptEditId").value = dept.id || deptId;
+    if ($("#deptModalTitle")) $("#deptModalTitle").textContent = "Edit Department";
+    if ($("#deptModalEyebrow")) $("#deptModalEyebrow").textContent = "MANAGE DEPARTMENT";
+    
+    if ($("#deptName")) $("#deptName").value = dept.name || "";
+    if ($("#deptCode")) $("#deptCode").value = dept.code || "";
+    if ($("#deptIcon")) $("#deptIcon").value = dept.icon || "🏛️";
+    if ($("#deptStatus")) $("#deptStatus").value = dept.status || "ACTIVE";
+    if ($("#deptHead")) $("#deptHead").value = dept.head_name || dept.head || "";
+    if ($("#deptHeadTitle")) $("#deptHeadTitle").value = dept.head_title || "";
+    if ($("#deptEmail")) $("#deptEmail").value = dept.email || "";
+    if ($("#deptPhone")) $("#deptPhone").value = dept.phone || "";
+    if ($("#deptStaff")) $("#deptStaff").value = dept.staff_count || 20;
+    if ($("#deptSlaHours")) $("#deptSlaHours").value = dept.sla_hours || 24;
+    if ($("#deptBudget")) $("#deptBudget").value = dept.budget_allocated || "₹25.0 L";
+    if ($("#deptCoverage")) $("#deptCoverage").value = dept.ward_coverage || "All Wards";
+    if ($("#deptDesc")) $("#deptDesc").value = dept.description || dept.desc || "";
+
+    modal.hidden = false;
+  };
+
+  // Delete Department
+  window.handleDeleteDepartment = async function(deptId, deptName) {
+    if (!confirm(`Are you sure you want to remove the department "${deptName}"? This will reassign any linked active complaints.`)) {
+      return;
+    }
+    if (window.CivicBuzzAPI?.admin?.deleteDepartment) {
+      await window.CivicBuzzAPI.admin.deleteDepartment(deptId);
+    } else if (window.DepartmentStore?.delete) {
+      window.DepartmentStore.delete(deptId);
+    }
+    showToast(`Department "${deptName}" removed.`);
+    loadLiveDepartments();
+  };
+
+  // Jump to Issue Queue with this department filter
+  window.filterGrievanceQueueByDept = function(deptCode) {
+    if (typeof showSection === "function") {
+      showSection("issuequeue");
+    }
+    const qInput = $("#issueSearch");
+    if (qInput) {
+      qInput.value = deptCode;
+      qInput.dispatchEvent(new Event("input"));
+    }
+    showToast(`Filtered Issue Queue by ${deptCode}.`);
+  };
+
+  function closeModal() {
     if (modal) modal.hidden = true;
   }
 
-  openBtn?.addEventListener("click", openDeptModal);
-  closeBtn?.addEventListener("click", closeDeptModal);
-  cancelBtn?.addEventListener("click", closeDeptModal);
+  openAddBtn?.addEventListener("click", openAddModal);
+  closeBtn?.addEventListener("click", closeModal);
+  cancelBtn?.addEventListener("click", closeModal);
 
-  async function loadDepartmentsFromDB() {
-    if (!window.CivicBuzzAPI?.admin?.listDepartments) return;
-    try {
-      const res = await window.CivicBuzzAPI.admin.listDepartments();
-      if (res && res.data && res.data.length > 0 && deptGrid) {
-        let gridHtml = "";
-        res.data.forEach((d) => {
-          const icon = d.name.toLowerCase().includes("light") ? "💡" :
-                       d.name.toLowerCase().includes("sanit") || d.name.toLowerCase().includes("waste") ? "🗑️" :
-                       d.name.toLowerCase().includes("water") || d.name.toLowerCase().includes("drain") ? "🚰" :
-                       d.name.toLowerCase().includes("park") || d.name.toLowerCase().includes("green") ? "🌳" : "🛣️";
-          gridHtml += `
-            <article class="dept-card" data-name="${d.name.toLowerCase()}">
-              <div class="card-topline">
-                <span class="dept-icon">${icon}</span>
-                <span class="badge-active">${d.is_active ? 'Active' : 'Inactive'}</span>
-              </div>
-              <h3>${d.name}</h3>
-              <p class="dept-desc">${d.description || 'Municipal department handling civic grievance triage.'}</p>
-              <div class="dept-meta">
-                <div><strong>Head:</strong> <span>${d.name.split(' ')[0]} Head</span></div>
-                <div><strong>Email:</strong> <span>${d.contact_email || `${d.code.toLowerCase()}@civicbuzz.gov`}</span></div>
-                <div><strong>Phone:</strong> <span>${d.contact_phone || '+91 80 2297 5000'}</span></div>
-              </div>
-              <div class="dept-footer">
-                <span><strong>${d.open_issues || 0}</strong> open issues</span>
-                <span class="pill-stat">${d.avg_resolution_days || 2.5}d avg</span>
-              </div>
-            </article>
-          `;
-        });
-        deptGrid.innerHTML = gridHtml;
-        const statTotal = $("#statTotal");
-        if (statTotal) statTotal.textContent = res.data.length;
-        translatePage(currentLanguage());
-      }
-    } catch (_) {}
-  }
-
-  loadDepartmentsFromDB();
-
+  // Form Submit (Add or Update)
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const editId = $("#deptEditId")?.value.trim();
     const name = $("#deptName")?.value.trim();
-    const head = $("#deptHead")?.value.trim();
+    const code = $("#deptCode")?.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "_");
+    const icon = $("#deptIcon")?.value || "🏛️";
+    const status = $("#deptStatus")?.value || "ACTIVE";
+    const headName = $("#deptHead")?.value.trim();
+    const headTitle = $("#deptHeadTitle")?.value.trim() || "Department Head";
     const email = $("#deptEmail")?.value.trim();
-    const desc = $("#deptDesc")?.value.trim();
+    const phone = $("#deptPhone")?.value.trim();
+    const staffCount = Number($("#deptStaff")?.value) || 20;
+    const slaHours = Number($("#deptSlaHours")?.value) || 24;
+    const budget = $("#deptBudget")?.value.trim() || "₹25.0 L";
+    const coverage = $("#deptCoverage")?.value.trim() || "All Wards";
+    const desc = $("#deptDesc")?.value.trim() || "Municipal department handling civic operations.";
 
-    if (name && deptGrid) {
-      if (window.CivicBuzzAPI?.admin?.createDepartment) {
-        try {
-          await window.CivicBuzzAPI.admin.createDepartment({
-            name,
-            head_name: head,
-            contact_email: email,
-            description: desc,
-          });
-        } catch (_) {}
+    const payload = {
+      name,
+      code,
+      icon,
+      status,
+      head_name: headName,
+      head_title: headTitle,
+      email,
+      phone,
+      staff_count: staffCount,
+      sla_hours: slaHours,
+      budget_allocated: budget,
+      ward_coverage: coverage,
+      description: desc
+    };
+
+    if (editId) {
+      if (window.CivicBuzzAPI?.admin?.updateDepartment) {
+        await window.CivicBuzzAPI.admin.updateDepartment(editId, payload);
+      } else if (window.DepartmentStore?.update) {
+        window.DepartmentStore.update(editId, payload);
       }
+      showToast(`Department "${name}" updated successfully.`);
+    } else {
+      if (window.CivicBuzzAPI?.admin?.createDepartment) {
+        await window.CivicBuzzAPI.admin.createDepartment(payload);
+      } else if (window.DepartmentStore?.add) {
+        window.DepartmentStore.add(payload);
+      }
+      showToast(`New department "${name}" registered in database.`);
+    }
 
-      const card = document.createElement("article");
-      card.className = "dept-card";
-      card.setAttribute("data-name", name.toLowerCase());
-      card.innerHTML = `
-        <div class="card-topline">
-          <span class="dept-icon">🏛️</span>
-          <span class="badge-active">Active</span>
-        </div>
-        <h3>${name}</h3>
-        <p class="dept-desc">${desc || 'Department registered for civic grievance triage.'}</p>
-        <div class="dept-meta">
-          <div><strong>Head:</strong> <span>${head}</span></div>
-          <div><strong>Email:</strong> <span>${email}</span></div>
-        </div>
-        <div class="dept-footer">
-          <span><strong>0</strong> open issues</span>
-          <span class="pill-stat">New</span>
+    closeModal();
+    form.reset();
+    loadLiveDepartments();
+  });
+
+  // Load & Render Departments from DB/Store with instant 0ms pre-render
+  function renderDeptData(depts) {
+    if (!deptGrid) return;
+    const complaints = window.ComplaintStore?.getAll ? window.ComplaintStore.getAll() : [];
+
+    // KPI Metrics calculation
+    const totalDepts = depts.length;
+    const activeDepts = depts.filter(d => (d.status || "").toUpperCase() === "ACTIVE").length;
+    const totalStaff = depts.reduce((acc, d) => acc + (Number(d.staff_count) || 0), 0);
+    
+    const openAssigned = complaints.filter(c => {
+      const st = (c.status || "").toUpperCase();
+      return ["SUBMITTED", "PENDING", "ASSIGNED", "IN_PROGRESS", "PROGRESS"].includes(st);
+    }).length;
+
+    const statTot = $("#deptStatTotal");
+    const statAct = $("#deptStatActive");
+    const statStf = $("#deptStatStaff");
+    const statOpn = $("#deptStatOpenIssues");
+
+    if (statTot) statTot.textContent = totalDepts;
+    if (statAct) statAct.textContent = activeDepts;
+    if (statStf) statStf.textContent = totalStaff;
+    if (statOpn) statOpn.textContent = openAssigned;
+
+    // Filter & Sort
+    const query = (searchInput?.value || "").toLowerCase().trim();
+    const statusVal = statusFilter?.value || "ALL";
+    const sortVal = sortFilter?.value || "name";
+
+    let filtered = depts.filter(d => {
+      const matchQuery = !query || 
+        (d.name || "").toLowerCase().includes(query) ||
+        (d.code || "").toLowerCase().includes(query) ||
+        (d.head_name || "").toLowerCase().includes(query) ||
+        (d.email || "").toLowerCase().includes(query) ||
+        (d.description || "").toLowerCase().includes(query);
+
+      const matchStatus = statusVal === "ALL" || (d.status || "").toUpperCase() === statusVal;
+      return matchQuery && matchStatus;
+    });
+
+    if (sortVal === "name") {
+      filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    } else if (sortVal === "open") {
+      filtered.sort((a, b) => {
+        const countA = complaints.filter(c => (c.department_code || "").toUpperCase() === (a.code || "").toUpperCase()).length;
+        const countB = complaints.filter(c => (c.department_code || "").toUpperCase() === (b.code || "").toUpperCase()).length;
+        return countB - countA;
+      });
+    } else if (sortVal === "staff") {
+      filtered.sort((a, b) => (Number(b.staff_count) || 0) - (Number(a.staff_count) || 0));
+    } else if (sortVal === "rating") {
+      filtered.sort((a, b) => (Number(b.performance_rating) || 90) - (Number(a.performance_rating) || 90));
+    }
+
+    if (filtered.length === 0) {
+      deptGrid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:40px 20px; background:var(--surface); border:1px dashed var(--border); border-radius:12px;">
+          <span style="font-size:32px;">🔍</span>
+          <h3 style="margin:10px 0 4px; color:var(--ink);" data-i18n="No matching departments found">No matching departments found</h3>
+          <p style="color:var(--muted); font-size:13px;" data-i18n="Try adjusting your search query or status filter.">Try adjusting your search query or status filter.</p>
         </div>
       `;
-      deptGrid.prepend(card);
-      translatePage(currentLanguage());
+      return;
+    }
 
-      const statTotal = $("#statTotal");
-      if (statTotal) {
-        statTotal.textContent = String(Number(statTotal.textContent || 6) + 1);
+    let cardsHtml = "";
+    filtered.forEach(d => {
+      const deptCodeClean = (d.code || "").toUpperCase();
+      const deptCategoryClean = (d.category_key || "").toLowerCase();
+
+      const deptComps = complaints.filter(c => {
+        const cDeptCode = (c.department_code || "").toUpperCase();
+        const cCat = (c.category || "").toLowerCase();
+        return cDeptCode === deptCodeClean || cCat === deptCategoryClean || (c.department_name && c.department_name.toLowerCase().includes(d.name.toLowerCase()));
+      });
+
+      const openCount = deptComps.filter(c => {
+        const st = (c.status || "").toUpperCase();
+        return ["SUBMITTED", "PENDING", "ASSIGNED", "IN_PROGRESS", "PROGRESS"].includes(st);
+      }).length;
+
+      const resolvedCount = deptComps.filter(c => {
+        const st = (c.status || "").toUpperCase();
+        return ["RESOLVED", "VERIFIED", "CLOSED"].includes(st);
+      }).length;
+
+      const totalCount = deptComps.length;
+      const perfRating = d.performance_rating || (totalCount > 0 ? Math.min(100, Math.round((resolvedCount / Math.max(1, totalCount)) * 100 + 40)) : 95);
+
+      const stUpper = (d.status || "ACTIVE").toUpperCase();
+      let badgeHtml = '<span class="badge-active">Active</span>';
+      if (stUpper === "UNDERSTAFFED") {
+        badgeHtml = '<span class="badge-warning">Understaffed</span>';
+      } else if (stUpper === "STANDBY") {
+        badgeHtml = '<span class="badge-standby">Standby</span>';
       }
 
-      showToast(`Department "${name}" stored in database.`);
-      form.reset();
-      closeDeptModal();
+      cardsHtml += `
+        <article class="dept-card" data-dept-id="${d.id || d.code}">
+          <div class="card-topline">
+            <div class="dept-icon-wrapper">
+              <span class="dept-icon">${d.icon || '🏛️'}</span>
+              <div>
+                <span class="dept-code-tag">${d.code || 'DEPT'}</span>
+              </div>
+            </div>
+            ${badgeHtml}
+          </div>
+
+          <h3>${d.name}</h3>
+          <p class="dept-desc">${d.description || 'Municipal department managing civic operations and grievance resolutions.'}</p>
+
+          <div class="dept-meta">
+            <div>
+              <strong>Head of Dept:</strong>
+              <span>${d.head_name || 'Officer in Charge'} <small style="color:var(--muted);font-weight:normal;">(${d.head_title || 'Chief'})</small></span>
+            </div>
+            <div>
+              <strong>Official Email:</strong>
+              <span><a href="mailto:${d.email || 'info@civicbuzz.gov.in'}">${d.email || 'info@civicbuzz.gov.in'}</a></span>
+            </div>
+            <div>
+              <strong>Contact Phone:</strong>
+              <span><a href="tel:${d.phone || '+916742534400'}">${d.phone || '+91 674 253 4400'}</a></span>
+            </div>
+            <div>
+              <strong>Staff & Coverage:</strong>
+              <span>${d.staff_count || 20} Staff · ${d.ward_coverage || 'All Wards'}</span>
+            </div>
+          </div>
+
+          <div class="dept-sla-box">
+            <div class="sla-labels">
+              <span>SLA Target: ${d.sla_hours || 24}h</span>
+              <span style="color:var(--green);">${perfRating}% SLA Adherence</span>
+            </div>
+            <div class="sla-progress-track">
+              <div class="sla-progress-fill" style="width:${perfRating}%;"></div>
+            </div>
+          </div>
+
+          <div class="dept-footer">
+            <span><strong>${openCount}</strong> open ${openCount === 1 ? 'grievance' : 'grievances'}</span>
+            <div class="dept-actions">
+              <button class="dept-btn primary" onclick="window.filterGrievanceQueueByDept('${d.code || d.name}')" title="View Assigned Issues">📋 Queue</button>
+              <button class="dept-btn" onclick="window.openEditDepartmentModal('${d.id || d.code}')" title="Edit Department Details">✏️ Edit</button>
+              <button class="dept-btn danger" onclick="window.handleDeleteDepartment('${d.id || d.code}', '${d.name.replace(/'/g, "\\'")}')" title="Delete Department">🗑️</button>
+            </div>
+          </div>
+        </article>
+      `;
+    });
+
+    deptGrid.innerHTML = cardsHtml;
+    translatePage(currentLanguage());
+  }
+
+  // Load & Render Departments with 0ms instant render & background sync
+  function loadLiveDepartments() {
+    if (!deptGrid) return;
+
+    // 1. Instant Synchronous Render (0ms) from local store
+    const localDepts = window.DepartmentStore?.getAll ? window.DepartmentStore.getAll() : [];
+    renderDeptData(localDepts);
+
+    // 2. Non-blocking Background API Sync
+    if (window.CivicBuzzAPI?.admin?.listDepartments) {
+      window.CivicBuzzAPI.admin.listDepartments().then((res) => {
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          renderDeptData(res.data);
+        }
+      }).catch(() => {});
+    }
+  }
+
+  // ---- Search Advice & Autocomplete Suggestions Dropdown ----
+  const suggestionsBox = $("#deptSearchSuggestions");
+
+  function escapeLocalHTML(val) {
+    const div = document.createElement("div");
+    div.textContent = val || "";
+    return div.innerHTML;
+  }
+
+  function renderSuggestions(query) {
+    if (!suggestionsBox) return;
+    const cleanQ = (query || "").trim().toLowerCase();
+
+    if (!cleanQ || cleanQ.length === 0) {
+      suggestionsBox.hidden = true;
+      suggestionsBox.innerHTML = "";
+      return;
+    }
+
+    const depts = window.DepartmentStore?.getAll ? window.DepartmentStore.getAll() : [];
+    
+    // Match departments on Name, Code, Head, Scope description, or Email
+    const matches = depts.filter(d => {
+      const name = (d.name || "").toLowerCase();
+      const code = (d.code || "").toLowerCase();
+      const head = (d.head_name || "").toLowerCase();
+      const desc = (d.description || "").toLowerCase();
+      const email = (d.email || "").toLowerCase();
+      const coverage = (d.ward_coverage || "").toLowerCase();
+      return name.includes(cleanQ) || code.includes(cleanQ) || head.includes(cleanQ) || desc.includes(cleanQ) || email.includes(cleanQ) || coverage.includes(cleanQ);
+    });
+
+    if (matches.length === 0) {
+      suggestionsBox.innerHTML = `
+        <div style="padding:10px 14px; color:var(--muted); font-size:12px; text-align:center;">
+          No department found matching "<strong>${escapeLocalHTML(cleanQ)}</strong>"
+        </div>
+      `;
+      suggestionsBox.hidden = false;
+      return;
+    }
+
+    let suggestHtml = `<div class="suggest-header">Matching Departments (${matches.length})</div>`;
+    matches.slice(0, 5).forEach((d) => {
+      const isAct = (d.status || "ACTIVE").toUpperCase() === "ACTIVE";
+      const badgeClass = isAct ? "badge-active" : (d.status === "UNDERSTAFFED" ? "badge-warning" : "badge-standby");
+      
+      const highlight = (text, term) => {
+        if (!text) return "";
+        const idx = text.toLowerCase().indexOf(term);
+        if (idx === -1) return escapeLocalHTML(text);
+        const before = text.substring(0, idx);
+        const match = text.substring(idx, idx + term.length);
+        const after = text.substring(idx + term.length);
+        return `${escapeLocalHTML(before)}<mark style="background:rgba(47,110,232,0.25); color:inherit; font-weight:800; border-radius:2px; padding:0 2px;">${escapeLocalHTML(match)}</mark>${escapeLocalHTML(after)}`;
+      };
+
+      suggestHtml += `
+        <div class="dept-suggest-item" data-dept-id="${d.id || d.code}" data-dept-name="${escapeLocalHTML(d.name || '')}">
+          <div class="suggest-left">
+            <span class="suggest-icon">${d.icon || '🏛️'}</span>
+            <div class="suggest-info">
+              <strong>${highlight(d.name || '', cleanQ)}</strong>
+              <small>Head: ${highlight(d.head_name || 'In-Charge', cleanQ)} · ${d.staff_count || 20} Staff</small>
+            </div>
+          </div>
+          <span class="suggest-badge ${badgeClass}" style="font-size:10px;">${d.status || 'Active'}</span>
+        </div>
+      `;
+    });
+
+    suggestionsBox.innerHTML = suggestHtml;
+    suggestionsBox.hidden = false;
+
+    // Click on advice suggestion
+    $$(".dept-suggest-item", suggestionsBox).forEach((item) => {
+      item.addEventListener("click", () => {
+        const deptName = item.getAttribute("data-dept-name");
+        const deptId = item.getAttribute("data-dept-id");
+        if (searchInput) {
+          searchInput.value = deptName;
+        }
+        suggestionsBox.hidden = true;
+        loadLiveDepartments();
+
+        // Smoothly focus & pulse highlight the matching department card
+        setTimeout(() => {
+          const targetCard = $(`article.dept-card[data-dept-id="${deptId}"]`);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetCard.classList.remove("highlight-pulse");
+            void targetCard.offsetWidth;
+            targetCard.classList.add("highlight-pulse");
+          }
+        }, 120);
+      });
+    });
+  }
+
+  // Event Listeners for Search Advice & Filters
+  searchInput?.addEventListener("input", (e) => {
+    renderSuggestions(e.target.value);
+    loadLiveDepartments();
+  });
+
+  searchInput?.addEventListener("focus", (e) => {
+    if (e.target.value.trim().length > 0) {
+      renderSuggestions(e.target.value);
     }
   });
+
+  statusFilter?.addEventListener("change", () => loadLiveDepartments());
+  sortFilter?.addEventListener("change", () => loadLiveDepartments());
+
+  // Close suggestions dropdown when clicking outside or pressing Escape
+  document.addEventListener("click", (e) => {
+    if (!searchInput?.contains(e.target) && !suggestionsBox?.contains(e.target)) {
+      if (suggestionsBox) suggestionsBox.hidden = true;
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && suggestionsBox && !suggestionsBox.hidden) {
+      suggestionsBox.hidden = true;
+    }
+  });
+
+  // Listen for cross-tab or data updates
+  window.addEventListener("civicbuzz:departments_changed", () => loadLiveDepartments());
+  window.addEventListener("civicbuzz:complaints_changed", () => loadLiveDepartments());
+
+  // Initial load
+  loadLiveDepartments();
 }
 
 // =========================================================
@@ -1352,124 +2070,280 @@ function setupDepartments() {
 // =========================================================
 
 function setupBudgeting() {
-  const filterBtns = $$("#statusFilters .filter-button");
   const tenderTrack = $("#tenderTrack");
+  const filterBtns = $$("#statusFilters .filter-button");
+  const searchInput = $("#tenderSearch");
   const modal = $("#tenderModal");
   const openBtn = $("#openTenderModal");
   const closeBtn = $("#closeTenderModal");
   const cancelBtn = $("#cancelTenderModal");
   const form = $("#tenderForm");
+  const lifecycleTrack = $("#tenderLifecycleTrack");
+  const selectedBadge = $("#selectedTenderBadge");
 
+  let activeTenderId = "CB-T-0015";
+  let activeFilter = "all";
+
+  // Helper format budget to INR
+  function formatINR(val) {
+    const num = Number(val) || 0;
+    if (num >= 10000000) return `₹${(num / 10000000).toFixed(2)} Cr`;
+    if (num >= 100000) return `₹${(num / 100000).toFixed(1)} L`;
+    return `₹${num.toLocaleString("en-IN")}`;
+  }
+
+  // Open Add Modal
+  function openAddModal() {
+    if (!modal) return;
+    const editIdEl = $("#tenderEditId");
+    if (editIdEl) editIdEl.value = "";
+    const titleEl = $("#tenderModalTitle");
+    if (titleEl) titleEl.textContent = "Add Tender";
+    const eyeEl = $("#tenderModalEyebrow");
+    if (eyeEl) eyeEl.textContent = "NEW PROJECT";
+    form?.reset();
+
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    if ($("#tenderDeadline")) $("#tenderDeadline").value = d.toISOString().slice(0, 10);
+    if ($("#tenderBudget")) $("#tenderBudget").value = "2500000";
+    if ($("#tenderWard")) $("#tenderWard").value = "15";
+    if ($("#tenderProgress")) $("#tenderProgress").value = "20";
+    if ($("#tenderStatus")) $("#tenderStatus").value = "PUBLISHED";
+    modal.hidden = false;
+  }
+
+  // Open Edit Modal
+  window.openEditTenderModal = function(tenderId) {
+    if (!modal) return;
+    let tender = null;
+    if (window.CivicBuzzAPI?.tenderStore?.getById) {
+      tender = window.CivicBuzzAPI.tenderStore.getById(tenderId);
+    }
+    if (!tender && window.TenderStore?.getById) {
+      tender = window.TenderStore.getById(tenderId);
+    }
+    if (!tender) return;
+
+    if ($("#tenderEditId")) $("#tenderEditId").value = tender.tender_id || tenderId;
+    if ($("#tenderModalTitle")) $("#tenderModalTitle").textContent = "Edit Tender";
+    if ($("#tenderModalEyebrow")) $("#tenderModalEyebrow").textContent = "MANAGE PROJECT";
+
+    if ($("#tenderTitle")) $("#tenderTitle").value = tender.title || "";
+    if ($("#tenderCategory")) $("#tenderCategory").value = tender.category || "roads_potholes";
+    if ($("#tenderStatus")) $("#tenderStatus").value = (tender.status || "PUBLISHED").toUpperCase();
+    if ($("#tenderWard")) $("#tenderWard").value = tender.ward_id || 15;
+    if ($("#tenderLocation")) $("#tenderLocation").value = tender.location || "";
+    if ($("#tenderBudget")) $("#tenderBudget").value = tender.estimated_budget || 250000;
+    if ($("#tenderContractor")) $("#tenderContractor").value = tender.contractor_name || "";
+    if ($("#tenderProgress")) $("#tenderProgress").value = tender.progress_percentage || 0;
+    if ($("#tenderDeadline")) {
+      const dl = tender.submission_deadline || tender.target_completion_date;
+      $("#tenderDeadline").value = dl ? dl.slice(0, 10) : "";
+    }
+    if ($("#tenderDesc")) $("#tenderDesc").value = tender.description || "";
+
+    modal.hidden = false;
+  };
+
+  // Delete Tender
+  window.handleDeleteTender = async function(tenderId, title) {
+    if (!confirm(`Are you sure you want to remove the tender "${title}" (${tenderId})?`)) {
+      return;
+    }
+    if (window.CivicBuzzAPI?.admin?.deleteTender) {
+      await window.CivicBuzzAPI.admin.deleteTender(tenderId);
+    } else if (window.TenderStore?.delete) {
+      window.TenderStore.delete(tenderId);
+    }
+    showToast(`Tender ${tenderId} removed.`);
+    loadLiveTenders();
+  };
+
+  function closeModal() {
+    if (modal) modal.hidden = true;
+  }
+
+  openBtn?.addEventListener("click", openAddModal);
+  closeBtn?.addEventListener("click", closeModal);
+  cancelBtn?.addEventListener("click", closeModal);
+
+  // Form Submit (Add or Update)
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const editId = $("#tenderEditId")?.value.trim();
+    const title = $("#tenderTitle")?.value.trim();
+    const category = $("#tenderCategory")?.value || "roads_potholes";
+    const status = ($("#tenderStatus")?.value || "PUBLISHED").toUpperCase();
+    const ward = Number($("#tenderWard")?.value) || 15;
+    const location = $("#tenderLocation")?.value.trim() || `Ward ${ward}`;
+    const budget = Number($("#tenderBudget")?.value) || 250000;
+    const deadline = $("#tenderDeadline")?.value;
+    const contractor = $("#tenderContractor")?.value.trim() || "TBD (Under Bidding)";
+    const progress = Number($("#tenderProgress")?.value) || (status === "COMPLETED" ? 100 : 20);
+    const desc = $("#tenderDesc")?.value.trim() || "Civic infrastructure project generated from verified citizen clusters.";
+
+    const payload = {
+      title,
+      category,
+      status,
+      ward_id: ward,
+      location,
+      estimated_budget: budget,
+      submission_deadline: deadline,
+      target_completion_date: deadline,
+      contractor_name: contractor,
+      progress_percentage: progress,
+      description: desc
+    };
+
+    if (editId) {
+      if (window.CivicBuzzAPI?.admin?.updateTender) {
+        await window.CivicBuzzAPI.admin.updateTender(editId, payload);
+      } else if (window.TenderStore?.update) {
+        window.TenderStore.update(editId, payload);
+      }
+      showToast(`Tender "${title}" updated successfully.`);
+    } else {
+      if (window.CivicBuzzAPI?.admin?.createTender) {
+        await window.CivicBuzzAPI.admin.createTender(payload);
+      } else if (window.TenderStore?.add) {
+        window.TenderStore.add(payload);
+      }
+      showToast(`Tender "${title}" published in database.`);
+    }
+
+    closeModal();
+    form.reset();
+    loadLiveTenders();
+  });
+
+  // Load & Render Tenders from DB/Store
+  async function loadLiveTenders() {
+    if (!tenderTrack) return;
+
+    let tenders = [];
+    if (window.CivicBuzzAPI?.tenders?.list) {
+      try {
+        const res = await window.CivicBuzzAPI.tenders.list();
+        if (res && res.data && Array.isArray(res.data)) {
+          tenders = res.data;
+        }
+      } catch (_) {}
+    }
+    if (!tenders || tenders.length === 0) {
+      tenders = window.TenderStore?.getAll ? window.TenderStore.getAll() : [];
+    }
+
+    // KPI Metrics calculation
+    const openCount = tenders.filter(t => (t.status || "").toUpperCase() === "PUBLISHED").length;
+    const draftCount = tenders.filter(t => (t.status || "").toUpperCase() === "DRAFT").length;
+    const inProgressCount = tenders.filter(t => (t.status || "").toUpperCase() === "IN_PROGRESS").length;
+    const totalAllocated = tenders.reduce((acc, t) => acc + (Number(t.estimated_budget) || 0), 0);
+
+    const statOpn = $("#budgetStatOpen");
+    const statDrf = $("#budgetStatDraft");
+    const statAlc = $("#budgetStatAllocated");
+    const statPrg = $("#budgetStatProgress");
+
+    if (statOpn) statOpn.textContent = openCount;
+    if (statDrf) statDrf.textContent = draftCount;
+    if (statAlc) statAlc.textContent = formatINR(totalAllocated);
+    if (statPrg) statPrg.textContent = inProgressCount;
+
+    // Filter & Search
+    const query = (searchInput?.value || "").toLowerCase().trim();
+    const filtered = tenders.filter(t => {
+      const matchQuery = !query ||
+        (t.title || "").toLowerCase().includes(query) ||
+        (t.tender_id || "").toLowerCase().includes(query) ||
+        (t.location || "").toLowerCase().includes(query) ||
+        (t.contractor_name || "").toLowerCase().includes(query) ||
+        (t.description || "").toLowerCase().includes(query);
+
+      const st = (t.status || "PUBLISHED").toUpperCase();
+      const matchFilter = activeFilter === "all" || st === activeFilter.toUpperCase();
+      return matchQuery && matchFilter;
+    });
+
+    if (filtered.length === 0) {
+      tenderTrack.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:40px 20px; background:var(--surface); border:1px dashed var(--border); border-radius:12px;">
+          <span style="font-size:32px;">📑</span>
+          <h3 style="margin:10px 0 4px; color:var(--ink);" data-i18n="No matching tenders found">No matching tenders found</h3>
+          <p style="color:var(--muted); font-size:13px;" data-i18n="Try adjusting your filter or search query.">Try adjusting your filter or search query.</p>
+        </div>
+      `;
+      renderLifecyclePipeline(activeTenderId);
+      return;
+    }
+
+    let cardsHtml = "";
+    filtered.forEach(t => {
+      const rawSt = (t.status || "PUBLISHED").toUpperCase();
+      const stClass = rawSt.toLowerCase();
+      const isSelected = t.tender_id === activeTenderId;
+      const progress = Number(t.progress_percentage) || 10;
+      const budgetFormatted = formatINR(t.estimated_budget);
+      const deadline = t.submission_deadline || t.target_completion_date || "24 Aug 2026";
+
+      cardsHtml += `
+        <article class="tender-card" data-status="${stClass}" data-tender-id="${t.tender_id}">
+          <div class="card-topline">
+            <span class="status-badge-sm ${stClass}">${rawSt.replace('_', ' ')}</span>
+            <span class="tender-id">${t.tender_id}</span>
+          </div>
+          <h3>${t.title}</h3>
+          <p class="card-description">${t.description || 'Civic works project generated from verified citizen grievance clusters.'}</p>
+          <div class="card-meta">
+            <span>📍 ${t.location || `Ward ${t.ward_id || 15}`}</span>
+            <span>✓ ${t.verified_locations_count || 6} verified complaints</span>
+          </div>
+          <div class="budget-row">
+            <div>
+              <span>Estimated budget</span>
+              <strong>${budgetFormatted}</strong>
+            </div>
+            <div>
+              <span>${rawSt === 'COMPLETED' ? 'Completed date' : 'Target deadline'}</span>
+              <strong>${deadline}</strong>
+            </div>
+          </div>
+          <div class="mini-progress"><span style="width:${progress}%"></span></div>
+          <p class="progress-label">Work progress · ${progress}% · ${t.contractor_name || 'Bidding open'}</p>
+          <div class="tender-actions">
+            <button class="dept-btn primary" onclick="window.openEditTenderModal('${t.tender_id}')" title="Edit Tender Details">✏️ Edit</button>
+            <button class="dept-btn danger" onclick="window.handleDeleteTender('${t.tender_id}', '${t.title.replace(/'/g, "\\'")}')" title="Delete Tender">🗑️ Delete</button>
+          </div>
+        </article>
+      `;
+    });
+
+    tenderTrack.innerHTML = cardsHtml;
+    translatePage(currentLanguage());
+  }
+
+  // Filter Buttons Handler
   filterBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       filterBtns.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-
-      const filter = btn.dataset.filter || "all";
-      $$(".tender-card", tenderTrack).forEach((card) => {
-        const st = card.dataset.status || "";
-        card.hidden = !(filter === "all" || st === filter);
-      });
+      activeFilter = btn.dataset.filter || "all";
+      loadLiveTenders();
     });
   });
 
-  function openTModal() {
-    if (modal) modal.hidden = false;
-  }
-  function closeTModal() {
-    if (modal) modal.hidden = true;
-  }
+  // Search Input Handler
+  searchInput?.addEventListener("input", () => loadLiveTenders());
 
-  openBtn?.addEventListener("click", openTModal);
-  closeBtn?.addEventListener("click", closeTModal);
-  cancelBtn?.addEventListener("click", closeTModal);
-
-  async function loadTendersFromDB() {
-    if (!window.CivicBuzzAPI?.tenders?.list) return;
-    try {
-      const res = await window.CivicBuzzAPI.tenders.list();
-      if (res && res.data && res.data.length > 0 && tenderTrack) {
-        let tendersHtml = "";
-        res.data.forEach((t) => {
-          const stClass = (t.status || "published").toLowerCase();
-          tendersHtml += `
-            <article class="tender-card" data-status="${stClass}">
-              <div class="card-topline"><span class="status-badge-sm ${stClass}">${t.status || 'Published'}</span><span class="tender-id">${t.tender_id}</span></div>
-              <h3>${t.title}</h3>
-              <p class="card-description">${t.description || 'Civic infrastructure project generated from verified citizen clusters.'}</p>
-              <div class="card-meta"><span>📍 Ward ${t.ward_id || 15}</span><span>✓ ${t.verified_locations_count || 5} verified complaints</span></div>
-              <div class="budget-row"><div><span>Estimated budget</span><strong>₹${Number(t.estimated_budget || 250000).toLocaleString('en-IN')}</strong></div><div><span>Deadline</span><strong>${t.submission_deadline || '24 Aug 2026'}</strong></div></div>
-              <div class="mini-progress"><span style="width:${t.progress_percentage || 20}%"></span></div>
-              <p class="progress-label">Tender progress · ${t.progress_percentage || 20}%</p>
-              <button class="outline-button view-tender" data-tender="${t.tender_id}">Manage Tender</button>
-            </article>
-          `;
-        });
-        tenderTrack.innerHTML = tendersHtml;
-        translatePage(currentLanguage());
-      }
-    } catch (_) {}
-  }
-
-  loadTendersFromDB();
-
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const title = $("#tenderTitle")?.value.trim();
-    const ward = $("#tenderWard")?.value.trim();
-    const budget = $("#tenderBudget")?.value.trim();
-    const deadline = $("#tenderDeadline")?.value.trim();
-
-    if (title && tenderTrack) {
-      const numBudget = Number(budget) || 250000;
-      let newTid = `CB-T-00${Math.floor(20 + Math.random() * 80)}`;
-
-      if (window.CivicBuzzAPI?.admin?.createTender) {
-        try {
-          const res = await window.CivicBuzzAPI.admin.createTender({
-            title,
-            description: `Tender created from verified complaint cluster in ${ward}.`,
-            ward_id: 15,
-            category: "Infrastructure",
-            location: ward,
-            estimated_budget: numBudget,
-            duration_days: 45,
-            submission_deadline: deadline,
-          });
-          if (res?.data?.tender_id) newTid = res.data.tender_id;
-        } catch (_) {}
-      }
-
-      const card = document.createElement("article");
-      card.className = "tender-card";
-      card.setAttribute("data-status", "published");
-      card.innerHTML = `
-        <div class="card-topline"><span class="status-badge-sm published">Published</span><span class="tender-id">${newTid}</span></div>
-        <h3>${title}</h3>
-        <p class="card-description">Civic project tender created from citizen grievance clusters.</p>
-        <div class="card-meta"><span>📍 ${ward}</span><span>✓ Verified cluster</span></div>
-        <div class="budget-row"><div><span>Estimated budget</span><strong>₹${numBudget.toLocaleString('en-IN')}</strong></div><div><span>Deadline</span><strong>${deadline}</strong></div></div>
-        <div class="mini-progress"><span style="width:10%"></span></div>
-        <p class="progress-label">Tender progress · 10%</p>
-        <button class="outline-button view-tender" data-tender="${newTid}">Manage Tender</button>
-      `;
-      tenderTrack.prepend(card);
-      translatePage(currentLanguage());
-
-      showToast(`Tender "${title}" stored in database.`);
-      form.reset();
-      closeTModal();
-    }
+  // Listen for Cross-Tab Updates
+  window.addEventListener("civicbuzz:tenders_changed", () => loadLiveTenders());
+  window.addEventListener("storage", (e) => {
+    if (e.key === "civicbuzz_tenders") loadLiveTenders();
   });
 
-  // Lifecycle steps interactive click
-  $$(".lifecycle-step").forEach((step) => {
-    step.addEventListener("click", () => {
-      $$(".lifecycle-step").forEach((s) => s.classList.remove("active"));
-      step.classList.add("active");
-      showToast(`Lifecycle milestone selected: ${step.querySelector("strong")?.textContent}`);
-    });
-  });
+  // Initial Load
+  loadLiveTenders();
 }
 
 function setupActions() {
@@ -1485,13 +2359,547 @@ function setupActions() {
       showToast(button.dataset.toast)
     );
   });
+}
 
-  $(".notification")?.addEventListener(
-    "click",
-    () => {
-      showToast("No unread system alerts.");
+// =========================================================
+// SUBMODULE: GLOBAL ADMIN SEARCH & LIVE SUGGESTIONS
+// =========================================================
+
+function setupSearch() {
+  const searchInput = $("#dashboardSearch");
+  const suggestionsBox = $("#searchSuggestions");
+  if (!searchInput || !suggestionsBox) return;
+
+  let selectedSuggestionIndex = -1;
+
+  // Gather all searchable data across the platform
+  function getSearchDatabase() {
+    const issues = [];
+    const departments = [];
+    const locations = [];
+    const locationSet = new Set();
+
+    // 1. Gather Issues from DOM table or live database store
+    const rows = $$("#issuesTableBody tr");
+    if (rows && rows.length > 0) {
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length >= 7) {
+          const id = cells[0]?.textContent.trim().replace("#", "");
+          const title = cells[1]?.textContent.trim();
+          const user = cells[2]?.textContent.trim();
+          const cat = cells[3]?.textContent.trim();
+          const priority = cells[4]?.textContent.trim();
+          const date = cells[5]?.textContent.trim();
+          const status = cells[6]?.textContent.trim();
+
+          issues.push({
+            type: "issue",
+            id: id,
+            displayId: `#${id}`,
+            title: title || "Civic Complaint",
+            category: cat || "Road",
+            priority: priority || "High",
+            status: status || "Pending",
+            user: user || "Citizen",
+            date: date || "Today",
+            location: "Janpath Road, Ward 12",
+            dept: "Roads & Potholes Department",
+          });
+        }
+      });
     }
-  );
+
+    // Also pull from CivicBuzzAPI store if available
+    if (window.CivicBuzzAPI?.store?.getAll) {
+      const dbComplaints = window.CivicBuzzAPI.store.getAll();
+      dbComplaints.forEach((c) => {
+        const cid = String(c.complaint_id);
+        if (!issues.some((i) => i.id === cid)) {
+          const locStr = c.location?.address || c.location?.ward_name || "Bhubaneswar";
+          issues.push({
+            type: "issue",
+            id: cid,
+            displayId: `#${cid}`,
+            title: c.title || "Civic Grievance",
+            category: c.category || "Roads & Potholes",
+            priority: c.priority_level || c.priority?.level || "Medium",
+            status: (c.status || "Pending").replace(/_/g, " "),
+            user: c.user_uid || "Citizen",
+            date: new Date(c.created_at || Date.now()).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+            location: locStr,
+            dept: c.department_name || "Municipal Department",
+            desc: c.description || "",
+          });
+
+          if (locStr && !locationSet.has(locStr.toLowerCase())) {
+            locationSet.add(locStr.toLowerCase());
+            locations.push({
+              type: "location",
+              name: locStr,
+              ward: c.location?.ward_name || "City Area",
+              issueCount: 1,
+            });
+          }
+        }
+      });
+    }
+
+    // Default Seed Issues if none found
+    if (issues.length === 0) {
+      const seedIssues = [
+        { id: "CB-12480", displayId: "#CB-12480", title: "Pothole on MG Road", category: "Roads & Potholes", priority: "High", status: "Resolved", location: "Near Metro Station, MG Road", dept: "Roads & Potholes Department" },
+        { id: "CB-12481", displayId: "#CB-12481", title: "Garbage Overflow & Waste Pile", category: "Sanitation & Waste", priority: "Urgent", status: "In Progress", location: "Sector 15, Nehru Park", dept: "Sanitation & Solid Waste" },
+        { id: "CB-12482", displayId: "#CB-12482", title: "Water Pipeline Leakage", category: "Water Supply", priority: "High", status: "Pending", location: "Block A, Green View Apartments", dept: "Water Supply & Drainage" },
+        { id: "CB-12479", displayId: "#CB-12479", title: "Street Light Not Working", category: "Street Lighting", priority: "Medium", status: "Pending", location: "Sector 4, Main Market", dept: "Street Lighting & Electricity" },
+        { id: "ISS-1024", displayId: "#ISS-1024", title: "Dangerous Pothole on Flyover", category: "Roads & Potholes", priority: "Critical", status: "Pending", location: "Janpath Corridor, Ward 12", dept: "Roads & Potholes Department" },
+        { id: "ISS-1025", displayId: "#ISS-1025", title: "Drainage Overflow & Waterlogging", category: "Drainage", priority: "High", status: "In Progress", location: "Shastri Nagar, Ward 9", dept: "Water Supply & Drainage" },
+      ];
+      seedIssues.forEach((si) => issues.push({ ...si, type: "issue", user: "CIT-1001", date: "Today", desc: si.title }));
+    }
+
+    // 2. Gather Departments
+    const deptCards = $$("#departmentGrid .dept-card");
+    if (deptCards && deptCards.length > 0) {
+      deptCards.forEach((card) => {
+        const title = card.querySelector("h3")?.textContent.trim();
+        const desc = card.querySelector(".dept-desc")?.textContent.trim();
+        const meta = card.querySelector(".dept-meta")?.textContent.trim();
+        const open = card.querySelector(".dept-footer")?.textContent.trim();
+        if (title) {
+          departments.push({
+            type: "department",
+            name: title,
+            desc: desc || "Municipal department for civic grievance triage",
+            meta: meta || "",
+            openCount: open || "Active",
+          });
+        }
+      });
+    }
+
+    if (departments.length === 0) {
+      const seedDepts = [
+        { name: "Roads & Potholes Department", desc: "Road surface repairs, potholes, asphalt resurfacing, and pavement maintenance.", openCount: "8 open issues", head: "Rajesh Kumar" },
+        { name: "Street Lighting & Electricity", desc: "Broken light poles, LED replacements, timer failures, and dark spot coverage.", openCount: "5 open issues", head: "S. Pattnaik" },
+        { name: "Sanitation & Solid Waste", desc: "Garbage collection route monitoring, bin clearing, and illegal dumping remediation.", openCount: "12 open issues", head: "Ananya Mishra" },
+        { name: "Water Supply & Drainage", desc: "Pipe leaks, low water pressure, contaminated water, stormwater drainage, and sewage overflow.", openCount: "7 open issues", head: "P. K. Das" },
+        { name: "Parks & Urban Greenery", desc: "Park upkeep, playground maintenance, fallen tree removal, and roadside tree trimming.", openCount: "3 open issues", head: "M. Mohanty" },
+      ];
+      seedDepts.forEach((sd) => departments.push({ ...sd, type: "department" }));
+    }
+
+    // 3. Gather Locations & Wards
+    const defaultLocations = [
+      { name: "Janpath Corridor, Bhubaneswar", ward: "Ward 12", hotspot: true },
+      { name: "Near Metro Station, MG Road", ward: "Ward 15", hotspot: true },
+      { name: "Sector 15, Nehru Park", ward: "Ward 15", hotspot: false },
+      { name: "Block A, Green View Apartments", ward: "Ward 8", hotspot: false },
+      { name: "Sector 4, Main Market", ward: "Ward 4", hotspot: true },
+      { name: "5th Main Street", ward: "Ward 12", hotspot: false },
+      { name: "Indiranagar", ward: "Ward 6", hotspot: true },
+      { name: "Koramangala", ward: "Ward 7", hotspot: true },
+      { name: "HSR Layout", ward: "Ward 14", hotspot: true },
+      { name: "School Road", ward: "Ward 12", hotspot: false },
+      { name: "Shastri Nagar", ward: "Ward 9", hotspot: false },
+      { name: "Flyover Junction", ward: "Ward 10", hotspot: true },
+    ];
+
+    defaultLocations.forEach((loc) => {
+      if (!locationSet.has(loc.name.toLowerCase())) {
+        locationSet.add(loc.name.toLowerCase());
+        locations.push({
+          type: "location",
+          name: loc.name,
+          ward: loc.ward,
+          hotspot: loc.hotspot,
+        });
+      }
+    });
+
+    return { issues, departments, locations };
+  }
+
+  // Highlight matched substrings
+  function highlightMatch(text, query) {
+    if (!text || !query) return text || "";
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
+    return text.replace(regex, "<mark>$1</mark>");
+  }
+
+  // Render suggestion items
+  function renderSuggestions(query = "") {
+    const q = query.trim().toLowerCase();
+    const db = getSearchDatabase();
+    const isHindi = currentLanguage() === "hi";
+
+    // Filter data (supports both English and Hindi query keywords)
+    let matchedIssues = [];
+    let matchedDepts = [];
+    let matchedLocations = [];
+
+    if (!q) {
+      // Empty query: Show recent/top quick suggestions
+      matchedIssues = db.issues.slice(0, 3);
+      matchedDepts = db.departments.slice(0, 2);
+      matchedLocations = db.locations.slice(0, 3);
+    } else {
+      matchedIssues = db.issues.filter((i) => {
+        const idMatch = i.id.toLowerCase().includes(q) || i.displayId.toLowerCase().includes(q);
+        const titleMatch = i.title.toLowerCase().includes(q) || t(i.title).toLowerCase().includes(q);
+        const catMatch = i.category.toLowerCase().includes(q) || t(i.category).toLowerCase().includes(q);
+        const locMatch = (i.location || "").toLowerCase().includes(q) || t(i.location || "").toLowerCase().includes(q);
+        return idMatch || titleMatch || catMatch || locMatch;
+      }).slice(0, 5);
+
+      matchedDepts = db.departments.filter((d) => {
+        const nameMatch = d.name.toLowerCase().includes(q) || t(d.name).toLowerCase().includes(q);
+        const descMatch = (d.desc || "").toLowerCase().includes(q) || t(d.desc || "").toLowerCase().includes(q);
+        const metaMatch = (d.meta || "").toLowerCase().includes(q);
+        return nameMatch || descMatch || metaMatch;
+      }).slice(0, 4);
+
+      matchedLocations = db.locations.filter((l) => {
+        const nameMatch = l.name.toLowerCase().includes(q) || t(l.name).toLowerCase().includes(q);
+        const wardMatch = l.ward.toLowerCase().includes(q) || t(l.ward).toLowerCase().includes(q);
+        return nameMatch || wardMatch;
+      }).slice(0, 4);
+    }
+
+    const totalMatches = matchedIssues.length + matchedDepts.length + matchedLocations.length;
+
+    if (totalMatches === 0) {
+      suggestionsBox.innerHTML = `
+        <div class="search-empty">
+          <span class="search-empty-icon">🔍</span>
+          <p><strong>${isHindi ? `"${query}" के लिए कोई परिणाम नहीं मिला` : `No matches found for "${query}"`}</strong></p>
+          <p class="search-item-sub">${isHindi ? `ट्रैक आईडी (उदा. <code>#CB-12480</code>), स्थान (उदा. <code>एमजी रोड</code>), या विभाग द्वारा खोजें।` : `Try searching by Track ID (e.g. <code>#CB-12480</code>), Location (e.g. <code>MG Road</code>), or Department.`}</p>
+        </div>
+      `;
+      suggestionsBox.hidden = false;
+      selectedSuggestionIndex = -1;
+      return;
+    }
+
+    let html = "";
+
+    // 1. Group: Track IDs & Issues
+    if (matchedIssues.length > 0) {
+      html += `
+        <div class="search-group-header">
+          <span>${isHindi ? '🔖 ट्रैक आईडी और शिकायतें' : '🔖 Track ID & Grievances'}</span>
+          <span class="search-group-count">${matchedIssues.length}</span>
+        </div>
+      `;
+      matchedIssues.forEach((issue) => {
+        const titleText = isHindi ? t(issue.title) : issue.title;
+        const locText = isHindi ? t(issue.location || '') : (issue.location || '');
+        const catText = isHindi ? t(issue.category) : issue.category;
+        const statusText = isHindi ? t(issue.status) : issue.status;
+        const priorityText = isHindi ? t(issue.priority) : issue.priority;
+
+        const idHl = highlightMatch(issue.displayId, q);
+        const titleHl = highlightMatch(titleText, q);
+        const locHl = highlightMatch(locText || "", q);
+        const statusClass = (issue.status || "pending").toLowerCase().replace(/\s+/g, "-");
+
+        html += `
+          <div class="search-item" data-type="issue" data-id="${issue.id}" data-title="${issue.title}" data-location="${issue.location || ''}">
+            <div class="search-item-icon icon-issue">🔖</div>
+            <div class="search-item-content">
+              <div class="search-item-title">
+                <span class="search-item-badge">${idHl}</span>
+                <span>${titleHl}</span>
+              </div>
+              <div class="search-item-sub">📍 ${locHl || (isHindi ? 'वार्ड क्षेत्र' : 'Ward Corridor')} · 📂 ${catText}</div>
+            </div>
+            <div class="search-item-meta">
+              <span class="status-badge ${statusClass}">${statusText}</span>
+              <span class="search-item-sub font-mono">${priorityText}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // 2. Group: Departments
+    if (matchedDepts.length > 0) {
+      html += `
+        <div class="search-group-header">
+          <span>${isHindi ? '🏛️ विभाग' : '🏛️ Departments'}</span>
+          <span class="search-group-count">${matchedDepts.length}</span>
+        </div>
+      `;
+      matchedDepts.forEach((dept) => {
+        const nameText = isHindi ? t(dept.name) : dept.name;
+        const descText = isHindi ? (t(dept.desc) || dept.desc) : (dept.desc || "Municipal triage department");
+
+        const nameHl = highlightMatch(nameText, q);
+        const descHl = highlightMatch(descText, q);
+
+        html += `
+          <div class="search-item" data-type="department" data-name="${dept.name}">
+            <div class="search-item-icon icon-dept">🏛️</div>
+            <div class="search-item-content">
+              <div class="search-item-title">${nameHl}</div>
+              <div class="search-item-sub">${descHl}</div>
+            </div>
+            <div class="search-item-meta">
+              <span class="search-item-badge">${dept.openCount || (isHindi ? 'सक्रिय' : 'Active')}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // 3. Group: Locations & Wards
+    if (matchedLocations.length > 0) {
+      html += `
+        <div class="search-group-header">
+          <span>${isHindi ? '📍 स्थान और वार्ड' : '📍 Locations & Wards'}</span>
+          <span class="search-group-count">${matchedLocations.length}</span>
+        </div>
+      `;
+      matchedLocations.forEach((loc) => {
+        const nameText = isHindi ? t(loc.name) : loc.name;
+        const wardText = isHindi ? t(loc.ward) : loc.ward;
+
+        const nameHl = highlightMatch(nameText, q);
+        const wardHl = highlightMatch(wardText, q);
+        const hotspotLabel = isHindi ? '· 🔥 उच्च गतिविधि हॉटस्पॉट' : '· 🔥 High Activity Hotspot';
+
+        html += `
+          <div class="search-item" data-type="location" data-name="${loc.name}" data-ward="${loc.ward}">
+            <div class="search-item-icon icon-location">📍</div>
+            <div class="search-item-content">
+              <div class="search-item-title">${nameHl}</div>
+              <div class="search-item-sub">🏛️ ${wardHl} ${loc.hotspot ? hotspotLabel : ''}</div>
+            </div>
+            <div class="search-item-meta">
+              <span class="search-item-badge">${wardText}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    html += `
+      <div class="search-footer-hint">
+        <span>${isHindi ? '<b>↑</b> <b>↓</b> नेविगेट करें · <b>↵ Enter</b> चुनें' : 'Use <b>↑</b> <b>↓</b> to navigate · <b>↵ Enter</b> to select'}</span>
+        <span>${isHindi ? '<b>ESC</b> बंद करें' : '<b>ESC</b> to close'}</span>
+      </div>
+    `;
+
+    suggestionsBox.innerHTML = html;
+    suggestionsBox.hidden = false;
+    selectedSuggestionIndex = -1;
+  }
+
+  // Handle selecting a suggestion
+  function handleSelectSuggestion(itemEl) {
+    if (!itemEl) return;
+    const type = itemEl.dataset.type;
+    const isHindi = currentLanguage() === "hi";
+
+    if (type === "issue") {
+      const issueId = itemEl.dataset.id;
+      const title = itemEl.dataset.title;
+      const loc = itemEl.dataset.location;
+
+      // 1. Switch to Issue Queue section
+      showSection("issuequeue");
+      const breadcrumb = $("#breadcrumbCurrent");
+      if (breadcrumb) breadcrumb.textContent = t("Issue Queue");
+
+      // 2. Set search filter in issue queue
+      const qInput = $("#issueSearch");
+      if (qInput) {
+        qInput.value = issueId;
+        qInput.dispatchEvent(new Event("input"));
+      }
+
+      // 3. Open details modal for this issue
+      const db = getSearchDatabase();
+      const matchedIssue = db.issues.find((i) => i.id === issueId) || {
+        rawId: issueId,
+        id: `#${issueId}`,
+        title: title || "Civic Complaint",
+        location: loc || "Janpath Road, Ward 12",
+        category: "🛣️ Road",
+        priority: "High",
+        status: "Pending",
+        dept: "Roads & Potholes Department",
+        desc: `${title || 'Complaint'} - Track ID #${issueId}.`,
+      };
+
+      if (typeof window.openIssueDetails === "function") {
+        window.openIssueDetails(matchedIssue);
+      } else {
+        // Fallback row click
+        const row = $(`#issuesTableBody tr[data-issue-id="${issueId}"]`) || $(`#issuesTableBody tr`);
+        row?.click();
+      }
+
+      showToast(isHindi ? `ट्रैक आईडी #${issueId} खोली गई` : `Opened Track ID #${issueId}`);
+    } else if (type === "department") {
+      const deptName = itemEl.dataset.name;
+
+      // 1. Switch to Departments section
+      showSection("departments");
+      const breadcrumb = $("#breadcrumbCurrent");
+      if (breadcrumb) breadcrumb.textContent = t("Departments");
+
+      // 2. Filter departments
+      const dSearch = $("#departmentSearch");
+      if (dSearch) {
+        dSearch.value = deptName.split(" ")[0];
+        dSearch.dispatchEvent(new Event("input"));
+      }
+
+      // 3. Scroll to department card and pulse
+      setTimeout(() => {
+        const cards = $$("#departmentGrid .dept-card");
+        const target = cards.find((c) => c.textContent.toLowerCase().includes(deptName.toLowerCase())) || cards[0];
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+          target.style.outline = "3px solid #6366f1";
+          target.style.transition = "outline 0.3s ease";
+          setTimeout(() => {
+            target.style.outline = "none";
+          }, 2400);
+        }
+      }, 150);
+
+      showToast(isHindi ? `${t(deptName)} पर नेविगेट किया गया` : `Navigated to ${deptName}`);
+    } else if (type === "location") {
+      const locName = itemEl.dataset.name;
+      const ward = itemEl.dataset.ward;
+
+      // 1. Switch to Issue Queue
+      showSection("issuequeue");
+      const breadcrumb = $("#breadcrumbCurrent");
+      if (breadcrumb) breadcrumb.textContent = t("Issue Queue");
+
+      // 2. Filter Issue Queue by location keyword or ward
+      const qInput = $("#issueSearch");
+      if (qInput) {
+        const keyword = locName.split(",")[0].trim();
+        qInput.value = keyword;
+        qInput.dispatchEvent(new Event("input"));
+      }
+
+      showToast(isHindi ? `${t(locName)} (${t(ward)}) में शिकायतें दिखाई जा रही हैं` : `Showing grievances in ${locName} (${ward})`);
+    }
+
+    closeSuggestions();
+  }
+
+  function closeSuggestions() {
+    suggestionsBox.hidden = true;
+    selectedSuggestionIndex = -1;
+  }
+
+  function updateSelectedSuggestion(items) {
+    items.forEach((item, idx) => {
+      item.classList.toggle("is-selected", idx === selectedSuggestionIndex);
+      if (idx === selectedSuggestionIndex) {
+        item.scrollIntoView({ block: "nearest" });
+      }
+    });
+  }
+
+  // Event Listeners
+  searchInput.addEventListener("input", (e) => {
+    renderSuggestions(e.target.value);
+  });
+
+  searchInput.addEventListener("focus", (e) => {
+    renderSuggestions(e.target.value);
+  });
+
+  suggestionsBox.addEventListener("click", (e) => {
+    const item = e.target.closest(".search-item");
+    if (item) {
+      handleSelectSuggestion(item);
+    }
+  });
+
+  // Keyboard navigation inside search input
+  searchInput.addEventListener("keydown", (e) => {
+    const items = $$(".search-item", suggestionsBox);
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (suggestionsBox.hidden) {
+        renderSuggestions(searchInput.value);
+        return;
+      }
+      if (items.length > 0) {
+        selectedSuggestionIndex = (selectedSuggestionIndex + 1) % items.length;
+        updateSelectedSuggestion(items);
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (items.length > 0) {
+        selectedSuggestionIndex = (selectedSuggestionIndex - 1 + items.length) % items.length;
+        updateSelectedSuggestion(items);
+      }
+    } else if (e.key === "Enter") {
+      if (!suggestionsBox.hidden && selectedSuggestionIndex >= 0 && items[selectedSuggestionIndex]) {
+        e.preventDefault();
+        handleSelectSuggestion(items[selectedSuggestionIndex]);
+      } else if (searchInput.value.trim()) {
+        e.preventDefault();
+        const firstItem = items[0];
+        if (firstItem) {
+          handleSelectSuggestion(firstItem);
+        } else {
+          showSection("issuequeue");
+          const qInput = $("#issueSearch");
+          if (qInput) {
+            qInput.value = searchInput.value.trim();
+            qInput.dispatchEvent(new Event("input"));
+          }
+          closeSuggestions();
+        }
+      }
+    } else if (e.key === "Escape") {
+      closeSuggestions();
+    }
+  });
+
+  // Global Keyboard Shortcut: Cmd+K / Ctrl+K
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+      renderSuggestions(searchInput.value);
+    } else if (e.key === "Escape") {
+      closeSuggestions();
+    }
+  });
+
+  // Click outside to close
+  document.addEventListener("click", (e) => {
+    if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+      closeSuggestions();
+    }
+  });
+}
+
+function setupFooterActions() {
+  $$(".footer a, .footer button").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      const href = el.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        e.preventDefault();
+        const sec = href.replace("#", "");
+        showSection(sec);
+      }
+    });
+  });
 }
 
 function setupProfileMenu() {
@@ -1511,9 +2919,11 @@ function setupProfileMenu() {
   // Populate dynamic logged-in user profile from localStorage
   try {
     const savedUser = JSON.parse(localStorage.getItem("civicbuzz_user") || "null");
-    let name = "Administrator";
-    let roleText = "Super Admin";
+    let name = "Aditya Kumar Shyam";
+    let roleText = "Super Administrator";
+    let email = "admin@civicbuzz.in";
     let uid = "ADMIN-001";
+    let jurisdiction = "Bhubaneswar Central Ward";
 
     if (savedUser) {
       if (savedUser.full_name) {
@@ -1522,10 +2932,20 @@ function setupProfileMenu() {
         name = savedUser.email.split("@")[0].replace(/[._-]/g, " ").split(" ").filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
       }
       if (savedUser.role) roleText = savedUser.role;
+      if (savedUser.email) email = savedUser.email;
       if (savedUser.user_uid) uid = savedUser.user_uid;
+      if (savedUser.jurisdiction) jurisdiction = savedUser.jurisdiction;
     }
 
-    const initials = name.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "AD";
+    let initials = "AK";
+    if (name) {
+      const parts = name.trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 1) {
+        initials = parts[0].slice(0, 2).toUpperCase();
+      } else {
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+    }
     
     button.textContent = initials;
     
@@ -1540,6 +2960,9 @@ function setupProfileMenu() {
     
     const uidEl = $("#userIdText");
     if (uidEl) uidEl.textContent = uid;
+
+    const jurEl = $("#headerJurisdiction");
+    if (jurEl) jurEl.textContent = jurisdiction;
 
     // Sidebar bottom mini profile
     const sideStrong = $(".admin-mini strong");
@@ -1596,7 +3019,7 @@ function setupProfileMenu() {
     if (!profileModal) return;
     try {
       const savedUser = JSON.parse(localStorage.getItem("civicbuzz_user") || "null");
-      let name = "Administrator";
+      let name = "Aditya Kumar Shyam";
       let roleText = "Super Administrator";
       let email = "admin@civicbuzz.in";
       let uid = "ADMIN-001";
@@ -1612,7 +3035,15 @@ function setupProfileMenu() {
         if (savedUser.user_uid) uid = savedUser.user_uid;
       }
 
-      const initials = name.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "AD";
+      let initials = "AK";
+      if (name) {
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        if (parts.length === 1) {
+          initials = parts[0].slice(0, 2).toUpperCase();
+        } else {
+          initials = (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+      }
 
       const mAvatar = $("#modalAvatarLarge");
       if (mAvatar) mAvatar.textContent = initials;
@@ -1710,6 +3141,8 @@ function initialiseDashboard() {
 
   setupLanguage();
 
+  renderRealMetricsAndStats();
+
   updateTrendChart("week");
 
   setupNavigation();
@@ -1741,26 +3174,23 @@ function initialiseDashboard() {
     }).catch((_) => {});
   }
 
-  // Load live stats if API available
-  if (window.CivicBuzzAPI) {
-    window.CivicBuzzAPI.public.getStats().then((res) => {
-      if (res && res.data) {
-        const s = res.data;
-        if (s.total_reported !== undefined) {
-          const el = $("#metricReported");
-          if (el) el.textContent = `${s.total_reported}`;
-        }
-        if (s.total_resolved !== undefined) {
-          const el = $("#metricResolved");
-          if (el) el.textContent = `${s.total_resolved}`;
-        }
-        if (s.active_reports !== undefined) {
-          const el = $("#metricOpen");
-          if (el) el.textContent = `${s.active_reports}`;
-        }
-      }
-    }).catch((_) => {});
-  }
+  // Real-time synchronization listeners for instant cross-tab and client complaint updates
+  const refreshAllLiveViews = () => {
+    renderRealMetricsAndStats();
+    updateTrendChart($("#trendRange")?.value || "week");
+  };
+
+  window.addEventListener("civicbuzz_data_updated", refreshAllLiveViews);
+  window.addEventListener("storage", (e) => {
+    if (e.key === "civicbuzz_complaints" || e.key === "civicbuzz_complaints_tick") {
+      refreshAllLiveViews();
+    }
+  });
+
+  // Background polling to ensure seamless live sync
+  setInterval(() => {
+    renderRealMetricsAndStats();
+  }, 3000);
 
   $("#trendRange")?.addEventListener("change", (event) => {
     updateTrendChart(event.target.value);

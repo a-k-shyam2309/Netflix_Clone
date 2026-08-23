@@ -42,18 +42,18 @@ async def get_dashboard_metrics(
     total_reported = await mongo_db.complaints.count_documents({})
     total_resolved = await mongo_db.complaints.count_documents({"status": "RESOLVED"})
     total_open = await mongo_db.complaints.count_documents({"status": {"$in": ["SUBMITTED", "ASSIGNED", "IN_PROGRESS", "READY_FOR_CITIZEN_VERIFICATION"]}})
-    total_overdue = await mongo_db.complaints.count_documents({"priority.level": "CRITICAL", "status": {"$ne": "RESOLVED"}})
+    total_overdue = await mongo_db.complaints.count_documents({"$or": [{"is_overdue": True}, {"priority.level": "CRITICAL", "status": {"$ne": "RESOLVED"}}]})
 
     data = AdminDashboardStatsResponse(
-        total_reported=total_reported or 12480,
-        total_resolved=total_resolved or 8240,
-        total_open=total_open or 1162,
-        total_overdue=total_overdue or 94,
-        resolution_rate_percent=round((total_resolved / (total_reported or 1)) * 100.0, 1) if total_reported else 78.0,
-        reported_change_percent=12.5,
-        resolved_change_percent=15.3,
-        open_change_percent=-6.8,
-        overdue_change_percent=-8.2,
+        total_reported=total_reported,
+        total_resolved=total_resolved,
+        total_open=total_open,
+        total_overdue=total_overdue,
+        resolution_rate_percent=round((total_resolved / (total_reported or 1)) * 100.0, 1) if total_reported else 0.0,
+        reported_change_percent=0.0,
+        resolved_change_percent=0.0,
+        open_change_percent=0.0,
+        overdue_change_percent=0.0,
         active_citizens=247,
         communities_count=50,
     )
