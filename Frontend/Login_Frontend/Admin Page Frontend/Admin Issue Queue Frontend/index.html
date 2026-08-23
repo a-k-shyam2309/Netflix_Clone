@@ -22,13 +22,54 @@
 
 
 <body>
+<div class="app-shell">
+	<!-- Sidebar Navigation (Same as Admin Portal) -->
+	<aside class="sidebar" id="sidebar" aria-label="Admin navigation">
+		<div class="brand">
+			<div class="brand-mark">
+				<img src="../Assets/Logo.png" alt="CivicBuzz Logo">
+			</div>
+			<span class="brand-name">CivicBuzz</span>
+		</div>
 
+		<nav class="main-nav">
+			<a class="nav-link" href="../index.html#dashboard" data-section="Dashboard">
+				<span>⌂</span> <span data-i18n="Dashboard">Dashboard</span>
+			</a>
+			<a class="nav-link active" href="index.html" data-section="Issue Queue">
+				<span>☷</span> <span data-i18n="Issue Queue">Issue Queue</span> <b class="nav-count" id="sidebarIssueCount">16</b>
+			</a>
+			<a class="nav-link" href="../Map & Hotspots/index.html" data-section="Map & Hotspots">
+				<span>⌖</span> <span data-i18n="Map & Hotspots">Map &amp; Hotspots</span>
+			</a>
+			<a class="nav-link" href="../index.html#departments" data-section="Departments">
+				<span>♜</span> <span data-i18n="Departments">Departments</span>
+			</a>
+			<a class="nav-link" href="../index.html#budgeting" data-section="Budgeting">
+				<span>◴</span> <span data-i18n="Budgeting">Budgeting</span>
+			</a>
+			<a class="nav-link" href="../Analytics/index.html" data-section="Analytics">
+				<span>◫</span> <span data-i18n="Analytics">Analytics</span>
+			</a>
+		</nav>
 
-	<!-- =====================================================
-         TOP HEADER
-    ====================================================== -->
+		<div class="sidebar-bottom">
+			<div class="admin-mini">
+				<span class="avatar-small">AK</span>
+				<span>
+					<strong>Aditya Kumar Shyam</strong>
+					<small>Super Administrator</small>
+				</span>
+				<button class="more-button" aria-label="Account options">⋯</button>
+			</div>
+		</div>
+	</aside>
 
-	<header class="top-header">
+	<div class="main-content-layout">
+		<!-- =====================================================
+			TOP HEADER
+		====================================================== -->
+		<header class="top-header">
 
 
 		<!-- Header Left -->
@@ -233,7 +274,42 @@
 				</div>
 
 			</div>
+ 
+			<!-- Verified -->
+			<div class="summary-card verified-card">
+				<div class="summary-icon">
+					🛡️
+				</div>
+				<div class="summary-content">
+					<span>
+						Verified
+					</span>
+					<strong id="queueVerifiedCount">
+						0
+					</strong>
+					<small>
+						Citizen verified &amp; closed
+					</small>
+				</div>
+			</div>
 
+			<!-- Rejected -->
+			<div class="summary-card rejected-card">
+				<div class="summary-icon">
+					✕
+				</div>
+				<div class="summary-content">
+					<span>
+						Rejected
+					</span>
+					<strong id="queueRejectedCount">
+						1
+					</strong>
+					<small>
+						Dismissed / Invalid
+					</small>
+				</div>
+			</div>
 
 			<!-- High Priority -->
 
@@ -1987,6 +2063,8 @@
 		</div>
 
 	</div>
+	</div>
+</div>
 
 	<!-- =====================================================
          JAVASCRIPT
