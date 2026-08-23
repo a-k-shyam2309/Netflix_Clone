@@ -977,6 +977,9 @@ function setupLogin() {
       if (errorMessageEl) {
         errorMessageEl.textContent = "";
         errorMessageEl.classList.add("hidden");
+        errorMessageEl.style.color = "";
+        errorMessageEl.style.background = "";
+        errorMessageEl.style.borderColor = "";
       }
 
       if (submitBtn) {
