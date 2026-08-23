@@ -986,20 +986,21 @@ body {
 }
 
 /* =========================================================
-   MAP WORKSPACE LAYOUT
+   MAP WORKSPACE LAYOUT & GOOGLE MAPS CANVAS
    ========================================================= */
 
 .map-workspace-grid {
 	display: grid;
-	grid-template-columns: 1fr 340px;
-	gap: 22px;
-	align-items: flex-start;
+	grid-template-columns: minmax(0, 1fr) 360px;
+	gap: 20px;
+	align-items: stretch;
 }
 
 .map-primary-column {
 	display: flex;
 	flex-direction: column;
 	gap: 14px;
+	min-width: 0;
 }
 
 /* Filter Controls Bar */
@@ -1010,7 +1011,7 @@ body {
 	gap: 14px;
 	background: var(--surface);
 	border: 1px solid var(--border);
-	border-radius: 12px;
+	border-radius: 14px;
 	padding: 14px 18px;
 	box-shadow: var(--shadow-sm);
 }
@@ -1035,8 +1036,8 @@ body {
 	font-family: inherit;
 	background-color: var(--page);
 	border: 1px solid var(--border);
-	border-radius: 8px;
-	padding: 6px 30px 6px 12px;
+	border-radius: 9px;
+	padding: 6px 32px 6px 12px;
 	color: var(--ink);
 	font-size: 12.5px;
 	font-weight: 600;
@@ -1049,14 +1050,20 @@ body {
 	background-repeat: no-repeat;
 	background-position: right 10px center;
 	background-size: 11px;
+	transition: border-color 0.15s ease;
+}
+
+.map-filter-item select:focus {
+	border-color: var(--blue);
 }
 
 .style-btn-group {
 	display: flex;
 	background: var(--page);
 	border: 1px solid var(--border);
-	border-radius: 8px;
+	border-radius: 9px;
 	padding: 2px;
+	gap: 2px;
 }
 
 .layer-btn {
@@ -1067,7 +1074,7 @@ body {
 	color: var(--muted);
 	font-size: 12px;
 	font-weight: 600;
-	border-radius: 6px;
+	border-radius: 7px;
 	cursor: pointer;
 	transition: all 0.15s ease;
 }
@@ -1079,60 +1086,126 @@ body {
 	font-weight: 700;
 }
 
-/* Map Frame Card & Canvas */
+/* Map Frame Card & Canvas (Authentic Google Maps Container) */
 .map-frame-card {
 	position: relative;
-	background: var(--surface);
+	background: #e5e3df; /* Google Maps base color */
 	border: 1px solid var(--border);
-	border-radius: 14px;
+	border-radius: 16px;
 	overflow: hidden;
-	height: 600px;
+	height: 620px;
 	box-shadow: var(--shadow-md);
+	display: flex;
+	flex-direction: column;
 }
 
 .incident-map-canvas {
 	width: 100%;
 	height: 100%;
-	background: #0f172a;
+	min-height: 100%;
+	flex: 1;
+	z-index: 1;
 }
 
-/* High-detail dark mode map filter: Converts rich road networks, paths, green zones, and waterways into a crystal-clear dark theme */
+/* Google Maps Tile Dark Theme Filter */
 .dark-theme .leaflet-tile-pane {
-	filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(96%);
+	filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(92%) saturate(110%);
 }
 
-.dark-theme .leaflet-control-zoom a {
-	background-color: #1e293b !important;
-	color: #f8fafc !important;
-	border-color: #334155 !important;
+.dark-theme .map-frame-card {
+	background: #1e293b;
 }
 
-.dark-theme .leaflet-control-zoom a:hover {
-	background-color: #334155 !important;
-	color: #60a5fa !important;
+/* =========================================================
+   AUTHENTIC GOOGLE MAPS FLOATING CONTROLS
+   ========================================================= */
+
+/* Top-Right Google Control Pills */
+.google-map-controls-cluster {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	z-index: 400;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	pointer-events: auto;
 }
 
-/* Floating Map Legend */
+.google-control-pill {
+	background: var(--surface);
+	border-radius: 10px;
+	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+	border: 1px solid var(--border);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.google-ctrl-btn {
+	width: 38px;
+	height: 38px;
+	display: grid;
+	place-items: center;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	color: var(--ink);
+	font-size: 13.5px;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.google-ctrl-btn:not(:last-child) {
+	border-bottom: 1px solid var(--border);
+}
+
+.google-ctrl-btn:hover {
+	background: var(--surface-soft);
+	color: var(--blue);
+}
+
+/* Floating Map Legend (Severity & Category) */
 .map-legend-box {
 	position: absolute;
-	bottom: 16px;
-	left: 16px;
+	bottom: 34px;
+	right: 14px;
 	background: var(--surface);
 	border: 1px solid var(--border);
-	border-radius: 10px;
+	border-radius: 12px;
 	padding: 12px 14px;
-	box-shadow: var(--shadow-lg);
-	z-index: 500;
+	box-shadow: 0 6px 22px rgba(0, 0, 0, 0.15);
+	z-index: 400;
 	backdrop-filter: blur(8px);
+	min-width: 230px;
+	pointer-events: auto;
 }
 
-.map-legend-box h4 {
+.legend-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid var(--border);
+}
+
+.legend-header h4 {
 	font-size: 11px;
 	font-weight: 800;
 	text-transform: uppercase;
 	color: var(--muted);
-	margin-bottom: 8px;
 	letter-spacing: 0.5px;
+	margin: 0;
+}
+
+.legend-badge {
+	font-size: 9px;
+	font-weight: 800;
+	text-transform: uppercase;
+	color: var(--blue);
+	background: var(--blue-soft);
+	padding: 1px 6px;
+	border-radius: 4px;
 }
 
 .legend-items {
@@ -1145,7 +1218,7 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	font-size: 11.5px;
+	font-size: 11px;
 	font-weight: 600;
 	color: var(--ink);
 }
@@ -1154,176 +1227,422 @@ body {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
+	flex-shrink: 0;
 }
 
-.dot-critical { background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.6); }
-.dot-high { background: #f59e0b; }
-.dot-medium { background: #3b82f6; }
-.dot-resolved { background: #10b981; }
-.dot-rejected { background: #94a3b8; }
+.legend-name {
+	flex: 1;
+}
 
-.map-coords-badge {
-	position: absolute;
-	bottom: 16px;
-	right: 16px;
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 6px;
-	padding: 4px 10px;
-	font-size: 11px;
+.legend-color-pill {
+	font-size: 9.5px;
+	font-weight: 800;
 	font-family: monospace;
-	font-weight: 600;
-	color: var(--muted);
-	z-index: 500;
-	box-shadow: var(--shadow-sm);
+	padding: 1px 5px;
+	border-radius: 4px;
 }
 
-/* Custom Pulsing Markers */
-.custom-map-marker {
-	display: grid;
-	place-items: center;
-}
+.dot-critical { background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.7); }
+.dot-high { background: #f97316; box-shadow: 0 0 6px rgba(249, 115, 22, 0.7); }
+.dot-medium { background: #3b82f6; box-shadow: 0 0 6px rgba(59, 130, 246, 0.7); }
+.dot-resolved { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.7); }
+.dot-rejected { background: #64748b; }
 
-.marker-pin {
-	width: 34px;
-	height: 34px;
-	border-radius: 50% 50% 50% 0;
-	transform: rotate(-45deg);
-	display: grid;
-	place-items: center;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-	cursor: pointer;
-	border: 2px solid #ffffff;
-	transition: transform 0.2s ease;
-}
+.pill-critical { background: rgba(239, 68, 68, 0.14); color: #dc2626; }
+.pill-high { background: rgba(249, 115, 22, 0.14); color: #ea580c; }
+.pill-medium { background: rgba(59, 130, 246, 0.14); color: #2563eb; }
+.pill-resolved { background: rgba(34, 197, 94, 0.14); color: #16a34a; }
+.pill-rejected { background: rgba(100, 116, 139, 0.14); color: #475569; }
 
-.dark-theme .marker-pin {
-	border: 2px solid #ffffff;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-}
-
-.marker-pin i {
-	transform: rotate(45deg);
-	font-size: 12px;
-	color: #fff;
-}
-
-.marker-pin.critical { background: #ef4444; animation: markerPulse 1.8s infinite; }
-.marker-pin.high { background: #f59e0b; }
-.marker-pin.medium { background: #3b82f6; }
-.marker-pin.resolved { background: #10b981; }
-.marker-pin.rejected { background: #64748b; }
-
-@keyframes markerPulse {
-	0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
-	70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
-	100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-
-/* Custom Popup */
-.leaflet-popup-content-wrapper {
-	background: var(--surface);
-	color: var(--ink);
-	border-radius: 12px;
-	box-shadow: var(--shadow-lg);
-	border: 1px solid var(--border);
-	padding: 4px;
-}
-
-.leaflet-popup-tip {
-	background: var(--surface);
-}
-
-.leaflet-popup-content {
-	margin: 10px 12px;
-	line-height: 1.4;
-}
-
-.map-popup-card {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	min-width: 220px;
-}
-
-.map-popup-header {
+/* Google Maps Bottom Attribution Footer Bar */
+.google-maps-footer-bar {
+	position: absolute;
+	bottom: 0;
+	inset-x: 0;
+	z-index: 390;
+	background: rgba(255, 255, 255, 0.88);
+	backdrop-filter: blur(4px);
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+	padding: 2px 10px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 6px;
+	font-size: 10px;
+	color: #475569;
+	user-select: none;
+	pointer-events: none;
 }
 
-.map-popup-id {
+.dark-theme .google-maps-footer-bar {
+	background: rgba(15, 23, 42, 0.88);
+	border-top-color: rgba(255, 255, 255, 0.08);
+	color: #94a3b8;
+}
+
+.google-maps-branding {
+	font-size: 13px;
+	font-weight: 800;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	letter-spacing: -0.4px;
+	pointer-events: auto;
+}
+
+.google-letter.g-blue { color: #4285F4; }
+.google-letter.o-red { color: #EA4335; }
+.google-letter.o-yellow { color: #FBBC05; }
+.google-letter.l-green { color: #34A853; }
+.google-letter.e-red { color: #EA4335; }
+
+.google-maps-footer-meta {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	pointer-events: auto;
+}
+
+.footer-coord-badge {
+	font-family: monospace;
+	font-weight: 700;
+	color: var(--ink);
+}
+
+.footer-divider {
+	color: var(--muted-2);
+}
+
+.footer-link {
+	cursor: pointer;
+}
+
+.footer-link:hover {
+	text-decoration: underline;
+}
+
+/* =========================================================
+   GOOGLE MAPS CUSTOM HOTSPOT BEACONS & INCIDENT PINS
+   ========================================================= */
+
+/* Hotspot Radar Beacon */
+.google-hotspot-beacon-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: auto;
+}
+
+.beacon-pulse-wave {
+	position: absolute;
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	animation: radarPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+	pointer-events: none;
+}
+
+@keyframes radarPulse {
+	0% { transform: scale(0.6); opacity: 0.85; }
+	100% { transform: scale(2.8); opacity: 0; }
+}
+
+.google-hotspot-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: var(--surface);
+	border: 2px solid;
+	border-radius: 999px;
+	padding: 4px 12px 4px 4px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	position: relative;
+	z-index: 2;
+}
+
+.google-hotspot-pill:hover {
+	transform: scale(1.08) translateY(-2px);
+}
+
+.hotspot-rank-tag {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	color: #ffffff;
+	font-size: 11px;
+	font-weight: 800;
+	display: grid;
+	place-items: center;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.hotspot-pill-text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+}
+
+.hotspot-pill-text strong {
+	font-size: 11.5px;
+	font-weight: 800;
+	color: var(--ink);
+	white-space: nowrap;
+}
+
+.hotspot-pill-text small {
+	font-size: 9.5px;
+	color: var(--muted);
+	white-space: nowrap;
+}
+
+/* Individual Google Teardrop Pin */
+.google-pin-container {
+	position: relative;
+	width: 36px;
+	height: 48px;
+	cursor: pointer;
+	transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+	pointer-events: auto;
+}
+
+.google-pin-container:hover {
+	transform: scale(1.18) translateY(-4px);
+}
+
+.google-pin-svg {
+	width: 36px;
+	height: 48px;
+	display: block;
+	filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+}
+
+.google-pin-icon {
+	position: absolute;
+	top: 11px;
+	left: 18px;
+	transform: translateX(-50%);
+	font-size: 11.5px;
+	pointer-events: none;
+}
+
+.pin-radar-wave {
+	position: absolute;
+	bottom: -4px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	animation: radarPulse 2.2s infinite ease-out;
+	pointer-events: none;
+}
+
+/* Ward Cluster Bubble */
+.ward-cluster-bubble {
+	width: 54px;
+	height: 54px;
+	border-radius: 50%;
+	border: 3px solid #ffffff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	color: #ffffff;
+	cursor: pointer;
+	transition: transform 0.2s ease;
+}
+
+.ward-cluster-bubble:hover {
+	transform: scale(1.12);
+}
+
+.cluster-count {
+	font-size: 16px;
+	font-weight: 800;
+	line-height: 1;
+}
+
+.cluster-label {
+	font-size: 8.5px;
+	font-weight: 700;
+	text-transform: uppercase;
+	opacity: 0.9;
+}
+
+/* =========================================================
+   GOOGLE MAPS CUSTOM INFOWINDOWS & POPUPS
+   ========================================================= */
+
+.google-custom-popup .leaflet-popup-content-wrapper {
+	padding: 0;
+	border-radius: 14px;
+	overflow: hidden;
+	box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+	border: 1px solid var(--border);
+	background: var(--surface);
+}
+
+.google-custom-popup .leaflet-popup-content {
+	margin: 0;
+	line-height: 1.4;
+}
+
+.google-custom-popup .leaflet-popup-tip {
+	background: var(--surface);
+}
+
+.google-infowindow {
+	display: flex;
+	flex-direction: column;
+	width: 280px;
+	font-family: var(--font-sans);
+}
+
+.g-info-header {
+	padding: 10px 14px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.g-info-rank-badge {
+	color: #ffffff;
+	font-size: 10.5px;
+	font-weight: 800;
+	padding: 2px 8px;
+	border-radius: 6px;
+}
+
+.g-info-id {
 	font-size: 11px;
 	font-weight: 800;
 	color: var(--blue);
 	font-family: monospace;
 }
 
-.map-popup-badge {
-	font-size: 9px;
+.g-info-severity-pill {
+	font-size: 9.5px;
 	font-weight: 800;
 	text-transform: uppercase;
 	padding: 2px 6px;
 	border-radius: 4px;
 }
 
-.map-popup-badge.critical { background: var(--red-soft); color: var(--red); }
-.map-popup-badge.high { background: var(--amber-soft); color: var(--amber-dark); }
-.map-popup-badge.medium { background: var(--blue-soft); color: var(--blue); }
-.map-popup-badge.resolved { background: var(--green-soft); color: var(--green); }
-.map-popup-badge.rejected { background: var(--border); color: var(--muted); }
-
-.map-popup-title {
-	font-size: 13px;
-	font-weight: 700;
-	color: var(--ink);
-	margin: 2px 0;
+.g-info-body {
+	padding: 12px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
-.map-popup-loc {
+.g-info-title {
+	font-size: 13px;
+	font-weight: 800;
+	color: var(--ink);
+	margin: 0;
+	line-height: 1.3;
+}
+
+.g-info-desc {
 	font-size: 11px;
 	color: var(--muted);
-	display: flex;
-	align-items: center;
-	gap: 4px;
+	margin: 0;
+	line-height: 1.35;
 }
 
-.map-popup-btn {
-	margin-top: 6px;
-	height: 28px;
-	background: var(--blue);
-	color: #fff;
-	border: none;
-	border-radius: 6px;
+.g-info-stats-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 6px;
+	background: var(--page);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 8px;
+	margin: 4px 0;
+}
+
+.g-info-stat-item {
+	display: flex;
+	flex-direction: column;
+}
+
+.g-info-stat-item span {
+	font-size: 9.5px;
+	color: var(--muted);
+	font-weight: 600;
+}
+
+.g-info-stat-item strong {
+	font-size: 11.5px;
+	color: var(--ink);
+	font-weight: 700;
+}
+
+.g-info-meta-line {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 11px;
+	color: var(--muted);
+}
+
+.g-info-actions {
+	display: flex;
+	gap: 6px;
+	margin-top: 4px;
+}
+
+.g-btn-primary, .g-btn-secondary {
+	flex: 1;
+	height: 30px;
+	border-radius: 7px;
 	font-size: 11.5px;
 	font-weight: 700;
-	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 6px;
-	transition: background 0.15s ease;
+	gap: 5px;
+	cursor: pointer;
+	border: none;
+	transition: filter 0.15s ease;
+	font-family: inherit;
 }
 
-.map-popup-btn:hover {
-	background: #1d4ed8;
+.g-btn-primary {
+	background: var(--blue);
+	color: #ffffff;
+}
+
+.g-btn-primary:hover {
+	filter: brightness(1.1);
+}
+
+.g-btn-secondary {
+	background: var(--page);
+	border: 1px solid var(--border);
+	color: var(--ink);
+}
+
+.g-btn-secondary:hover {
+	background: var(--surface-soft);
 }
 
 /* =========================================================
-   RIGHT SIDEBAR: HOTSPOTS & WARD DISTRIBUTION
+   RIGHT SIDEBAR: RANKED HOTSPOTS INTELLIGENCE
    ========================================================= */
 
 .map-sidebar-column {
 	display: flex;
 	flex-direction: column;
 	gap: 18px;
+	min-width: 0;
 }
 
 .hotspot-panel-card {
 	background: var(--surface);
 	border: 1px solid var(--border);
-	border-radius: 14px;
+	border-radius: 16px;
 	padding: 18px;
 	box-shadow: var(--shadow-sm);
 }
@@ -1353,7 +1672,7 @@ body {
 	font-size: 10px;
 	font-weight: 800;
 	color: #ef4444;
-	background: rgba(239, 68, 68, 0.12);
+	background: rgba(239, 68, 68, 0.14);
 	padding: 3px 8px;
 	border-radius: 999px;
 	animation: badgeBlink 2s infinite;
@@ -1373,39 +1692,62 @@ body {
 .hotspot-card {
 	background: var(--surface-soft);
 	border: 1px solid var(--border);
-	border-radius: 10px;
-	padding: 12px;
+	border-radius: 12px;
+	padding: 12px 14px;
 	cursor: pointer;
-	transition: all 0.18s ease;
+	transition: all 0.2s ease;
 }
 
-.hotspot-card:hover {
+.hotspot-card:hover, .hotspot-card.active-card {
 	border-color: var(--blue);
-	transform: translateX(3px);
+	transform: translateX(4px);
 	background: var(--surface);
-	box-shadow: var(--shadow-sm);
+	box-shadow: var(--shadow-md);
 }
 
 .hotspot-topline {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: 4px;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+
+.hotspot-title-group {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.hotspot-rank-badge {
+	width: 22px;
+	height: 22px;
+	border-radius: 6px;
+	color: #ffffff;
+	font-size: 10.5px;
+	font-weight: 800;
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
 }
 
 .hotspot-title {
 	font-size: 12.5px;
-	font-weight: 700;
+	font-weight: 800;
 	color: var(--ink);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .hotspot-count-pill {
 	font-size: 10.5px;
 	font-weight: 800;
-	padding: 2px 7px;
+	padding: 2px 8px;
 	border-radius: 999px;
-	background: var(--red-soft);
-	color: var(--red);
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 .hotspot-desc {
@@ -1425,18 +1767,19 @@ body {
 }
 
 .btn-focus-hotspot {
-	font-size: 10.5px;
-	font-weight: 700;
-	color: var(--blue);
+	font-size: 11px;
+	font-weight: 800;
 	background: transparent;
 	border: none;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	gap: 4px;
+	transition: opacity 0.15s ease;
 }
 
 .btn-focus-hotspot:hover {
+	opacity: 0.8;
 	text-decoration: underline;
 }
 

@@ -382,39 +382,97 @@
 								<label data-i18n="Map Style">Map Style</label>
 								<div class="style-btn-group">
 									<button type="button" class="layer-btn active" id="btnLayerStreet"
-										title="Street Map">Default</button>
+										title="Google Street Map">Default</button>
+									<button type="button" class="layer-btn" id="btnLayerSatellite"
+										title="Google Satellite Hybrid">Satellite</button>
 									<button type="button" class="layer-btn" id="btnLayerHotspots"
-										title="Heatmap Density">Heat</button>
+										title="Heatmap Density Zones">Heat</button>
 									<button type="button" class="layer-btn" id="btnLayerClusters"
-										title="Ward Bubbles">Clusters</button>
+										title="Ward Clusters">Clusters</button>
 								</div>
 							</div>
 						</div>
 
-						<!-- Map Canvas Container -->
-						<div class="map-frame-card">
+						<!-- Map Canvas Container (Authentic Google Maps UI) -->
+						<div class="map-frame-card" id="mapFrameCard">
 							<div id="incidentMap" class="incident-map-canvas"></div>
 
-							<!-- Floating Map Legend -->
+							<!-- Floating Map Legend (Severity & Hotspot Zones) -->
 							<div class="map-legend-box" id="mapLegend">
-								<h4 data-i18n="Incident Severity & Category">Map Legend</h4>
+								<div class="legend-header">
+									<h4 data-i18n="Incident Severity & Category">Incident Severity &amp; Hotspots</h4>
+									<span class="legend-badge">Live Triage</span>
+								</div>
 								<div class="legend-items">
-									<div class="legend-row"><span class="legend-dot dot-critical"></span> <span
-											data-i18n="Critical Emergency">Critical / Emergency</span></div>
-									<div class="legend-row"><span class="legend-dot dot-high"></span> <span
-											data-i18n="High Priority">High Priority</span></div>
-									<div class="legend-row"><span class="legend-dot dot-medium"></span> <span
-											data-i18n="Medium Priority">Medium Priority</span></div>
-									<div class="legend-row"><span class="legend-dot dot-resolved"></span> <span
-											data-i18n="Resolved / Verified">Resolved / Verified</span></div>
-									<div class="legend-row"><span class="legend-dot dot-rejected"></span> <span
-											data-i18n="Rejected">Rejected</span></div>
+									<div class="legend-row">
+										<span class="legend-dot dot-critical"></span>
+										<span class="legend-name" data-i18n="Critical Emergency">Critical Emergency / Rank 1</span>
+										<span class="legend-color-pill pill-critical">#ef4444</span>
+									</div>
+									<div class="legend-row">
+										<span class="legend-dot dot-high"></span>
+										<span class="legend-name" data-i18n="High Priority">High Priority / Rank 2</span>
+										<span class="legend-color-pill pill-high">#f97316</span>
+									</div>
+									<div class="legend-row">
+										<span class="legend-dot dot-medium"></span>
+										<span class="legend-name" data-i18n="Medium Priority">Medium Priority / Rank 3</span>
+										<span class="legend-color-pill pill-medium">#3b82f6</span>
+									</div>
+									<div class="legend-row">
+										<span class="legend-dot dot-resolved"></span>
+										<span class="legend-name" data-i18n="Resolved / Verified">Resolved / Rank 4</span>
+										<span class="legend-color-pill pill-resolved">#22c55e</span>
+									</div>
+									<div class="legend-row">
+										<span class="legend-dot dot-rejected"></span>
+										<span class="legend-name" data-i18n="Rejected">Rejected / Low Risk</span>
+										<span class="legend-color-pill pill-rejected">#64748b</span>
+									</div>
 								</div>
 							</div>
 
-							<!-- Floating Coordinates / Zoom Indicator -->
-							<div class="map-coords-badge" id="mapCoordsBadge">
-								Lat: 20.2961 · Lng: 85.8245 · Zoom: 13
+							<!-- Google Maps Custom Floating Controls (Top/Right) -->
+							<div class="google-map-controls-cluster">
+								<div class="google-control-pill">
+									<button type="button" class="google-ctrl-btn" id="btnGoogleZoomIn" title="Zoom in">
+										<i class="fa-solid fa-plus"></i>
+									</button>
+									<button type="button" class="google-ctrl-btn" id="btnGoogleZoomOut" title="Zoom out">
+										<i class="fa-solid fa-minus"></i>
+									</button>
+								</div>
+								<div class="google-control-pill">
+									<button type="button" class="google-ctrl-btn" id="btnGoogleRecenter" title="Recenter on Bhubaneswar City Center">
+										<i class="fa-solid fa-crosshairs"></i>
+									</button>
+									<button type="button" class="google-ctrl-btn" id="btnGoogleFullscreen" title="Toggle Fullscreen Map">
+										<i class="fa-solid fa-expand" id="fullscreenIcon"></i>
+									</button>
+								</div>
+							</div>
+
+							<!-- Google Maps Bottom Attribution Footer Bar -->
+							<div class="google-maps-footer-bar">
+								<div class="google-maps-branding">
+									<span class="google-letter g-blue">G</span>
+									<span class="google-letter o-red">o</span>
+									<span class="google-letter o-yellow">o</span>
+									<span class="google-letter g-blue">g</span>
+									<span class="google-letter l-green">l</span>
+									<span class="google-letter e-red">e</span>
+								</div>
+								<div class="google-maps-footer-meta">
+									<span class="footer-coord-badge" id="mapCoordsBadge">Lat: 20.2961 · Lng: 85.8245 · Zoom: 13</span>
+									<span class="footer-divider">•</span>
+									<span>Keyboard shortcuts</span>
+									<span class="footer-divider">•</span>
+									<span>Map data ©2026 Google</span>
+									<span class="footer-divider">•</span>
+									<span class="footer-link">Terms</span>
+									<span class="footer-divider">•</span>
+									<span class="footer-link">Report a map error</span>
+								</div>
 							</div>
 						</div>
 					</div>

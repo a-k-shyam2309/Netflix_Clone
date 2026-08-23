@@ -1,12 +1,12 @@
 /**
  * CIVICBUZZ • GEOSPATIAL MAP & HOTSPOTS SCRIPT
+ * Full Google Maps UI Integration & Color-Coded Ranked Hotspots
  */
 
 // =========================================================
 // 1. HINDI & ENGLISH DICTIONARY
 // =========================================================
 const TRANSLATIONS = {
-  // Navigation & General
   "Dashboard": "डैशबोर्ड",
   "Issue Queue": "समस्या सूची",
   "Map & Hotspots": "मानचित्र और हॉटस्पॉट",
@@ -18,8 +18,6 @@ const TRANSLATIONS = {
   "Real-time spatial distribution, AI grievance clustering, and ward-level intensity tracking.": "वास्तविक समय स्थानिक वितरण, एआई शिकायत क्लस्टरिंग, और वार्ड-स्तरीय तीव्रता ट्रैकिंग।",
   "Recenter View": "दृष्टिकोण रीसेट करें",
   "Toggle Heatmap": "हीटमैप टॉगल करें",
-  
-  // Metric Cards
   "Spatial Incidents": "स्थानिक घटनाएं",
   "Live mapped issues": "लाइव मैप की गई समस्याएं",
   "Active Hotspots": "सक्रिय हॉटस्पॉट",
@@ -32,8 +30,6 @@ const TRANSLATIONS = {
   "Citizen audit accuracy": "नागरिक ऑडिट सटीकता",
   "Critical Hazards": "गंभीर खतरे",
   "Immediate SLA risk": "तत्काल एसएलए जोखिम",
-  
-  // Filters & Map Controls
   "Ward / Area": "वार्ड / क्षेत्र",
   "All Wards (Citywide)": "सभी वार्ड (शहरव्यापी)",
   "Category": "श्रेणी",
@@ -51,19 +47,15 @@ const TRANSLATIONS = {
   "Verified": "सत्यापित",
   "Rejected": "अस्वीकृत",
   "Map Style": "मानचित्र शैली",
-  "Incident Severity & Category": "घटना गंभीरता और श्रेणी",
-  "Critical / Emergency": "गंभीर / आपातकालीन",
-  "High Priority": "उच्च प्राथमिकता",
-  "Medium Priority": "मध्यम प्राथमिकता",
-  "Resolved / Verified": "हल / सत्यापित",
-  
-  // Sidebar Hotspots & Panels
+  "Incident Severity & Category": "घटना गंभीरता और हॉटस्पॉट",
+  "Critical Emergency": "गंभीर आपातकाल / रैंक 1",
+  "High Priority": "उच्च प्राथमिकता / रैंक 2",
+  "Medium Priority": "मध्यम प्राथमिकता / रैंक 3",
+  "Resolved / Verified": "हल / रैंक 4",
   "Ranked Hotspot Zones": "रैंक किए गए हॉटस्पॉट क्षेत्र",
   "High-density citizen report clusters": "उच्च घनत्व नागरिक रिपोर्ट क्लस्टर",
   "Ward Load Distribution": "वार्ड भार वितरण",
   "Grievance density by administrative ward": "वार्ड अनुसार शिकायत घनत्व",
-  
-  // Slide-out Details
   "User ID": "यूजर आईडी",
   "Date": "दिनांक",
   "Location": "स्थान",
@@ -82,67 +74,142 @@ const TRANSLATIONS = {
 };
 
 // =========================================================
-// 2. STATE & VARIABLES
+// 2. STATE & GOOGLE MAPS CONFIGURATION
 // =========================================================
-let map = null;
-let tileLayer = null;
-let currentLanguage = "en";
-let currentTheme = "light";
-let markersLayerGroup = null;
-let heatmapCirclesGroup = null;
-let activeComplaints = [];
-let isHeatmapActive = false;
-let currentActiveIssueId = null;
-
 const BHUBANESWAR_CENTER = [20.2961, 85.8245];
 
-// Predefined Hotspots definition with coordinates and descriptions
+// Google Maps Tile URLs
+const GOOGLE_TILE_URLS = {
+  roadmap: "https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+  satellite: "https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", // Hybrid satellite with streets/labels
+  terrain: "https://mt{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}"
+};
+
+// Severity Color Mapping (Matches Legend & Requirements)
+const SEVERITY_COLORS = {
+  CRITICAL: {
+    name: "Critical Emergency",
+    color: "#ef4444",
+    border: "#b91c1c",
+    bgSoft: "rgba(239, 68, 68, 0.14)",
+    glow: "rgba(239, 68, 68, 0.45)",
+    text: "#dc2626",
+    pinClass: "pin-critical"
+  },
+  HIGH: {
+    name: "High Priority",
+    color: "#f97316",
+    border: "#c2410c",
+    bgSoft: "rgba(249, 115, 22, 0.14)",
+    glow: "rgba(249, 115, 22, 0.45)",
+    text: "#ea580c",
+    pinClass: "pin-high"
+  },
+  MEDIUM: {
+    name: "Medium Priority",
+    color: "#3b82f6",
+    border: "#1d4ed8",
+    bgSoft: "rgba(59, 130, 246, 0.14)",
+    glow: "rgba(59, 130, 246, 0.45)",
+    text: "#2563eb",
+    pinClass: "pin-medium"
+  },
+  RESOLVED: {
+    name: "Resolved / Verified",
+    color: "#22c55e",
+    border: "#15803d",
+    bgSoft: "rgba(34, 197, 94, 0.14)",
+    glow: "rgba(34, 197, 94, 0.45)",
+    text: "#16a34a",
+    pinClass: "pin-resolved"
+  },
+  REJECTED: {
+    name: "Rejected / Low Risk",
+    color: "#64748b",
+    border: "#475569",
+    bgSoft: "rgba(100, 116, 139, 0.14)",
+    glow: "rgba(100, 116, 139, 0.35)",
+    text: "#475569",
+    pinClass: "pin-rejected"
+  }
+};
+
+// Ranked Hotspots Data (with preferred severity colors & categories)
 const HOTSPOTS_DATA = [
   {
     id: "hotspot-1",
+    rank: 1,
     name: "Janpath Central Corridor",
     ward: "Ward 12",
     lat: 20.2961,
     lng: 85.8245,
+    radius: 480,
     count: 18,
     severity: "CRITICAL",
     category: "Roads & Drainage",
+    categoryKey: "roads_potholes",
+    velocity: "+14 new today",
     desc: "Multiple deep potholes and water stagnation along metro construction corridor."
   },
   {
     id: "hotspot-2",
+    rank: 2,
     name: "Sector 15 Community Park",
     ward: "Ward 15",
     lat: 20.2910,
     lng: 85.8310,
+    radius: 380,
     count: 12,
     severity: "HIGH",
     category: "Garbage & Sanitation",
+    categoryKey: "garbage_sanitation",
+    velocity: "+8 new today",
     desc: "Persistent commercial waste accumulation and overflow near public park."
   },
   {
     id: "hotspot-3",
+    rank: 3,
     name: "5th Cross BTM Layout",
     ward: "Ward 09",
     lat: 20.3120,
     lng: 85.8180,
+    radius: 330,
     count: 9,
     severity: "MEDIUM",
     category: "Drainage Overflow",
+    categoryKey: "drainage",
+    velocity: "+5 new today",
     desc: "Blocked stormwater drain causing pedestrian walkway flooding."
   },
   {
     id: "hotspot-4",
+    rank: 4,
     name: "Green View Residential Block",
     ward: "Ward 04",
     lat: 20.3010,
     lng: 85.8150,
+    radius: 270,
     count: 6,
     severity: "RESOLVED",
     category: "Water Pipeline Leak",
+    categoryKey: "water_supply",
+    velocity: "Resolved 2h ago",
     desc: "Main supply pipeline burst under repair and street resurfacing."
   }
 ];
+
+let map = null;
+let tileLayer = null;
+let currentMapType = "roadmap"; // 'roadmap' | 'satellite'
+let currentStyleMode = "street"; // 'street' | 'satellite' | 'hotspots' | 'clusters'
+let currentLanguage = "en";
+let currentTheme = "light";
+
+let hotspotsLayerGroup = null;
+let markersLayerGroup = null;
+let clustersLayerGroup = null;
+let activeComplaints = [];
+let currentActiveIssueId = null;
 
 // =========================================================
 // 3. INITIALIZATION
@@ -150,30 +217,35 @@ const HOTSPOTS_DATA = [
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initLanguage();
-  initMap();
+  initGoogleMap();
   initEventListeners();
   loadLiveComplaints();
   renderHotspotsList();
 });
 
 // =========================================================
-// 4. MAP SETUP & RENDERING
+// 4. GOOGLE MAP SETUP & TILE RENDERING
 // =========================================================
-function initMap() {
-  if (typeof L === "undefined") return;
+function initGoogleMap() {
+  const container = document.getElementById("incidentMap");
+  if (!container || typeof L === "undefined") return;
 
   map = L.map("incidentMap", {
     center: BHUBANESWAR_CENTER,
     zoom: 13,
-    zoomControl: true,
+    zoomControl: false, // Using Google Maps styled floating control pill
     attributionControl: false
   });
 
+  // Layer groups
+  hotspotsLayerGroup = L.layerGroup().addTo(map);
   markersLayerGroup = L.layerGroup().addTo(map);
-  heatmapCirclesGroup = L.layerGroup().addTo(map);
+  clustersLayerGroup = L.layerGroup().addTo(map);
 
-  updateMapTiles();
+  // Set Google Maps Tile Layer
+  setGoogleTileLayer("roadmap");
 
+  // Coordinate readout tracker
   map.on("moveend", () => {
     const center = map.getCenter();
     const zoom = map.getZoom();
@@ -182,30 +254,32 @@ function initMap() {
       badge.textContent = `Lat: ${center.lat.toFixed(4)} · Lng: ${center.lng.toFixed(4)} · Zoom: ${zoom}`;
     }
   });
+
+  // Map Click Handler for popup dismiss
+  map.on("click", (e) => {
+    // If clicking outside, close any hover highlighters
+  });
 }
 
-function updateMapTiles(layerType = "default") {
+function setGoogleTileLayer(type = "roadmap") {
   if (!map) return;
 
   if (tileLayer) {
     map.removeLayer(tileLayer);
   }
 
-  let tileUrl = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+  currentMapType = type;
+  const url = GOOGLE_TILE_URLS[type] || GOOGLE_TILE_URLS.roadmap;
 
-  if (layerType === "satellite") {
-    tileUrl = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-  }
-
-  tileLayer = L.tileLayer(tileUrl, {
-    maxZoom: 19,
-    subdomains: layerType === "satellite" ? [] : "abcd",
-    attribution: false
+  tileLayer = L.tileLayer(url, {
+    subdomains: ["0", "1", "2", "3"],
+    maxZoom: 20,
+    attribution: "Map data &copy; Google"
   }).addTo(map);
 }
 
 // =========================================================
-// 5. LOAD COMPLAINTS & RENDER MARKERS
+// 5. LOAD COMPLAINTS & RENDER GOOGLE MAP HOTSPOTS & PINS
 // =========================================================
 async function loadLiveComplaints() {
   try {
@@ -220,100 +294,238 @@ async function loadLiveComplaints() {
     }
 
     if (!comps || comps.length === 0) {
-      // Fallback sample complaints with coordinates
+      // Fallback realistic incidents in Bhubaneswar with precise coordinates
       comps = [
         {
           complaint_id: "CB-12480",
-          title: "Dangerous Pothole on Janpath",
+          title: "Dangerous Deep Potholes near Metro Pillar 42",
           category: "roads_potholes",
+          department_name: "Roads & Potholes Department",
           priority_level: "CRITICAL",
           status: "PENDING",
           user_uid: "CIT-2041",
+          description: "Multiple severe potholes and deep road depression along metro construction corridor.",
+          created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
           location: { ward_name: "Ward 12", address: "Janpath Road, Metro Pillar 42", latitude: 20.2961, longitude: 85.8245 }
         },
         {
           complaint_id: "CB-12481",
-          title: "Streetlight outage near Market",
+          title: "High-mast Streetlight outage near Market Circle",
           category: "streetlights",
+          department_name: "Electrical & Street Lighting",
           priority_level: "HIGH",
           status: "IN_PROGRESS",
           user_uid: "CIT-1892",
+          description: "Main junction high-mast light completely off for 2 consecutive nights.",
+          created_at: new Date(Date.now() - 3600000 * 5).toISOString(),
           location: { ward_name: "Ward 08", address: "16th Main Road, Sector 4", latitude: 20.2980, longitude: 85.8210 }
         },
         {
           complaint_id: "CB-12482",
-          title: "Garbage overflow near Sector 15 Park",
+          title: "Commercial garbage overflow near Community Park gate",
           category: "garbage_sanitation",
+          department_name: "Sanitation & Solid Waste",
           priority_level: "HIGH",
           status: "REJECTED",
           user_uid: "CIT-3301",
+          description: "Heavy solid waste overflow from community bins obstructing park entrance.",
+          created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
           location: { ward_name: "Ward 15", address: "Sector 15, Nehru Park", latitude: 20.2910, longitude: 85.8310 }
         },
         {
           complaint_id: "CB-12483",
-          title: "Main pipeline leak flooding street",
+          title: "Main municipal pipeline burst flooding street",
           category: "water_supply",
+          department_name: "Water Supply & Public Health",
           priority_level: "HIGH",
           status: "RESOLVED",
           user_uid: "CIT-4412",
+          description: "High-pressure underground pipeline leak causing water logging across 100 meters.",
+          created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
           location: { ward_name: "Ward 04", address: "Block A, Green View", latitude: 20.3010, longitude: 85.8150 }
         },
         {
           complaint_id: "CB-12484",
-          title: "Clogged stormwater drain",
+          title: "Blocked stormwater drain and sewage backflow",
           category: "drainage",
+          department_name: "Drainage & Sewerage",
           priority_level: "MEDIUM",
           status: "PENDING",
           user_uid: "CIT-5520",
+          description: "Stormwater drain clogged with plastic silt, spilling over pedestrian path.",
+          created_at: new Date(Date.now() - 3600000 * 8).toISOString(),
           location: { ward_name: "Ward 09", address: "5th Cross Road, BTM Sector 5", latitude: 20.3120, longitude: 85.8180 }
         },
         {
           complaint_id: "CB-12479",
-          title: "Flickering high-mast street light",
+          title: "Streetlight flickering continuously",
           category: "streetlights",
+          department_name: "Electrical & Street Lighting",
           priority_level: "LOW",
           status: "VERIFIED",
           user_uid: "CIT-1090",
+          description: "Sodium lamp flickering rapidly near residential lane entrance.",
+          created_at: new Date(Date.now() - 3600000 * 30).toISOString(),
           location: { ward_name: "Ward 12", address: "Janpath Square", latitude: 20.2940, longitude: 85.8260 }
         }
       ];
     }
 
     activeComplaints = comps;
-    renderMapMarkers();
+    renderAllMapLayers();
     updateSpatialMetrics();
   } catch (err) {
     console.error("Error loading complaints for map:", err);
   }
 }
 
-function renderMapMarkers() {
-  if (!map || !markersLayerGroup) return;
+// Master map rendering function
+function renderAllMapLayers() {
+  if (!map) return;
 
+  hotspotsLayerGroup.clearLayers();
   markersLayerGroup.clearLayers();
-  heatmapCirclesGroup.clearLayers();
+  clustersLayerGroup.clearLayers();
 
   const selectedWard = document.getElementById("mapWardFilter")?.value || "all";
   const selectedCategory = document.getElementById("mapCategoryFilter")?.value || "all";
   const selectedStatus = document.getElementById("mapStatusFilter")?.value || "all";
 
+  // 1. Render Ranked Hotspots Geofence Zones & Beacons
+  renderRankedHotspots(selectedWard, selectedCategory, selectedStatus);
+
+  // 2. Render Incident Pins
+  if (currentStyleMode !== "clusters") {
+    renderIncidentMarkers(selectedWard, selectedCategory, selectedStatus);
+  } else {
+    renderWardClusters(selectedWard, selectedCategory, selectedStatus);
+  }
+}
+
+// =========================================================
+// 6. RANKED HOTSPOT ZONES RENDERING (Preferred Colors)
+// =========================================================
+function renderRankedHotspots(selectedWard, selectedCategory, selectedStatus) {
+  HOTSPOTS_DATA.forEach((h) => {
+    // Filter matching
+    if (selectedWard !== "all" && !h.ward.toLowerCase().includes(selectedWard.toLowerCase())) return;
+    if (selectedCategory !== "all" && h.categoryKey && !h.categoryKey.toLowerCase().includes(selectedCategory.toLowerCase())) return;
+
+    const sevConfig = SEVERITY_COLORS[h.severity] || SEVERITY_COLORS.MEDIUM;
+
+    // A. Outer Geofence Zone Circle with matching severity color
+    const circleRadius = currentStyleMode === "hotspots" ? h.radius * 1.3 : h.radius;
+    const fillOpacity = currentStyleMode === "hotspots" ? 0.32 : 0.16;
+
+    const geofenceCircle = L.circle([h.lat, h.lng], {
+      radius: circleRadius,
+      color: sevConfig.color,
+      fillColor: sevConfig.color,
+      fillOpacity: fillOpacity,
+      weight: 2,
+      dashArray: h.severity === "CRITICAL" ? null : "6, 6"
+    }).addTo(hotspotsLayerGroup);
+
+    // B. Custom Google Maps Ranked Beacon Badge Icon
+    const beaconHtml = `
+      <div class="google-hotspot-beacon-wrapper" data-hotspot-id="${h.id}">
+        <!-- Pulsing radar wave ring -->
+        <div class="beacon-pulse-wave" style="background-color: ${sevConfig.glow};"></div>
+        
+        <!-- Ranked Hotspot Marker Pill -->
+        <div class="google-hotspot-pill" style="border-color: ${sevConfig.color}; box-shadow: 0 4px 14px ${sevConfig.glow};">
+          <span class="hotspot-rank-tag" style="background-color: ${sevConfig.color};">#${h.rank}</span>
+          <div class="hotspot-pill-text">
+            <strong>${h.name}</strong>
+            <small>${h.count} Issues · <span style="color:${sevConfig.color}; font-weight:800;">${h.severity}</span></small>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const beaconIcon = L.divIcon({
+      html: beaconHtml,
+      className: "google-hotspot-div-icon",
+      iconSize: [220, 48],
+      iconAnchor: [110, 24],
+      popupAnchor: [0, -28]
+    });
+
+    const beaconMarker = L.marker([h.lat, h.lng], { icon: beaconIcon }).addTo(hotspotsLayerGroup);
+
+    // C. Rich Google Maps styled InfoWindow for Hotspot
+    const hotspotPopupContent = `
+      <div class="google-infowindow hotspot-infowindow">
+        <div class="g-info-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+          <div class="g-info-rank-badge" style="background:${sevConfig.color};">Rank #${h.rank} Hotspot</div>
+          <span class="g-info-severity-pill" style="background:${sevConfig.bgSoft}; color:${sevConfig.color}; border:1px solid ${sevConfig.color};">
+            ${h.severity}
+          </span>
+        </div>
+        <div class="g-info-body">
+          <h3 class="g-info-title">${h.name}</h3>
+          <p class="g-info-desc">${h.desc}</p>
+          
+          <div class="g-info-stats-grid">
+            <div class="g-info-stat-item">
+              <span>Total Volume</span>
+              <strong style="color:${sevConfig.color};">${h.count} Incidents</strong>
+            </div>
+            <div class="g-info-stat-item">
+              <span>Administrative Ward</span>
+              <strong>${h.ward}</strong>
+            </div>
+            <div class="g-info-stat-item">
+              <span>Primary Category</span>
+              <strong>${h.category}</strong>
+            </div>
+            <div class="g-info-stat-item">
+              <span>Velocity</span>
+              <strong style="color:#10b981;">${h.velocity}</strong>
+            </div>
+          </div>
+          
+          <div class="g-info-actions">
+            <button type="button" class="g-btn-primary" onclick="window.focusHotspot('${h.id}')" style="background:${sevConfig.color};">
+              <i class="fa-solid fa-crosshairs"></i> Focus Zone
+            </button>
+            <button type="button" class="g-btn-secondary" onclick="window.filterByWard('${h.ward}')">
+              <i class="fa-solid fa-filter"></i> Filter Ward
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    beaconMarker.bindPopup(hotspotPopupContent, {
+      maxWidth: 320,
+      className: "google-custom-popup"
+    });
+
+    // Hover / Click interaction
+    geofenceCircle.on("click", () => {
+      beaconMarker.openPopup();
+    });
+  });
+}
+
+// =========================================================
+// 7. INDIVIDUAL INCIDENT MARKERS (Google Pin Design)
+// =========================================================
+function renderIncidentMarkers(selectedWard, selectedCategory, selectedStatus) {
   const categoryIcons = {
     roads_potholes: "fa-road",
-    road: "fa-road",
     streetlights: "fa-lightbulb",
-    electricity: "fa-bolt",
     water_supply: "fa-faucet-drip",
-    water: "fa-water",
-    garbage_sanitation: "fa-trash",
-    garbage: "fa-trash",
+    garbage_sanitation: "fa-trash-can",
     drainage: "fa-water-ladder"
   };
 
   activeComplaints.forEach((c) => {
-    // Check filters
     const ward = c.location?.ward_name || "";
     const cat = (c.category || "").toLowerCase();
     const rawSt = (c.status || "PENDING").toLowerCase();
+
     let normalizedStatus = "pending";
     if (rawSt.includes("subm") || rawSt.includes("pend")) normalizedStatus = "pending";
     else if (rawSt.includes("prog") || rawSt.includes("assign") || rawSt.includes("work")) normalizedStatus = "in progress";
@@ -327,100 +539,143 @@ function renderMapMarkers() {
 
     const lat = c.location?.latitude || (BHUBANESWAR_CENTER[0] + (Math.random() - 0.5) * 0.03);
     const lng = c.location?.longitude || (BHUBANESWAR_CENTER[1] + (Math.random() - 0.5) * 0.03);
-    const priority = (c.priority_level || c.priority?.level || "MEDIUM").toLowerCase();
+    const priorityKey = (c.priority_level || c.priority?.level || "MEDIUM").toUpperCase();
+    const sevConfig = SEVERITY_COLORS[priorityKey] || SEVERITY_COLORS.MEDIUM;
     const iconClass = categoryIcons[c.category] || "fa-location-dot";
 
-    // Create Custom HTML Pin Marker
-    const markerHtml = `
-      <div class="custom-map-marker" data-issue-id="${c.complaint_id}">
-        <div class="marker-pin ${priority}">
-          <i class="fa-solid ${iconClass}"></i>
-        </div>
+    // Google Maps Pixel-Perfect Teardrop Pin HTML
+    const pinHtml = `
+      <div class="google-pin-container" data-issue-id="${c.complaint_id}">
+        <!-- Radar Pulse on Tip -->
+        <span class="pin-radar-wave" style="background-color: ${sevConfig.glow};"></span>
+        
+        <!-- Google Teardrop Pin Body -->
+        <svg class="google-pin-svg" viewBox="0 0 36 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Pin Drop Shadow -->
+          <ellipse cx="18" cy="46.5" rx="7" ry="2.5" fill="rgba(0,0,0,0.35)" />
+          <!-- Pin Body -->
+          <path d="M18 0C8.06 0 0 8.06 0 18C0 30.5 15.6 44.8 17.2 46.2C17.7 46.6 18.3 46.6 18.8 46.2C20.4 44.8 36 30.5 36 18C36 8.06 27.94 0 18 0Z" fill="${sevConfig.color}"/>
+          <path d="M18 0.75C8.47 0.75 0.75 8.47 0.75 18C0.75 29.8 15.9 43.6 17.6 45.1C17.8 45.3 18.2 45.3 18.4 45.1C20.1 43.6 35.25 29.8 35.25 18C35.25 8.47 27.53 0.75 18 0.75Z" stroke="${sevConfig.border}" stroke-width="1.2"/>
+          <!-- Inner Core White Circle -->
+          <circle cx="18" cy="17" r="7.5" fill="#FFFFFF"/>
+        </svg>
+
+        <!-- Category Icon inside Pin Core -->
+        <i class="fa-solid ${iconClass} google-pin-icon" style="color: ${sevConfig.color};"></i>
       </div>
     `;
 
-    const customIcon = L.divIcon({
-      html: markerHtml,
-      className: "custom-div-icon",
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-      popupAnchor: [0, -32]
+    const pinIcon = L.divIcon({
+      html: pinHtml,
+      className: "google-pin-div-icon",
+      iconSize: [36, 48],
+      iconAnchor: [18, 48],
+      popupAnchor: [0, -48]
     });
 
-    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(markersLayerGroup);
+    const marker = L.marker([lat, lng], { icon: pinIcon }).addTo(markersLayerGroup);
 
-    // Popup Content
+    // Google Maps Styled InfoWindow for Incident
     const popupContent = `
-      <div class="map-popup-card">
-        <div class="map-popup-header">
-          <span class="map-popup-id">#${c.complaint_id}</span>
-          <span class="map-popup-badge ${priority}">${priority}</span>
+      <div class="google-infowindow incident-infowindow">
+        <div class="g-info-header" style="border-bottom: 2px solid ${sevConfig.color};">
+          <div class="g-info-id">${c.complaint_id}</div>
+          <span class="g-info-severity-pill" style="background:${sevConfig.bgSoft}; color:${sevConfig.color};">
+            ${priorityKey}
+          </span>
         </div>
-        <h4 class="map-popup-title">${c.title}</h4>
-        <div class="map-popup-loc">
-          <i class="fa-solid fa-location-dot"></i> ${c.location?.address || 'Janpath Corridor'}, ${ward}
+        <div class="g-info-body">
+          <h4 class="g-info-title">${c.title}</h4>
+          <div class="g-info-meta-line">
+            <i class="fa-solid fa-location-dot" style="color:${sevConfig.color};"></i>
+            <span>${c.location?.address || 'Janpath Corridor'}, ${ward}</span>
+          </div>
+          <div class="g-info-meta-line">
+            <i class="fa-solid fa-clock"></i>
+            <span>Status: <strong style="color:var(--ink);">${normalizedStatus.toUpperCase()}</strong></span>
+          </div>
+          <div class="g-info-actions">
+            <button type="button" class="g-btn-primary" onclick="window.openIssueDetails('${c.complaint_id}')">
+              <i class="fa-solid fa-eye"></i> View Full Incident
+            </button>
+          </div>
         </div>
-        <div style="font-size:11px; margin-top:3px;">
-          Status: <strong>${normalizedStatus.toUpperCase()}</strong>
-        </div>
-        <button type="button" class="map-popup-btn" onclick="window.openIssueDetails('${c.complaint_id}')">
-          <i class="fa-solid fa-eye"></i> View Full Details
-        </button>
       </div>
     `;
 
-    marker.bindPopup(popupContent);
-
-    // If heatmap overlay is active, add glowing density circles
-    if (isHeatmapActive) {
-      const radius = priority === "critical" ? 450 : priority === "high" ? 350 : 250;
-      const color = priority === "critical" ? "#ef4444" : priority === "high" ? "#f59e0b" : "#3b82f6";
-      L.circle([lat, lng], {
-        radius: radius,
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.18,
-        weight: 1.5
-      }).addTo(heatmapCirclesGroup);
-    }
+    marker.bindPopup(popupContent, {
+      maxWidth: 290,
+      className: "google-custom-popup"
+    });
   });
 }
 
-function updateSpatialMetrics() {
-  const statTotal = document.getElementById("statTotalPins");
-  const statCritical = document.getElementById("statCriticalPins");
-  const statHotspots = document.getElementById("statActiveHotspots");
+// =========================================================
+// 8. WARD CLUSTERS RENDERING
+// =========================================================
+function renderWardClusters(selectedWard, selectedCategory, selectedStatus) {
+  // Aggregate complaints by ward
+  const wardMap = {
+    "Ward 12": { name: "Ward 12 (Janpath Central)", center: [20.2961, 85.8245], count: 18, severity: "CRITICAL" },
+    "Ward 15": { name: "Ward 15 (Nehru Park Zone)", center: [20.2910, 85.8310], count: 12, severity: "HIGH" },
+    "Ward 09": { name: "Ward 09 (BTM 5th Cross)", center: [20.3120, 85.8180], count: 9, severity: "MEDIUM" },
+    "Ward 04": { name: "Ward 04 (Green View Block)", center: [20.3010, 85.8150], count: 6, severity: "RESOLVED" }
+  };
 
-  if (statTotal) statTotal.textContent = activeComplaints.length;
-  
-  const criticalCount = activeComplaints.filter(c => {
-    const p = (c.priority_level || c.priority?.level || "").toUpperCase();
-    return p === "CRITICAL" || p === "HIGH";
-  }).length;
-  if (statCritical) statCritical.textContent = criticalCount;
-  if (statHotspots) statHotspots.textContent = HOTSPOTS_DATA.length;
+  Object.values(wardMap).forEach((w) => {
+    if (selectedWard !== "all" && !w.name.toLowerCase().includes(selectedWard.toLowerCase())) return;
+
+    const sevConfig = SEVERITY_COLORS[w.severity] || SEVERITY_COLORS.MEDIUM;
+
+    const clusterHtml = `
+      <div class="ward-cluster-bubble" style="background: ${sevConfig.color}; border-color: #ffffff; box-shadow: 0 6px 20px ${sevConfig.glow};">
+        <span class="cluster-count">${w.count}</span>
+        <span class="cluster-label">${w.name.split(" ")[0]}</span>
+      </div>
+    `;
+
+    const clusterIcon = L.divIcon({
+      html: clusterHtml,
+      className: "ward-cluster-div-icon",
+      iconSize: [60, 60],
+      iconAnchor: [30, 30]
+    });
+
+    const marker = L.marker(w.center, { icon: clusterIcon }).addTo(clustersLayerGroup);
+    marker.on("click", () => {
+      map.flyTo(w.center, 15);
+      showToast(`Zoomed into ${w.name}`);
+    });
+  });
 }
 
 // =========================================================
-// 6. HOTSPOTS SIDEBAR LIST
+// 9. HOTSPOTS SIDEBAR LIST RENDERING
 // =========================================================
 function renderHotspotsList() {
   const container = document.getElementById("hotspotList");
   if (!container) return;
 
   let html = "";
-  HOTSPOTS_DATA.forEach(h => {
+  HOTSPOTS_DATA.forEach((h) => {
+    const sevConfig = SEVERITY_COLORS[h.severity] || SEVERITY_COLORS.MEDIUM;
+
     html += `
-      <div class="hotspot-card" onclick="window.flyToLocation(${h.lat}, ${h.lng}, 15)">
+      <div class="hotspot-card" id="card-${h.id}" onclick="window.focusHotspot('${h.id}')" style="border-left: 4px solid ${sevConfig.color};">
         <div class="hotspot-topline">
-          <strong class="hotspot-title">${h.name}</strong>
-          <span class="hotspot-count-pill">${h.count} Issues</span>
+          <div class="hotspot-title-group">
+            <span class="hotspot-rank-badge" style="background: ${sevConfig.color};">#${h.rank}</span>
+            <strong class="hotspot-title">${h.name}</strong>
+          </div>
+          <span class="hotspot-count-pill" style="background: ${sevConfig.bgSoft}; color: ${sevConfig.color}; border: 1px solid ${sevConfig.color};">
+            ${h.count} Issues
+          </span>
         </div>
         <p class="hotspot-desc">${h.desc}</p>
         <div class="hotspot-meta-row">
           <span>🏛️ ${h.ward} · ${h.category}</span>
-          <button type="button" class="btn-focus-hotspot" onclick="event.stopPropagation(); window.flyToLocation(${h.lat}, ${h.lng}, 16)">
-            🎯 Focus
+          <button type="button" class="btn-focus-hotspot" style="color:${sevConfig.color};" onclick="event.stopPropagation(); window.focusHotspot('${h.id}')">
+            <i class="fa-solid fa-crosshairs"></i> Focus
           </button>
         </div>
       </div>
@@ -430,22 +685,56 @@ function renderHotspotsList() {
   container.innerHTML = html;
 }
 
-window.flyToLocation = function(lat, lng, zoom = 15) {
-  if (!map) return;
-  map.flyTo([lat, lng], zoom, {
+// Focus Hotspot Handler
+window.focusHotspot = function (hotspotId) {
+  const hotspot = HOTSPOTS_DATA.find((h) => h.id === hotspotId);
+  if (!hotspot || !map) return;
+
+  map.flyTo([hotspot.lat, hotspot.lng], 16, {
     duration: 1.2,
     easeLinearity: 0.25
   });
-  showToast(`Focused map view on coordinates: [${lat.toFixed(3)}, ${lng.toFixed(3)}]`);
+
+  // Highlight active sidebar card
+  document.querySelectorAll(".hotspot-card").forEach((c) => c.classList.remove("active-card"));
+  document.getElementById(`card-${hotspotId}`)?.classList.add("active-card");
+
+  showToast(`Focused on Rank #${hotspot.rank} Hotspot: ${hotspot.name} (${hotspot.severity})`);
 };
 
+// Filter by Ward Quick-Trigger
+window.filterByWard = function (wardName) {
+  const wardSelect = document.getElementById("mapWardFilter");
+  if (wardSelect) {
+    wardSelect.value = wardName;
+    renderAllMapLayers();
+    showToast(`Filter applied for ${wardName}`);
+  }
+};
+
+function updateSpatialMetrics() {
+  const statTotal = document.getElementById("statTotalPins");
+  const statCritical = document.getElementById("statCriticalPins");
+  const statHotspots = document.getElementById("statActiveHotspots");
+
+  if (statTotal) statTotal.textContent = activeComplaints.length;
+
+  const criticalCount = activeComplaints.filter((c) => {
+    const p = (c.priority_level || c.priority?.level || "").toUpperCase();
+    return p === "CRITICAL" || p === "HIGH";
+  }).length;
+
+  if (statCritical) statCritical.textContent = criticalCount;
+  if (statHotspots) statHotspots.textContent = HOTSPOTS_DATA.length;
+}
+
 // =========================================================
-// 7. ISSUE DETAILS SLIDE-OUT PANEL
+// 10. ISSUE DETAILS SLIDE-OUT PANEL
 // =========================================================
-window.openIssueDetails = function(issueId) {
+window.openIssueDetails = function (issueId) {
   currentActiveIssueId = issueId;
   const cleanId = (issueId || "").replace("#", "");
-  const issue = activeComplaints.find(c => (c.complaint_id || "").replace("#", "") === cleanId);
+  const issue = activeComplaints.find((c) => (c.complaint_id || "").replace("#", "") === cleanId);
 
   const panel = document.getElementById("issueDetailsPanel");
   const overlay = document.getElementById("issuePanelOverlay");
@@ -454,11 +743,11 @@ window.openIssueDetails = function(issueId) {
   if (issue) {
     document.getElementById("panelIssueId").textContent = `#${issue.complaint_id}`;
     document.getElementById("panelIssueTitle").textContent = issue.title || "Citizen Grievance";
-    document.getElementById("panelUserId").textContent = issue.user_uid || "CIT-1001";
+    document.getElementById("panelUserId").textContent = issue.user_uid || "CIT-2041";
     document.getElementById("panelDate").textContent = new Date(issue.created_at || Date.now()).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
     document.getElementById("panelLocation").textContent = `${issue.location?.address || 'Janpath'}, ${issue.location?.ward_name || 'Ward 12'}`;
     document.getElementById("panelCategory").textContent = issue.department_name || issue.category || "General";
-    
+
     const pr = (issue.priority_level || issue.priority?.level || "MEDIUM").toLowerCase();
     const prEl = document.getElementById("panelPriority");
     if (prEl) {
@@ -475,7 +764,7 @@ window.openIssueDetails = function(issueId) {
     else if (rawSt.includes("resolv")) { stText = "RESOLVED"; badgeCls = "resolved"; }
     else if (rawSt.includes("verif") || rawSt.includes("close")) { stText = "VERIFIED"; badgeCls = "verified"; }
     else if (rawSt.includes("reject")) { stText = "REJECTED"; badgeCls = "rejected"; }
-    
+
     if (stEl) {
       stEl.textContent = stText;
       stEl.className = `status-badge ${badgeCls}`;
@@ -483,61 +772,10 @@ window.openIssueDetails = function(issueId) {
 
     document.getElementById("panelDescription").textContent = issue.description || "Issue reported via citizen portal.";
     document.getElementById("panelAssigned").textContent = issue.department_name || "Roads & Potholes Department";
-
-    // Dynamic Image Evidence Rendering
-    const imageContainer = document.getElementById("panelImageContainer");
-    let imageUrl = issue.image_url || issue.image || null;
-    
-    if (!imageUrl && window.ComplaintStore?.getAll) {
-      const allComps = window.ComplaintStore.getAll();
-      const match = allComps.find(c => (c.complaint_id || "").replace("#", "") === cleanId);
-      if (match && match.image_url) {
-        imageUrl = match.image_url;
-      }
-    }
-
-    if (imageContainer) {
-      if (imageUrl) {
-        imageContainer.innerHTML = `
-          <div class="issue-image-card" onclick="window.openImageLightbox('${imageUrl}')">
-            <img src="${imageUrl}" alt="${issue.title || 'Attached Evidence'}" loading="lazy" />
-            <div class="image-card-caption">
-              <span>🔍 Click to enlarge</span>
-              <small>Citizen Uploaded Evidence</small>
-            </div>
-          </div>
-        `;
-      } else {
-        imageContainer.innerHTML = `
-          <div class="image-not-uploaded-box">
-            <div class="no-img-icon">📷</div>
-            <div class="no-img-text">
-              <strong data-i18n="Image not uploaded">Image not uploaded</strong>
-              <p data-i18n="No visual media was attached by the citizen with this complaint.">No visual media was attached by the citizen with this complaint.</p>
-            </div>
-          </div>
-        `;
-      }
-    }
   }
 
   panel.classList.add("open");
   overlay.classList.add("active");
-};
-
-window.openImageLightbox = function(src) {
-  let lightbox = document.getElementById("civicbuzzImageLightbox");
-  if (!lightbox) {
-    lightbox = document.createElement("div");
-    lightbox.id = "civicbuzzImageLightbox";
-    lightbox.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;backdrop-filter:blur(4px);";
-    lightbox.onclick = function() { lightbox.style.display = "none"; };
-    lightbox.innerHTML = `<img id="lightboxImg" style="max-width:92vw;max-height:92vh;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.8);border:2px solid rgba(255,255,255,0.2);object-fit:contain;" />`;
-    document.body.appendChild(lightbox);
-  }
-  const img = lightbox.querySelector("#lightboxImg");
-  if (img) img.src = src;
-  lightbox.style.display = "flex";
 };
 
 function closeIssueDetails() {
@@ -548,44 +786,94 @@ function closeIssueDetails() {
 }
 
 // =========================================================
-// 8. EVENT LISTENERS
+// 11. EVENT LISTENERS & GOOGLE CONTROLS
 // =========================================================
 function initEventListeners() {
-  // Recenter button
-  document.getElementById("btnRecenterMap")?.addEventListener("click", () => {
-    if (map) map.flyTo(BHUBANESWAR_CENTER, 13);
-    showToast("Map view recentered to city center.");
+  // Google Zoom In
+  document.getElementById("btnGoogleZoomIn")?.addEventListener("click", () => {
+    if (map) map.zoomIn();
   });
 
-  // Heatmap toggle
+  // Google Zoom Out
+  document.getElementById("btnGoogleZoomOut")?.addEventListener("click", () => {
+    if (map) map.zoomOut();
+  });
+
+  // Google Recenter
+  document.getElementById("btnGoogleRecenter")?.addEventListener("click", () => {
+    if (map) map.flyTo(BHUBANESWAR_CENTER, 13);
+    showToast("Map view recentered to Bhubaneswar City Center.");
+  });
+
+  document.getElementById("btnRecenterMap")?.addEventListener("click", () => {
+    if (map) map.flyTo(BHUBANESWAR_CENTER, 13);
+    showToast("Map view recentered.");
+  });
+
+  // Fullscreen Map Toggle
+  document.getElementById("btnGoogleFullscreen")?.addEventListener("click", () => {
+    const mapCard = document.getElementById("mapFrameCard");
+    const icon = document.getElementById("fullscreenIcon");
+    if (!mapCard) return;
+
+    if (!document.fullscreenElement) {
+      mapCard.requestFullscreen().then(() => {
+        if (icon) icon.className = "fa-solid fa-compress";
+        showToast("Fullscreen mode enabled.");
+      }).catch(err => {
+        console.error("Fullscreen error:", err);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        if (icon) icon.className = "fa-solid fa-expand";
+      });
+    }
+  });
+
+  // Heatmap Toggle in Header
   document.getElementById("btnToggleHeatmap")?.addEventListener("click", () => {
-    isHeatmapActive = !isHeatmapActive;
+    currentStyleMode = currentStyleMode === "hotspots" ? "street" : "hotspots";
     const btnText = document.getElementById("heatmapToggleText");
     if (btnText) {
-      btnText.textContent = isHeatmapActive ? (currentLanguage === "hi" ? "हीटमैप छुपाएं" : "Hide Heatmap") : (currentLanguage === "hi" ? "हीटमैप दिखाएं" : "Toggle Heatmap");
+      btnText.textContent = currentStyleMode === "hotspots" ? (currentLanguage === "hi" ? "हीटमैप छुपाएं" : "Hide Heatmap") : (currentLanguage === "hi" ? "हीटमैप दिखाएं" : "Toggle Heatmap");
     }
-    renderMapMarkers();
-    showToast(isHeatmapActive ? "Heatmap density overlay enabled." : "Heatmap overlay disabled.");
+
+    // Sync toolbar style buttons
+    document.querySelectorAll(".layer-btn").forEach((b) => b.classList.remove("active"));
+    if (currentStyleMode === "hotspots") {
+      document.getElementById("btnLayerHotspots")?.classList.add("active");
+    } else {
+      document.getElementById("btnLayerStreet")?.classList.add("active");
+    }
+
+    renderAllMapLayers();
+    showToast(currentStyleMode === "hotspots" ? "Heatmap density overlay enabled." : "Standard Google Roadmap view restored.");
   });
 
   // Filters change
-  document.getElementById("mapWardFilter")?.addEventListener("change", renderMapMarkers);
-  document.getElementById("mapCategoryFilter")?.addEventListener("change", renderMapMarkers);
-  document.getElementById("mapStatusFilter")?.addEventListener("change", renderMapMarkers);
+  document.getElementById("mapWardFilter")?.addEventListener("change", renderAllMapLayers);
+  document.getElementById("mapCategoryFilter")?.addEventListener("change", renderAllMapLayers);
+  document.getElementById("mapStatusFilter")?.addEventListener("change", renderAllMapLayers);
 
   // Layer style buttons
   const styleBtns = document.querySelectorAll(".layer-btn");
-  styleBtns.forEach(btn => {
+  styleBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      styleBtns.forEach(b => b.classList.remove("active"));
+      styleBtns.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      
-      if (btn.id === "btnLayerHotspots") {
-        isHeatmapActive = true;
-      } else {
-        isHeatmapActive = false;
+
+      if (btn.id === "btnLayerStreet") {
+        currentStyleMode = "street";
+        setGoogleTileLayer("roadmap");
+      } else if (btn.id === "btnLayerSatellite") {
+        currentStyleMode = "satellite";
+        setGoogleTileLayer("satellite");
+      } else if (btn.id === "btnLayerHotspots") {
+        currentStyleMode = "hotspots";
+      } else if (btn.id === "btnLayerClusters") {
+        currentStyleMode = "clusters";
       }
-      renderMapMarkers();
+      renderAllMapLayers();
     });
   });
 
@@ -634,7 +922,7 @@ function initEventListeners() {
     });
   }
 
-  document.querySelectorAll(".language-option").forEach(opt => {
+  document.querySelectorAll(".language-option").forEach((opt) => {
     opt.addEventListener("click", (e) => {
       e.stopPropagation();
       const lang = opt.dataset.lang;
@@ -672,7 +960,7 @@ function initEventListeners() {
 }
 
 // =========================================================
-// 9. THEME & LANGUAGE MANAGEMENT
+// 12. THEME & LANGUAGE MANAGEMENT
 // =========================================================
 function initTheme() {
   const saved = localStorage.getItem("civicbuzz-admin-theme") || localStorage.getItem("civicbuzz-theme") || "light";
@@ -694,7 +982,6 @@ function toggleTheme() {
   localStorage.setItem("civicbuzz-admin-theme", currentTheme);
   localStorage.setItem("civicbuzz-theme", currentTheme);
   updateThemeControls();
-  updateMapTiles();
   showToast(isDark ? "Dark mode activated." : "Light mode activated.");
 }
 
@@ -718,12 +1005,11 @@ function setLanguage(lang) {
   const langText = document.getElementById("currentLanguageText");
   if (langText) langText.textContent = lang === "hi" ? "हिन्दी" : "English";
 
-  document.querySelectorAll(".language-option").forEach(opt => {
+  document.querySelectorAll(".language-option").forEach((opt) => {
     opt.classList.toggle("active", opt.dataset.lang === lang);
   });
 
-  // Translate all [data-i18n]
-  document.querySelectorAll("[data-i18n]").forEach(el => {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
     if (lang === "hi" && TRANSLATIONS[key]) {
       el.textContent = TRANSLATIONS[key];
@@ -732,8 +1018,7 @@ function setLanguage(lang) {
     }
   });
 
-  // Translate placeholders
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
     const key = el.dataset.i18nPlaceholder;
     if (lang === "hi" && TRANSLATIONS[key]) {
       el.setAttribute("placeholder", TRANSLATIONS[key]);
@@ -746,9 +1031,9 @@ function setLanguage(lang) {
 }
 
 // =========================================================
-// 10. GLOBAL ACTIONS & WINDOW EXPORTS
+// 13. GLOBAL ACTIONS & WINDOW EXPORTS
 // =========================================================
-window.toggleNotificationMenu = function(e) {
+window.toggleNotificationMenu = function (e) {
   e?.stopPropagation();
   const wrapper = document.getElementById("notificationWrapper");
   const dropdown = document.getElementById("notificationDropdown");
@@ -757,9 +1042,9 @@ window.toggleNotificationMenu = function(e) {
   document.getElementById("profileWrapper")?.classList.remove("is-open");
 };
 
-window.markAllNotificationsRead = function(e) {
+window.markAllNotificationsRead = function (e) {
   e?.stopPropagation();
-  document.querySelectorAll(".notification-item.unread").forEach(item => item.classList.remove("unread"));
+  document.querySelectorAll(".notification-item.unread").forEach((item) => item.classList.remove("unread"));
   const pill = document.getElementById("notifCountPill");
   const badge = document.getElementById("notifBadge");
   if (pill) pill.textContent = "0 New";
@@ -767,7 +1052,7 @@ window.markAllNotificationsRead = function(e) {
   showToast("All notifications marked as read.");
 };
 
-window.handleNotifClick = function(e, action, id) {
+window.handleNotifClick = function (e, action, id) {
   e?.stopPropagation();
   window.toggleNotificationMenu();
   if (action === "issue" && id) {
@@ -779,7 +1064,7 @@ window.handleNotifClick = function(e, action, id) {
   }
 };
 
-window.toggleProfileMenu = function(e) {
+window.toggleProfileMenu = function (e) {
   e?.stopPropagation();
   const wrapper = document.getElementById("profileWrapper");
   const dropdown = document.getElementById("profileDropdown");
@@ -788,7 +1073,7 @@ window.toggleProfileMenu = function(e) {
   document.getElementById("notificationWrapper")?.classList.remove("is-open");
 };
 
-window.handleProfileAction = function(e, action) {
+window.handleProfileAction = function (e, action) {
   e?.stopPropagation();
   if (action === "theme") {
     toggleTheme();
@@ -800,14 +1085,14 @@ window.handleProfileAction = function(e, action) {
   }
 };
 
-window.copyAdminId = function(e) {
+window.copyAdminId = function (e) {
   e?.stopPropagation();
   navigator.clipboard.writeText("ADMIN-001");
   showToast("Admin ID copied to clipboard: ADMIN-001");
 };
 
 // =========================================================
-// 11. SEARCH AUTOCOMPLETE
+// 14. SEARCH AUTOCOMPLETE
 // =========================================================
 function initSearchAutocomplete() {
   const input = document.getElementById("mapSearchInput");
@@ -822,21 +1107,22 @@ function initSearchAutocomplete() {
       return;
     }
 
-    const matchedHotspots = HOTSPOTS_DATA.filter(h => h.name.toLowerCase().includes(q) || h.ward.toLowerCase().includes(q));
-    const matchedIssues = activeComplaints.filter(c => 
-      (c.complaint_id || "").toLowerCase().includes(q) || 
-      (c.title || "").toLowerCase().includes(q) || 
+    const matchedHotspots = HOTSPOTS_DATA.filter((h) => h.name.toLowerCase().includes(q) || h.ward.toLowerCase().includes(q));
+    const matchedIssues = activeComplaints.filter((c) =>
+      (c.complaint_id || "").toLowerCase().includes(q) ||
+      (c.title || "").toLowerCase().includes(q) ||
       (c.location?.address || "").toLowerCase().includes(q)
     );
 
     let html = "";
     if (matchedHotspots.length > 0) {
-      html += `<div class="search-group-header">Hotspots & Corridors</div>`;
-      matchedHotspots.forEach(h => {
+      html += `<div class="search-group-header">Hotspots & Ranked Corridors</div>`;
+      matchedHotspots.forEach((h) => {
+        const sevConfig = SEVERITY_COLORS[h.severity] || SEVERITY_COLORS.MEDIUM;
         html += `
-          <div class="search-item" onclick="window.flyToLocation(${h.lat}, ${h.lng}, 16); document.getElementById('searchSuggestions').setAttribute('hidden','');">
-            <span>🔥</span>
-            <div><strong>${h.name}</strong><br><small style="color:var(--muted);">${h.ward} · ${h.count} issues</small></div>
+          <div class="search-item" onclick="window.focusHotspot('${h.id}'); document.getElementById('searchSuggestions').setAttribute('hidden','');">
+            <span style="color:${sevConfig.color};">🔥</span>
+            <div><strong>#${h.rank} ${h.name}</strong><br><small style="color:var(--muted);">${h.ward} · ${h.count} issues · ${h.severity}</small></div>
           </div>
         `;
       });
@@ -844,7 +1130,7 @@ function initSearchAutocomplete() {
 
     if (matchedIssues.length > 0) {
       html += `<div class="search-group-header">Incidents & Track IDs</div>`;
-      matchedIssues.forEach(c => {
+      matchedIssues.forEach((c) => {
         html += `
           <div class="search-item" onclick="window.openIssueDetails('${c.complaint_id}'); document.getElementById('searchSuggestions').setAttribute('hidden','');">
             <span>📍</span>
@@ -855,7 +1141,7 @@ function initSearchAutocomplete() {
     }
 
     if (!html) {
-      html = `<div style="padding:10px; font-size:12px; color:var(--muted); text-align:center;">No matching locations or track IDs found.</div>`;
+      html = `<div style="padding:10px; font-size:12px; color:var(--muted); text-align:center;">No matching hotspots or track IDs found.</div>`;
     }
 
     container.innerHTML = html;
