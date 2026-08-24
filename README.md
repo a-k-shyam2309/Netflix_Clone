@@ -12,11 +12,11 @@ Citizens report civic problems using text, photo evidence, voice architecture, a
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│                    CIVICBUZZ WEB APP                       │
-│  React 18 + Vite + Tailwind CSS + Lucide Icons             │
-│  Home | Report | Track | Public | Budget | Tenders | Admin │
+│              CIVICBUZZ MULTI-PAGE PORTAL                   │
+│  HTML5 + Vanilla CSS3 Glassmorphism + Vanilla JS + Leaflet │
+│  Auth Gateway | Citizen Portal | Admin Municipal Suite     │
 └─────────────────────────────┬──────────────────────────────┘
-                              │ REST (JWT Bearer)
+                              │ REST (JWT Bearer) / Local Sync
                               ▼
 ┌────────────────────────────────────────────────────────────┐
 │                  FASTAPI ASYNC BACKEND                     │
@@ -40,9 +40,9 @@ Citizens report civic problems using text, photo evidence, voice architecture, a
 
 1. **Evidence-Grounded Reporting**:
    - Photo upload with SHA-256 integrity verification hash.
-   - Voice grievance note recording (multilingual).
+   - Voice grievance note recording (multilingual speech-to-text).
    - GPS Current Location + Interactive Map Pinning with automatic reverse geocoding to Bhubaneswar Wards (e.g. Ward 12 Janpath, Ward 30 Saheed Nagar, Ward 5 Patia).
-   - Gemini AI automated grievance triage (severity, category, and department recommendation).
+   - Gemini AI automated grievance triage (severity, category, SLA estimation, and department routing).
 
 2. **Citizen-Verified Resolution Lifecycle**:
    - Department officers can only move tickets to `READY_FOR_CITIZEN_VERIFICATION` with before/after photos and work description.
@@ -50,7 +50,7 @@ Citizens report civic problems using text, photo evidence, voice architecture, a
 
 3. **Public Transparency & Issue Clusters**:
    - Public feed with privacy safeguards (complainant identities sanitized).
-   - Duplicate clustering (`IC-101`) aggregating multiple reports for the same localized problem.
+   - Duplicate clustering aggregating multiple reports for the same localized problem with one-click "Upvote & Merge".
 
 4. **Participatory Budgeting & Democratic Voting**:
    - Community proposals with estimated vs allocated budget meters.
@@ -61,14 +61,14 @@ Citizens report civic problems using text, photo evidence, voice architecture, a
    - 5-stage procurement lifecycle (Publication -> Technical Evaluation -> Financial Bids -> Work Order -> Execution).
    - Direct link between community grievances and municipal tenders.
 
-6. **Gemini AI Civic Assistant Chatbot**:
+6. **Gemini AI Civic Assistant Chatbot & Live Triage**:
    - Multilingual citizen assistant for complaint reporting guidance, tracking status queries, and budget explanations.
 
 ---
 
 ## Quickstart Guide
 
-### 1. Run Backend
+### 1. Run Backend (FastAPI)
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -76,13 +76,16 @@ python -m uvicorn app.main:app --port 8000 --reload
 ```
 API Documentation available at `http://localhost:8000/docs`.
 
-### 2. Run React Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Access the application at `http://localhost:5173`.
+### 2. Run Frontend Portal
+Open `Frontend/Login_Frontend/index.html` directly in your browser or run with any static server:
+- **Option A (Direct):** Double-click `Frontend/Login_Frontend/index.html` or open in any browser.
+- **Option B (VS Code Live Server):** Right click `Frontend/Login_Frontend/index.html` and select **"Open with Live Server"** (at `http://127.0.0.1:5500`).
+- **Option C (Python HTTP Server):**
+  ```bash
+  cd Frontend/Login_Frontend
+  python -m http.server 3000
+  ```
+  Access at `http://localhost:3000`.
 
 ### 3. Fast Demo Roles (Hackathon Evaluation)
 Use the 1-click role switcher in the top navigation or Sign In page:
