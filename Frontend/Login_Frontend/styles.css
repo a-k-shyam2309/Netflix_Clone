@@ -1353,6 +1353,7 @@ body.dark input::placeholder {
 		opacity: 0;
 		transform: scale(0.94) translateY(8px);
 	}
+
 	100% {
 		opacity: 1;
 		transform: scale(1) translateY(0);
@@ -1883,7 +1884,7 @@ body.dark #login-form input:focus {
 .logo {
 	display: inline-flex;
 	align-items: center;
-	gap: 10px;
+	gap: -2px;
 
 	color: inherit;
 	text-decoration: none;
@@ -1894,14 +1895,10 @@ body.dark #login-form input:focus {
 }
 
 .logo img {
-	width: 38px;
-	height: 38px;
-
+	width: 88px;
+	height: 88px;
 	object-fit: contain;
-
 	display: block;
-
-	border-radius: 8px;
 }
 
 .logo-name {

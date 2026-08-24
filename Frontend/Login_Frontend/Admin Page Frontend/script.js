@@ -1150,10 +1150,14 @@ function showSection(sectionName) {
 
   if (normalized === "maphotspots" || normalized === "map") {
     $("#map")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => { if (adminLiveMap) adminLiveMap.invalidateSize(); }, 250);
   } else if (normalized === "analytics") {
     $(".trend-panel")?.scrollIntoView({ behavior: "smooth", block: "center" });
   } else {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    if (normalized === "dashboard" || normalized === "home" || !normalized) {
+      setTimeout(() => { if (adminLiveMap) adminLiveMap.invalidateSize(); }, 250);
+    }
   }
 }
 
@@ -2545,6 +2549,330 @@ function setupBudgeting() {
   loadLiveTenders();
 }
 
+// =========================================================
+// SUBMODULE: LIVE BHUBANESWAR GIS ISSUE MAP
+// =========================================================
+
+const BHUBANESWAR_CENTER = [20.2961, 85.8245];
+let adminLiveMap = null;
+let adminMapMarkersLayer = null;
+
+const BHUBANESWAR_LOCATIONS_MAP = {
+  patia: [20.3533, 85.8189],
+  kiit: [20.3533, 85.8189],
+  infocity: [20.3548, 85.8184],
+  "saheed nagar": [20.2905, 85.8450],
+  "jayadev vihar": [20.3015, 85.8235],
+  "master canteen": [20.2650, 85.8390],
+  rasulgarh: [20.2950, 85.8650],
+  khandagiri: [20.2580, 85.7870],
+  nayapalli: [20.2990, 85.8120],
+  "old town": [20.2390, 85.8340],
+  lingaraj: [20.2390, 85.8340],
+  chandrasekharpur: [20.3250, 85.8150],
+  kalpana: [20.2570, 85.8440],
+  "unit 4": [20.2780, 85.8350],
+  baramunda: [20.2790, 85.7920],
+  mancheswar: [20.3200, 85.8500],
+  "irc village": [20.3060, 85.8170],
+  janpath: [20.2860, 85.8410],
+  "ashok nagar": [20.2710, 85.8360],
+  "bapuji nagar": [20.2630, 85.8320],
+  laxmisagar: [20.2720, 85.8580],
+  samantarapur: [20.2350, 85.8480],
+  tamando: [20.2440, 85.7480],
+  dumduma: [20.2490, 85.7830]
+};
+
+function getComplaintCoordinates(c) {
+  let lat = Number(c.latitude || c.location?.latitude || (c.location_point?.coordinates ? c.location_point.coordinates[1] : 0));
+  let lng = Number(c.longitude || c.location?.longitude || (c.location_point?.coordinates ? c.location_point.coordinates[0] : 0));
+
+  if (lat && lng && !isNaN(lat) && !isNaN(lng) && lat >= 20.15 && lat <= 20.45 && lng >= 85.65 && lng <= 85.95) {
+    return [lat, lng];
+  }
+
+  const text = `${c.location?.address || ""} ${c.location?.ward_name || ""} ${c.ward || ""} ${c.title || ""}`.toLowerCase();
+  for (const [key, coords] of Object.entries(BHUBANESWAR_LOCATIONS_MAP)) {
+    if (text.includes(key)) {
+      const hash = String(c.complaint_id || "").split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+      const jitterLat = ((hash % 10) - 5) * 0.0015;
+      const jitterLng = (((hash >> 2) % 10) - 5) * 0.0015;
+      return [coords[0] + jitterLat, coords[1] + jitterLng];
+    }
+  }
+
+  const seed = String(c.complaint_id || c.title || "bhub").split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  const offsetLat = (((seed % 20) - 10) / 10) * 0.035;
+  const offsetLng = ((((seed >> 2) % 20) - 10) / 10) * 0.035;
+  return [BHUBANESWAR_CENTER[0] + offsetLat, BHUBANESWAR_CENTER[1] + offsetLng];
+}
+
+function initAdminLiveMap() {
+  const mapEl = document.getElementById("adminLiveIssueMap");
+  if (!mapEl || typeof L === "undefined") return;
+
+  if (adminLiveMap) {
+    adminLiveMap.invalidateSize();
+    renderAdminMapIssues();
+    return;
+  }
+
+  try {
+    adminLiveMap = L.map("adminLiveIssueMap", {
+      center: BHUBANESWAR_CENTER,
+      zoom: 12.5,
+      minZoom: 10,
+      maxZoom: 18,
+      zoomControl: true,
+      attributionControl: true
+    });
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: "abcd",
+      maxZoom: 19
+    }).addTo(adminLiveMap);
+
+    adminMapMarkersLayer = L.layerGroup().addTo(adminLiveMap);
+
+    // Recenter Button
+    const recenterBtn = document.getElementById("adminMapRecenterBtn");
+    if (recenterBtn) {
+      recenterBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (adminLiveMap) {
+          adminLiveMap.flyTo(BHUBANESWAR_CENTER, 13, { duration: 1 });
+          showToast("Recentered to Bhubaneswar City Center.");
+        }
+      });
+    }
+
+    renderAdminMapIssues();
+
+    // Map sizing fix on load
+    setTimeout(() => {
+      if (adminLiveMap) adminLiveMap.invalidateSize();
+    }, 400);
+
+    window.addEventListener("resize", () => {
+      if (adminLiveMap) adminLiveMap.invalidateSize();
+    });
+  } catch (err) {
+    console.warn("Live issue map init notice:", err);
+  }
+}
+
+function renderAdminMapIssues() {
+  if (!adminLiveMap || !adminMapMarkersLayer || typeof L === "undefined") return;
+
+  adminMapMarkersLayer.clearLayers();
+
+  let complaints = [];
+  if (window.CivicBuzzAPI?.store?.getAll) {
+    complaints = window.CivicBuzzAPI.store.getAll();
+  }
+
+  if (!complaints || complaints.length === 0) {
+    complaints = [
+      {
+        complaint_id: "CB-BHUB-1042",
+        title: "Deep crater-sized pothole near KIIT Square",
+        category: "roads_potholes",
+        priority_level: "CRITICAL",
+        status: "IN_PROGRESS",
+        location: { ward_name: "Ward 1 (Patia & KIIT)", address: "KIIT Square, Patia Main Road, Bhubaneswar" },
+        latitude: 20.3533,
+        longitude: 85.8189
+      },
+      {
+        complaint_id: "CB-BHUB-1043",
+        title: "Blocked stormwater drain causing waterlogging",
+        category: "drainage",
+        priority_level: "HIGH",
+        status: "SUBMITTED",
+        location: { ward_name: "Ward 2 (Patia Corridor)", address: "Near Infocity Square, Patia" },
+        latitude: 20.3548,
+        longitude: 85.8184
+      },
+      {
+        complaint_id: "CB-BHUB-1044",
+        title: "Broken high-mast streetlight pole",
+        category: "streetlights",
+        priority_level: "HIGH",
+        status: "RESOLVED",
+        location: { ward_name: "Ward 7 (Saheed Nagar)", address: "Saheed Nagar Main Market" },
+        latitude: 20.2905,
+        longitude: 85.8450
+      },
+      {
+        complaint_id: "CB-BHUB-1045",
+        title: "Garbage pile overflow near Jayadev Vihar flyover",
+        category: "garbage_sanitation",
+        priority_level: "CRITICAL",
+        status: "IN_PROGRESS",
+        location: { ward_name: "Ward 4 (Jayadev Vihar)", address: "Jayadev Vihar Overbridge Junction" },
+        latitude: 20.3015,
+        longitude: 85.8235
+      },
+      {
+        complaint_id: "CB-BHUB-1046",
+        title: "Drinking water pipeline burst near Master Canteen",
+        category: "water_supply",
+        priority_level: "CRITICAL",
+        status: "SUBMITTED",
+        location: { ward_name: "Ward 11 (Master Canteen)", address: "Master Canteen Chowk" },
+        latitude: 20.2650,
+        longitude: 85.8390
+      },
+      {
+        complaint_id: "CB-BHUB-1047",
+        title: "Industrial sewage overflow into open drain",
+        category: "drainage",
+        priority_level: "HIGH",
+        status: "IN_PROGRESS",
+        location: { ward_name: "Ward 6 (Rasulgarh)", address: "Rasulgarh Industrial Area" },
+        latitude: 20.2950,
+        longitude: 85.8650
+      },
+      {
+        complaint_id: "CB-BHUB-1048",
+        title: "Road erosion along Khandagiri tourist corridor",
+        category: "roads_potholes",
+        priority_level: "MEDIUM",
+        status: "SUBMITTED",
+        location: { ward_name: "Ward 15 (Khandagiri)", address: "Khandagiri Caves Entry Road" },
+        latitude: 20.2580,
+        longitude: 85.7870
+      },
+      {
+        complaint_id: "CB-BHUB-1049",
+        title: "Dead tree branch hazard on overhead powerline",
+        category: "streetlights",
+        priority_level: "HIGH",
+        status: "RESOLVED",
+        location: { ward_name: "Ward 5 (Nayapalli)", address: "Nayapalli Behera Sahi" },
+        latitude: 20.2990,
+        longitude: 85.8120
+      },
+      {
+        complaint_id: "CB-BHUB-1050",
+        title: "Sanitation waste accumulation near temple perimeter",
+        category: "garbage_sanitation",
+        priority_level: "MEDIUM",
+        status: "RESOLVED",
+        location: { ward_name: "Ward 18 (Old Town)", address: "Old Town Lingaraj Temple North Gate" },
+        latitude: 20.2390,
+        longitude: 85.8340
+      }
+    ];
+  }
+
+  let urgentCount = 0;
+  let openCount = 0;
+  let resolvedCount = 0;
+
+  const catMap = {
+    roads_potholes: { icon: "⌁", label: "Roads & Potholes" },
+    road: { icon: "⌁", label: "Roads & Potholes" },
+    potholes: { icon: "⌁", label: "Roads & Potholes" },
+    garbage_sanitation: { icon: "♜", label: "Sanitation" },
+    garbage: { icon: "♜", label: "Sanitation" },
+    sanitation: { icon: "♜", label: "Sanitation" },
+    water_supply: { icon: "◒", label: "Water Supply" },
+    water: { icon: "◒", label: "Water Supply" },
+    streetlights: { icon: "☼", label: "Street Lighting" },
+    electricity: { icon: "☼", label: "Street Lighting" },
+    drainage: { icon: "🌊", label: "Drainage & Sewerage" }
+  };
+
+  complaints.forEach((c) => {
+    const coords = getComplaintCoordinates(c);
+    const pr = String(c.priority_level || c.priority?.level || "MEDIUM").toUpperCase();
+    const st = String(c.status || "PENDING").toUpperCase();
+    const isOverdue = Boolean(c.is_overdue);
+
+    let pinClass = "pin-open";
+    let statusClass = "status-open";
+
+    if (st === "RESOLVED") {
+      resolvedCount++;
+      pinClass = "pin-resolved";
+      statusClass = "status-resolved";
+    } else if (pr === "CRITICAL" || isOverdue || pr === "HIGH") {
+      urgentCount++;
+      pinClass = "pin-urgent";
+      statusClass = "status-urgent";
+    } else {
+      openCount++;
+      pinClass = "pin-open";
+      statusClass = "status-open";
+    }
+
+    const catInfo = catMap[c.category] || { icon: "●", label: "Civic Issue" };
+    const locName = c.location?.address || c.location?.ward_name || c.ward || "Bhubaneswar";
+    const cid = String(c.complaint_id || "CB-1000");
+
+    const markerIcon = L.divIcon({
+      className: "admin-leaflet-marker-wrap",
+      html: `<div class="admin-map-pin ${pinClass}" data-id="${cid}" title="${c.title || 'Civic Issue'}"><span class="pin-inner-icon">${catInfo.icon}</span></div>`,
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24]
+    });
+
+    const popupHtml = `
+      <div class="admin-popup-card">
+        <div class="admin-popup-header">
+          <span class="admin-popup-category">${catInfo.icon} ${catInfo.label}</span>
+          <span class="admin-popup-status ${statusClass}">${st.replace(/_/g, " ")}</span>
+        </div>
+        <h4 class="admin-popup-title">${c.title || "Civic Grievance"}</h4>
+        <p class="admin-popup-location"><i class="fa-solid fa-location-dot"></i> ${locName}</p>
+        <div class="admin-popup-footer">
+          <span class="admin-popup-id">#${cid}</span>
+          <button type="button" class="admin-popup-btn" onclick="window.adminFocusMapComplaint('${cid}')">View in Queue →</button>
+        </div>
+      </div>
+    `;
+
+    const marker = L.marker(coords, { icon: markerIcon });
+    marker.bindPopup(popupHtml, { closeButton: false, offset: [0, -6] });
+    adminMapMarkersLayer.addLayer(marker);
+  });
+
+  // Update counters
+  const urgentEl = document.getElementById("mapUrgentCount");
+  const openEl = document.getElementById("mapOpenCount");
+  const resolvedEl = document.getElementById("mapResolvedCount");
+  const totalEl = document.getElementById("mapIssueTotalCount");
+
+  if (urgentEl) urgentEl.textContent = urgentCount;
+  if (openEl) openEl.textContent = openCount;
+  if (resolvedEl) resolvedEl.textContent = resolvedCount;
+  if (totalEl) totalEl.textContent = `${complaints.length} Live Issues`;
+}
+
+window.adminFocusMapComplaint = function(cid) {
+  showSection("issuequeue");
+  showToast(`Viewing complaint #${cid} in Priority Queue.`);
+
+  setTimeout(() => {
+    const rows = $$("#issuesTableBody tr");
+    for (const r of rows) {
+      if (r.textContent.includes(cid)) {
+        r.scrollIntoView({ behavior: "smooth", block: "center" });
+        r.style.transition = "background-color 0.4s ease";
+        r.style.backgroundColor = "rgba(47, 110, 232, 0.25)";
+        setTimeout(() => {
+          r.style.backgroundColor = "";
+        }, 2500);
+        break;
+      }
+    }
+  }, 200);
+};
+
 function setupActions() {
   const newIssue = $("#newIssue");
 
@@ -2691,17 +3019,17 @@ function setupSearch() {
     // 3. Gather Locations & Wards
     const defaultLocations = [
       { name: "Janpath Corridor, Bhubaneswar", ward: "Ward 12", hotspot: true },
-      { name: "Near Metro Station, MG Road", ward: "Ward 15", hotspot: true },
-      { name: "Sector 15, Nehru Park", ward: "Ward 15", hotspot: false },
-      { name: "Block A, Green View Apartments", ward: "Ward 8", hotspot: false },
-      { name: "Sector 4, Main Market", ward: "Ward 4", hotspot: true },
-      { name: "5th Main Street", ward: "Ward 12", hotspot: false },
-      { name: "Indiranagar", ward: "Ward 6", hotspot: true },
-      { name: "Koramangala", ward: "Ward 7", hotspot: true },
-      { name: "HSR Layout", ward: "Ward 14", hotspot: true },
-      { name: "School Road", ward: "Ward 12", hotspot: false },
-      { name: "Shastri Nagar", ward: "Ward 9", hotspot: false },
-      { name: "Flyover Junction", ward: "Ward 10", hotspot: true },
+      { name: "KIIT Square, Patia Main Road", ward: "Ward 1", hotspot: true },
+      { name: "Jayadev Vihar Overbridge", ward: "Ward 4", hotspot: true },
+      { name: "Saheed Nagar Main Market", ward: "Ward 7", hotspot: false },
+      { name: "Master Canteen Chowk", ward: "Ward 11", hotspot: true },
+      { name: "Rasulgarh Industrial Area", ward: "Ward 6", hotspot: true },
+      { name: "Khandagiri Caves Entry", ward: "Ward 15", hotspot: false },
+      { name: "Nayapalli Behera Sahi", ward: "Ward 5", hotspot: false },
+      { name: "Old Town Lingaraj Gate", ward: "Ward 18", hotspot: true },
+      { name: "Chandrasekharpur Housing Board", ward: "Ward 3", hotspot: false },
+      { name: "Infocity IT Corridor, Patia", ward: "Ward 2", hotspot: true },
+      { name: "Baramunda Bus Terminal", ward: "Ward 14", hotspot: true },
     ];
 
     defaultLocations.forEach((loc) => {
@@ -3388,6 +3716,8 @@ function initialiseDashboard() {
 
   setupProfileMenu();
 
+  initAdminLiveMap();
+
   // Synchronize authenticated admin profile from backend database
   if (window.CivicBuzzAPI?.auth?.getMe && window.CivicBuzzAPI?.getToken?.()) {
     window.CivicBuzzAPI.auth.getMe().then((res) => {
@@ -3404,6 +3734,7 @@ function initialiseDashboard() {
   // Real-time synchronization listeners for instant cross-tab and client complaint updates
   const refreshAllLiveViews = () => {
     renderRealMetricsAndStats();
+    renderAdminMapIssues();
     updateTrendChart($("#trendRange")?.value || "week");
   };
 
@@ -3417,6 +3748,7 @@ function initialiseDashboard() {
   // Background polling to ensure seamless live sync
   setInterval(() => {
     renderRealMetricsAndStats();
+    renderAdminMapIssues();
   }, 3000);
 
   $("#trendRange")?.addEventListener("change", (event) => {

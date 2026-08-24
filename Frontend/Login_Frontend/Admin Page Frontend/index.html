@@ -14,6 +14,9 @@
 		rel="stylesheet" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 		referrerpolicy="no-referrer" />
+	<!-- Leaflet CSS for GIS Map Rendering -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 	<link rel="stylesheet" href="style.css" />
 </head>
 
@@ -391,44 +394,31 @@
 				<section class="dashboard-grid operations-row">
 					<article class="panel map-panel" id="map">
 						<div class="panel-header">
-							<h2>Live Issue Map</h2>
-							<button class="text-button" data-toast="Hotspots updated with live ward data">View full map
-								↗</button>
+							<div class="map-header-left">
+								<h2>Live Issue Map</h2>
+								<span class="city-location-tag"><i class="fa-solid fa-location-dot"></i> Bhubaneswar City</span>
+							</div>
+							<div class="map-header-right">
+								<button type="button" class="icon-recenter-btn" id="adminMapRecenterBtn" title="Recenter Bhubaneswar Map" aria-label="Recenter Bhubaneswar">
+									<i class="fa-solid fa-crosshairs"></i>
+								</button>
+								<a href="Map & Hotspots/index.html" class="text-button view-full-map-link">View full map ↗</a>
+							</div>
 						</div>
 
-						<div class="abstract-map" aria-label="Map showing reported issue hotspots">
-							<span class="river river-one"></span>
-							<span class="river river-two"></span>
+						<div class="admin-live-map-container" aria-label="Live GIS Map of Bhubaneswar showing reported civic issues">
+							<div id="adminLiveIssueMap" class="admin-gis-map"></div>
 
-							<span class="road road-one"></span>
-							<span class="road road-two"></span>
-							<span class="road road-three"></span>
-							<span class="road road-four"></span>
-							<span class="road road-five"></span>
+							<!-- Floating Dynamic Legend Badge -->
+							<div class="admin-map-legend">
+								<span class="map-legend-pill map-legend-urgent"><i class="red-dot"></i> <span data-i18n="Urgent">Urgent</span> (<b id="mapUrgentCount">0</b>)</span>
+								<span class="map-legend-pill map-legend-open"><i class="amber-dot"></i> <span data-i18n="Open">Open</span> (<b id="mapOpenCount">0</b>)</span>
+								<span class="map-legend-pill map-legend-resolved"><i class="green-dot"></i> <span data-i18n="Resolved">Resolved</span> (<b id="mapResolvedCount">0</b>)</span>
+							</div>
 
-							<span class="map-label label-a">Indiranagar</span>
-							<span class="map-label label-b">Koramangala</span>
-							<span class="map-label label-c">HSR Layout</span>
-
-							<button class="pin green-pin" style="left: 15%; top: 24%"
-								aria-label="4 resolved issues">●</button>
-							<button class="pin red-pin" style="left: 50%; top: 18%"
-								aria-label="7 urgent issues">●</button>
-							<button class="pin red-pin" style="left: 78%; top: 29%"
-								aria-label="5 urgent issues">●</button>
-							<button class="pin amber-pin" style="left: 61%; top: 53%"
-								aria-label="3 open issues">●</button>
-							<button class="pin red-pin" style="left: 27%; top: 69%"
-								aria-label="6 urgent issues">●</button>
-							<button class="pin green-pin" style="left: 66%; top: 74%"
-								aria-label="6 resolved issues">●</button>
-							<button class="pin amber-pin" style="left: 45%; top: 83%"
-								aria-label="2 open issues">●</button>
-
-							<div class="map-key">
-								<span><i class="red-dot"></i> Urgent</span>
-								<span><i class="amber-dot"></i> Open</span>
-								<span><i class="green-dot"></i> Resolved</span>
+							<!-- Floating Live Status Tag -->
+							<div class="admin-map-live-tag">
+								<span class="live-pulse"></span> <span id="mapIssueTotalCount">Live Issues</span>
 							</div>
 						</div>
 					</article>
@@ -455,8 +445,8 @@
 								<div class="issue-name">
 									<span class="issue-thumb pothole-thumb">⌁</span>
 									<span>
-										<b>Pothole on 5th Main St</b>
-										<small>HSR Layout · #CB-12481</small>
+										<b>Pothole near KIIT Square</b>
+										<small>Ward 1 (Patia) · #CB-BHUB-1042</small>
 									</span>
 								</div>
 								<strong class="match high">92%</strong>
@@ -469,8 +459,8 @@
 								<div class="issue-name">
 									<span class="issue-thumb garbage-thumb">♜</span>
 									<span>
-										<b>Garbage not collected</b>
-										<small>7th Cross, BTM Layout · #CB-12482</small>
+										<b>Garbage pile near Jayadev Vihar</b>
+										<small>Ward 4 (Jayadev Vihar) · #CB-BHUB-1045</small>
 									</span>
 								</div>
 								<strong class="match high">87%</strong>
@@ -483,8 +473,8 @@
 								<div class="issue-name">
 									<span class="issue-thumb street-thumb">☼</span>
 									<span>
-										<b>Street light not working</b>
-										<small>16th Main, Sector 4 · #CB-12483</small>
+										<b>Street light broken in Saheed Nagar</b>
+										<small>Ward 7 (Saheed Nagar) · #CB-BHUB-1044</small>
 									</span>
 								</div>
 								<strong class="match medium">78%</strong>
@@ -1648,6 +1638,9 @@
 		});
 	</script>
 
+	<!-- Leaflet JS for GIS Map Rendering -->
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+		integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 	<script src="../api-config.js"></script>
 	<script src="script.js"></script>
 </body>
