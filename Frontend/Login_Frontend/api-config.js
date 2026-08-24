@@ -147,7 +147,7 @@ const SEED_COMPLAINTS = [
     is_overdue: false,
     sla_hours: 12,
     upvotes: 53,
-    image_url: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80",
+    image_url: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
     created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
     latitude: 20.3241,
     longitude: 85.8152,
@@ -339,19 +339,48 @@ const SEED_COMPLAINTS = [
   },
   {
     complaint_id: "CB-12481",
-    title: "Overflowing Community Garbage Dump near Park",
-    description: "Garbage container spilling onto the walkway near Jayadev Vihar Community Park causing foul smell and health hazard.",
+    title: "Broken Streetlight & Dark Stretch",
+    description: "Non-functional high mast streetlight pole causing complete darkness and security hazards for night commuters in Market Corridor.",
+    category: "streetlights",
+    sub_category: "broken_light",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 92 },
+    urgency_score: 92,
+    status: "SUBMITTED",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 28,
+    image_url: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
+    latitude: 20.2741,
+    longitude: 85.8362,
+    ward: "Ward 8 (Market Corridor)",
+    location: { ward_name: "Ward 8 (Market Corridor)", address: "Market Corridor Junction, Ward 8", latitude: 20.2741, longitude: 85.8362 },
+    location_point: { type: "Point", coordinates: [85.8362, 20.2741] },
+    department_name: "Street Lighting & Electricity",
+    department_code: "STREET_LIGHTS_AND_ELECTRICITY",
+    user_uid: "CIT-12481",
+    timeline: [
+      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 3 * 86400000).toISOString(), notes: "Grievance registered with verified dark corridor coordinates." },
+      { step: "AI Triage & Urgency Ranked", status: "ASSIGNED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Ranked CRITICAL (92/100). Auto-routed to Electrical Cell." }
+    ]
+  },
+  {
+    complaint_id: "CB-12482",
+    title: "Overflowing Garbage Dump near Community Park",
+    description: "Solid waste overflowing on pedestrian walkways near Jayadev Vihar Community Park causing foul smell and stray animal menace.",
     category: "garbage_sanitation",
     sub_category: "overflowing_bin",
     severity: "HIGH",
     priority_level: "HIGH",
-    priority: { level: "HIGH", score: 84 },
-    urgency_score: 84,
-    status: "ASSIGNED",
+    priority: { level: "HIGH", score: 88 },
+    urgency_score: 88,
+    status: "IN_PROGRESS",
     is_overdue: false,
     sla_hours: 24,
-    upvotes: 25,
-    image_url: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=800&q=80",
+    upvotes: 35,
+    image_url: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
     created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
     latitude: 20.3012,
     longitude: 85.8234,
@@ -360,16 +389,16 @@ const SEED_COMPLAINTS = [
     location_point: { type: "Point", coordinates: [85.8234, 20.3012] },
     department_name: "Garbage & Sanitation Department",
     department_code: "GARBAGE_AND_SANITATION",
-    user_uid: "CIT-12481",
+    user_uid: "CIT-12482",
     timeline: [
       { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Grievance submitted with photo evidence." },
       { step: "Routed to Sanitation", status: "ASSIGNED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Assigned to Ward 4 Sanitation Truck Team." }
     ]
   },
   {
-    complaint_id: "CB-12482",
-    title: "Main Water Supply Pipeline Leakage",
-    description: "High pressure potable water leaking onto street from cracked underground main line in Patia.",
+    complaint_id: "CB-12483",
+    title: "Main Water Pipeline Leakage",
+    description: "Pressurized drinking water pipeline burst causing heavy water wastage and road flooding in Patia.",
     category: "water_supply",
     sub_category: "pipe_burst",
     severity: "HIGH",
@@ -380,7 +409,7 @@ const SEED_COMPLAINTS = [
     is_overdue: false,
     sla_hours: 36,
     upvotes: 31,
-    image_url: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80",
+    image_url: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
     created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
     latitude: 20.3548,
     longitude: 85.8184,
@@ -389,16 +418,45 @@ const SEED_COMPLAINTS = [
     location_point: { type: "Point", coordinates: [85.8184, 20.3548] },
     department_name: "Water & Drainage Department",
     department_code: "WATER_AND_DRAINAGE",
-    user_uid: "CIT-12482",
+    user_uid: "CIT-12483",
     timeline: [
-      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Leakage reported." },
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Water pipeline fracture reported with verified photo." },
       { step: "Plumbing Crew on Site", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 10 * 3600000).toISOString(), notes: "Water supply line isolated for weld repair." }
     ]
   },
   {
-    complaint_id: "CB-12483",
-    title: "Blocked Stormwater Drain near College Gate",
-    description: "Concrete culvert completely blocked with silt, threatening street flooding during rains.",
+    complaint_id: "CB-12484",
+    title: "Deep Pothole on Janpath Road",
+    description: "Major asphalt cavity with exposed aggregate causing vehicle traffic slowdown and accident risks near Janpath.",
+    category: "roads_potholes",
+    sub_category: "potholes",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 94 },
+    urgency_score: 94,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 42,
+    image_url: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.2961,
+    longitude: 85.8245,
+    ward: "Ward 12 (Janpath)",
+    location: { ward_name: "Ward 12 (Janpath)", address: "Janpath Road, Ward 12, Bhubaneswar", latitude: 20.2961, longitude: 85.8245 },
+    location_point: { type: "Point", coordinates: [85.8245, 20.2961] },
+    department_name: "Roads & Works Department",
+    department_code: "ROADS_AND_POTHOLES",
+    user_uid: "CIT-12484",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Grievance logged by citizen with road photo." },
+      { step: "Asphalt Squad Dispatched", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 5 * 3600000).toISOString(), notes: "Patching material and road roller scheduled on site." }
+    ]
+  },
+  {
+    complaint_id: "CB-12485",
+    title: "Blocked Drain Causing Waterlogging",
+    description: "Silt and plastic waste blocking primary stormwater culvert, creating knee-deep stagnant water during rains.",
     category: "drainage",
     sub_category: "blocked_drain",
     severity: "CRITICAL",
@@ -413,78 +471,193 @@ const SEED_COMPLAINTS = [
     created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
     latitude: 20.2961,
     longitude: 85.8245,
-    ward: "Ward 12 (Janpath / College Gate)",
-    location: { ward_name: "Ward 12 (Janpath / College Gate)", address: "College Gate, Janpath, Ward 12", latitude: 20.2961, longitude: 85.8245 },
+    ward: "Ward 12 (College Gate)",
+    location: { ward_name: "Ward 12 (College Gate)", address: "College Gate, Janpath, Ward 12", latitude: 20.2961, longitude: 85.8245 },
     location_point: { type: "Point", coordinates: [85.8245, 20.2961] },
     department_name: "Water & Drainage Department",
     department_code: "WATER_AND_DRAINAGE",
-    user_uid: "CIT-12483",
+    user_uid: "CIT-12485",
     timeline: [
       { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Reported drainage blockage." },
       { step: "De-silting Crew Active", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "JCB & manual de-silting crew clearing line." }
     ]
   },
   {
-    complaint_id: "CB-12484",
-    title: "Flickering & Broken Streetlights on Infocity Road",
-    description: "3 consecutive LED streetlight poles non-functional near Infocity IT corridor.",
-    category: "streetlights",
-    sub_category: "broken_light",
+    complaint_id: "CB-12486",
+    title: "Broken Footpath Near Market",
+    description: "Cracked paving tiles and broken curbs on pedestrian walkway near Saheed Nagar market creating severe trip hazards.",
+    category: "infrastructure",
+    sub_category: "broken_pavement",
+    severity: "MEDIUM",
+    priority_level: "MEDIUM",
+    priority: { level: "MEDIUM", score: 72 },
+    urgency_score: 72,
+    status: "SUBMITTED",
+    is_overdue: false,
+    sla_hours: 48,
+    upvotes: 19,
+    image_url: "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.2905,
+    longitude: 85.8450,
+    ward: "Ward 7 (Saheed Nagar)",
+    location: { ward_name: "Ward 7 (Saheed Nagar)", address: "Saheed Nagar Main Market Footpath, Ward 7", latitude: 20.2905, longitude: 85.8450 },
+    location_point: { type: "Point", coordinates: [85.8450, 20.2905] },
+    department_name: "Roads & Works Department",
+    department_code: "ROADS_AND_POTHOLES",
+    user_uid: "CIT-12486",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Logged broken pedestrian pathway tiles." }
+    ]
+  },
+  {
+    complaint_id: "CB-12487",
+    title: "Garbage Accumulation Near School",
+    description: "Uncollected trash pile and decaying organic waste dumped directly outside primary school boundary wall in Rasulgarh.",
+    category: "garbage_sanitation",
+    sub_category: "garbage_dump",
+    severity: "HIGH",
+    priority_level: "HIGH",
+    priority: { level: "HIGH", score: 85 },
+    urgency_score: 85,
+    status: "ASSIGNED",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 27,
+    image_url: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.2912,
+    longitude: 85.8641,
+    ward: "Ward 6 (Rasulgarh)",
+    location: { ward_name: "Ward 6 (Rasulgarh)", address: "Primary School Road, Rasulgarh, Ward 6", latitude: 20.2912, longitude: 85.8641 },
+    location_point: { type: "Point", coordinates: [85.8641, 20.2912] },
+    department_name: "Garbage & Sanitation Department",
+    department_code: "GARBAGE_AND_SANITATION",
+    user_uid: "CIT-12487",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Grievance filed with photo evidence." },
+      { step: "Assigned to Sanitation Wing", status: "ASSIGNED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Sanitation squad notified for urgent removal." }
+    ]
+  },
+  {
+    complaint_id: "CB-12488",
+    title: "Waterlogging After Heavy Rain",
+    description: "Severe monsoon waterlogging inundating major road intersection and stranding two-wheelers near Jayadev Vihar overbridge.",
+    category: "drainage",
+    sub_category: "waterlogging",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 95 },
+    urgency_score: 95,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 12,
+    upvotes: 68,
+    image_url: "https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.3012,
+    longitude: 85.8234,
+    ward: "Ward 4 (Jayadev Vihar)",
+    location: { ward_name: "Ward 4 (Jayadev Vihar)", address: "Jayadev Vihar Overbridge, Ward 4", latitude: 20.3012, longitude: 85.8234 },
+    location_point: { type: "Point", coordinates: [85.8234, 20.3012] },
+    department_name: "Water & Drainage Department",
+    department_code: "WATER_AND_DRAINAGE",
+    user_uid: "CIT-12488",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Emergency waterlogging reported." },
+      { step: "Mobile Dewatering Pump Deployed", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 6 * 3600000).toISOString(), notes: "High capacity pump clearing stagnant water." }
+    ]
+  },
+  {
+    complaint_id: "CB-12489",
+    title: "Damaged Park Equipment",
+    description: "Broken metal swings and damaged park benches creating physical injury hazard for children at Community Park.",
+    category: "parks",
+    sub_category: "damaged_equipment",
     severity: "MEDIUM",
     priority_level: "MEDIUM",
     priority: { level: "MEDIUM", score: 68 },
     urgency_score: 68,
     status: "SUBMITTED",
     is_overdue: false,
-    sla_hours: 48,
-    upvotes: 12,
-    image_url: null,
-    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
-    latitude: 20.3491,
-    longitude: 85.8082,
-    ward: "Ward 15 (Infocity Road)",
-    location: { ward_name: "Ward 15 (Infocity Road)", address: "Infocity Road, Ward 15", latitude: 20.3491, longitude: 85.8082 },
-    location_point: { type: "Point", coordinates: [85.8082, 20.3491] },
-    department_name: "Street Lighting & Electricity",
-    department_code: "STREET_LIGHTS_AND_ELECTRICITY",
-    user_uid: "CIT-12484",
+    sla_hours: 72,
+    upvotes: 14,
+    image_url: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.2514,
+    longitude: 85.8315,
+    ward: "Ward 10 (Ekamra Park)",
+    location: { ward_name: "Ward 10 (Ekamra Park)", address: "Ekamra Public Park Children Area, Ward 10", latitude: 20.2514, longitude: 85.8315 },
+    location_point: { type: "Point", coordinates: [85.8315, 20.2514] },
+    department_name: "Parks & Public Spaces",
+    department_code: "PARKS_AND_GREENERY",
+    user_uid: "CIT-12489",
     timeline: [
-      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Grievance logged by citizen." }
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Damaged playground equipment reported." }
     ]
   },
   {
-    complaint_id: "CB-12479",
-    title: "Dark Stretch — Non-functional High-Mast Light",
-    description: "High-mast tower at Market Corridor junction was dark for 2 days. Repaired and verified.",
-    category: "streetlights",
-    sub_category: "broken_light",
+    complaint_id: "CB-12490",
+    title: "Illegal Encroachment on Footpath",
+    description: "Unauthorized commercial sheds and hoardings blocking pedestrian walkway, forcing citizens onto active traffic lane.",
+    category: "encroachment",
+    sub_category: "blocked_walkway",
     severity: "HIGH",
     priority_level: "HIGH",
-    priority: { level: "HIGH", score: 78 },
-    urgency_score: 78,
-    status: "RESOLVED",
+    priority: { level: "HIGH", score: 80 },
+    urgency_score: 80,
+    status: "ASSIGNED",
     is_overdue: false,
-    sla_hours: 24,
-    upvotes: 27,
-    image_url: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
-    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
-    latitude: 20.2741,
-    longitude: 85.8362,
-    ward: "Ward 8 (Market Corridor)",
-    location: { ward_name: "Ward 8 (Market Corridor)", address: "Market Corridor Square, Ward 8", latitude: 20.2741, longitude: 85.8362 },
-    location_point: { type: "Point", coordinates: [85.8362, 20.2741] },
-    department_name: "Street Lighting & Electricity",
-    department_code: "STREET_LIGHTS_AND_ELECTRICITY",
-    user_uid: "CIT-12479",
+    sla_hours: 48,
+    upvotes: 22,
+    image_url: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.3533,
+    longitude: 85.8189,
+    ward: "Ward 1 (KIIT Square)",
+    location: { ward_name: "Ward 1 (KIIT Square)", address: "KIIT Square Footpath, Ward 1", latitude: 20.3533, longitude: 85.8189 },
+    location_point: { type: "Point", coordinates: [85.8189, 20.3533] },
+    department_name: "Municipal Enforcement Cell",
+    department_code: "MUNICIPAL_ENFORCEMENT",
+    user_uid: "CIT-12490",
     timeline: [
-      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 3 * 86400000).toISOString(), notes: "Reported non-functional light." },
-      { step: "Repaired & Verified", status: "RESOLVED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Capacitor replaced. Verified operational by 2 residents." }
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Walkway obstruction logged." },
+      { step: "Enforcement Notice Issued", status: "ASSIGNED", timestamp: new Date(Date.now() - 12 * 3600000).toISOString(), notes: "Encroachment eviction team scheduled." }
     ]
   }
 ];
 
 const ComplaintStore = {
   broadcastChannel: typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("civicbuzz_complaints_channel") : null,
+
+  CATEGORY_FALLBACKS: {
+    roads: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    roads_potholes: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    streetlights: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
+    lighting: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
+    garbage_sanitation: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
+    sanitation: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
+    water_supply: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+    water: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+    drainage: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+    parks: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    parks_greenery: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    infrastructure: "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=800&q=80",
+    encroachment: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80"
+  },
+
+  getCategoryFallback(category) {
+    const clean = String(category || "roads_potholes").toLowerCase().replace(/[^a-z_]/g, "");
+    return this.CATEGORY_FALLBACKS[clean] || this.CATEGORY_FALLBACKS.roads_potholes;
+  },
+
+  getComplaintImage(complaint) {
+    if (!complaint) return this.CATEGORY_FALLBACKS.roads_potholes;
+    if (complaint.image_url && typeof complaint.image_url === "string" && complaint.image_url.trim() && !complaint.image_url.includes("1584992236310")) {
+      return complaint.image_url;
+    }
+    return this.getCategoryFallback(complaint.category);
+  },
 
   init() {
     try {
@@ -496,12 +669,26 @@ const ComplaintStore = {
       if (!Array.isArray(list) || list.length === 0) {
         list = [...SEED_COMPLAINTS];
       } else {
-        const existingIds = new Set(list.map(c => String(c.complaint_id || c.id || '').replace('#', '').toLowerCase()));
+        // Sanitize any existing list items that had wool/yarn image or mismatched photo IDs
+        list = list.map(c => {
+          if (!c.image_url || c.image_url.includes("1584992236310") || c.image_url.includes("1517486808906") || c.image_url.includes("1508739773434")) {
+            c.image_url = ComplaintStore.getCategoryFallback(c.category);
+          }
+          return c;
+        });
+
+        const existingIds = new Set(list.map(c => String(c.complaint_id || c.id || "").replace("#", "").toLowerCase()));
         SEED_COMPLAINTS.forEach(sc => {
-          const cleanScId = String(sc.complaint_id).replace('#', '').toLowerCase();
+          const cleanScId = String(sc.complaint_id).replace("#", "").toLowerCase();
           if (!existingIds.has(cleanScId)) {
             list.push(sc);
             existingIds.add(cleanScId);
+          } else {
+            // Update demo complaints in place if image was stale/bad
+            const idx = list.findIndex(c => String(c.complaint_id || c.id || "").replace("#", "").toLowerCase() === cleanScId);
+            if (idx >= 0 && (!list[idx].image_url || list[idx].image_url.includes("1584992236310") || list[idx].image_url.includes("1517486808906") || list[idx].image_url.includes("1508739773434"))) {
+              list[idx].image_url = sc.image_url;
+            }
           }
         });
       }
@@ -536,26 +723,70 @@ const ComplaintStore = {
     const cleanId = String(id).trim().replace('#', '').toLowerCase();
     const list = this.getAll();
     
+    const enrich = (item) => {
+      if (!item) return null;
+      if (!item.ai_triage) {
+        const cat = (item.category || "roads_potholes").toLowerCase();
+        const wardStr = item.ward || item.location?.ward_name || "Ward Area";
+        const urg = item.urgency_score || (item.severity === "CRITICAL" ? 92 : (item.severity === "HIGH" ? 82 : 65));
+        const sev = item.severity || (urg >= 85 ? "CRITICAL" : (urg >= 65 ? "HIGH" : "MEDIUM"));
+        item.ai_triage = {
+          processed: true,
+          processed_at: item.created_at || new Date().toISOString(),
+          language: item.language === "hi" ? "Hindi" : (item.language === "or" ? "Odia" : "English"),
+          original_language: item.language || "en",
+          original_description: item.description || "",
+          canonical_summary: item.ai_summary || item.description || "",
+          tags: [`#${cat}`, `#${wardStr.toLowerCase().replace(/[^a-z0-9]/g, "")}`, "#civic_defect"],
+          detected_category: cat.toUpperCase(),
+          urgency_score: urg,
+          priority: sev,
+          confidence: item.image_url ? 96 : 82,
+          evidence_analysis: {
+            status: "VERIFIED",
+            confidence: item.image_url ? 96 : 82,
+            elements: [cat.replace(/_/g, " ") + " Surface Defect", "Location Geotagged"],
+            notes: "Grounded against municipal infrastructure catalog"
+          },
+          duplicate_check: {
+            is_duplicate: false,
+            matched_id: null,
+            match_score: "None",
+            distance: 0
+          },
+          assigned_department: item.department_name || "Municipal Department",
+          ward_cell: `${wardStr} Infrastructure Cell`,
+          sla_hours: item.sla_hours || 48,
+          reasoning: [
+            `Prioritized according to ${cat.replace(/_/g, " ")} department schedule`,
+            `Spatial coordinates resolved within ${wardStr}`,
+            item.image_url ? "Photographic evidence verified" : "Citizen description verified"
+          ]
+        };
+      }
+      return item;
+    };
+
     // 1. Direct exact or lowercase match
     let found = list.find((c) => {
-      const cId = String(c.complaint_id || c.id || '').trim().replace('#', '').toLowerCase();
+      const cId = String(c.complaint_id || c.id || "").trim().replace("#", "").toLowerCase();
       return cId === cleanId;
     });
-    if (found) return found;
+    if (found) return enrich(found);
 
     // 2. Suffix / sub-string match (e.g. 12480 in CB-12480 or CB-BHUB-12480)
     found = list.find((c) => {
-      const cId = String(c.complaint_id || c.id || '').trim().replace('#', '').toLowerCase();
+      const cId = String(c.complaint_id || c.id || "").trim().replace("#", "").toLowerCase();
       return cId.endsWith(cleanId) || cleanId.endsWith(cId);
     });
-    if (found) return found;
+    if (found) return enrich(found);
 
     // 3. Match within SEED_COMPLAINTS array directly as fallback
     found = SEED_COMPLAINTS.find((c) => {
-      const cId = String(c.complaint_id || c.id || '').trim().replace('#', '').toLowerCase();
+      const cId = String(c.complaint_id || c.id || "").trim().replace("#", "").toLowerCase();
       return cId === cleanId || cId.endsWith(cleanId) || cleanId.endsWith(cId);
     });
-    return found || null;
+    return found ? enrich(found) : null;
   },
 
   get(id) {
@@ -607,6 +838,39 @@ const ComplaintStore = {
     const lat = Number(complaintData.latitude || complaintData.location?.latitude || 20.3533);
     const lng = Number(complaintData.longitude || complaintData.location?.longitude || 85.8189);
 
+    const aiTriageData = complaintData.ai_triage || {
+      processed: true,
+      processed_at: now,
+      language: complaintData.language === "hi" ? "Hindi" : (complaintData.language === "or" ? "Odia" : "English"),
+      original_language: complaintData.language || "en",
+      original_description: complaintData.description || "",
+      canonical_summary: complaintData.ai_summary || complaintData.description || "",
+      tags: [`#${cleanCategory}`, `#${wardName.toLowerCase().replace(/[^a-z0-9]/g, "")}`],
+      detected_category: cleanCategory.toUpperCase(),
+      urgency_score: urgencyScore,
+      priority: complaintData.priority_level || (urgencyScore >= 90 ? "CRITICAL" : urgencyScore >= 75 ? "HIGH" : "MEDIUM"),
+      confidence: complaintData.image_url ? 96 : 82,
+      evidence_analysis: {
+        status: "VERIFIED",
+        confidence: complaintData.image_url ? 96 : 82,
+        elements: [cleanCategory.replace(/_/g, " ") + " Defect", "Spatial Coordinates Verified"],
+        notes: "Grounded against municipal infrastructure catalog"
+      },
+      duplicate_check: {
+        is_duplicate: false,
+        matched_id: null,
+        match_score: "None",
+        distance: 0
+      },
+      assigned_department: deptName,
+      ward_cell: `${wardName} Infrastructure Cell`,
+      sla_hours: complaintData.sla_hours || 48,
+      reasoning: [
+        `Prioritized according to ${cleanCategory.replace(/_/g, " ")} department protocols`,
+        `Location resolved within ${wardName}`
+      ]
+    };
+
     const newDoc = {
       complaint_id: id,
       title: complaintData.title || (complaintData.description ? complaintData.description.slice(0, 50) + (complaintData.description.length > 50 ? "…" : "") : "Citizen Reported Grievance"),
@@ -643,6 +907,7 @@ const ComplaintStore = {
       department_name: deptName,
       department_code: cleanCategory.toUpperCase(),
       user_uid: complaintData.user_uid || "CIT-1001",
+      ai_triage: aiTriageData,
       timeline: [
         {
           step: "Reported & AI Triaged",
@@ -695,6 +960,48 @@ const ComplaintStore = {
       status: item.status,
       timestamp: now,
       notes: notes || `Updated by Administrator.`
+    });
+
+    this.saveAll(list);
+    return item;
+  },
+
+  update(complaintId, updates = {}) {
+    const list = this.getAll();
+    const idx = list.findIndex((c) => {
+      const cId = String(c.complaint_id || c.id || "").trim().replace("#", "").toLowerCase();
+      const targetId = String(complaintId || "").trim().replace("#", "").toLowerCase();
+      return cId === targetId || cId.endsWith(targetId) || targetId.endsWith(cId);
+    });
+    if (idx === -1) return null;
+
+    list[idx] = {
+      ...list[idx],
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+
+    this.saveAll(list);
+    return list[idx];
+  },
+
+  addTimelineEvent(complaintId, event = {}) {
+    const list = this.getAll();
+    const item = list.find((c) => {
+      const cId = String(c.complaint_id || c.id || "").trim().replace("#", "").toLowerCase();
+      const targetId = String(complaintId || "").trim().replace("#", "").toLowerCase();
+      return cId === targetId || cId.endsWith(targetId) || targetId.endsWith(cId);
+    });
+    if (!item) return null;
+
+    if (!item.timeline) item.timeline = [];
+    item.timeline.push({
+      step: event.action || event.step || "Status Update",
+      status: event.status || item.status,
+      timestamp: event.timestamp || new Date().toISOString(),
+      notes: event.notes || event.note || "",
+      actor: event.actor || "Municipal System",
+      role: event.role || "Official"
     });
 
     this.saveAll(list);
@@ -1091,134 +1398,247 @@ if (typeof window !== "undefined") {
 const SEED_TENDERS = [
   {
     tender_id: "CB-T-0015",
-    title: "Priority Road Patching & Resurfacing",
-    description: "Repair the most-reported pothole locations, asphalt resurfacing, and pedestrian pavement reinstatement across Ward 15.",
-    category: "roads_potholes",
+    id: "TND-1001",
+    title: "Priority Road Patching — Ward 15",
+    description: "Repair the most-reported pothole locations, asphalt resurfacing, and road maintenance across Ward 15.",
+    category: "roads",
+    ward: "Ward 15",
     ward_id: 15,
     location: "Ward 15, Saheed Nagar & Janpath Corridor",
+    department_name: "Roads & Works Department",
     department_code: "ROADS_AND_POTHOLES",
     contractor_name: "L&T Infrastructure Projects Ltd.",
     contractor_contact: "+91 674 254 9901",
-    estimated_budget: 2500000,
-    utilized_budget: 1450000,
-    status: "PUBLISHED",
-    progress_percentage: 58,
-    lifecycle_stage: "CONTRACTOR_AWARDED",
-    verified_locations_count: 8,
-    linked_complaint_ids: ["CB-12480", "CB-12483"],
-    submission_deadline: "2026-08-24",
-    target_completion_date: "2026-10-15",
+    estimated_value: 250000,
+    estimated_budget: 250000,
+    approved_budget: 250000,
+    utilized_budget: 145000,
+    duration: "30 days",
+    duration_days: 30,
+    community_votes: 21,
+    communityVotes: 21,
+    verified_locations_count: 3,
+    verifiedLocations: 3,
+    status: "Open",
+    status_raw: "PUBLISHED",
+    stage_progress: 2,
+    progress_percentage: 40,
+    closing_in_days: 3,
+    submission_deadline: "2026-08-27",
+    image_url: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    linked_complaint_ids: ["CB-12484", "CB-12480", "CB-BHUB-1042"],
     created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
     updated_at: new Date().toISOString()
   },
   {
     tender_id: "CB-T-0018",
-    title: "Stormwater Drainage Network Upgrade",
-    description: "Resolve recurring drainage overflow and install covered culverts near primary school corridor.",
+    id: "TND-1002",
+    title: "Drainage Improvement — School Road",
+    description: "Clear blocked drains and improve two drainage segments near the primary school.",
     category: "drainage",
+    ward: "Ward 12",
     ward_id: 12,
     location: "Ward 12, School Road & Central Avenue",
+    department_name: "Water & Drainage Department",
     department_code: "DRAINAGE",
     contractor_name: "Apex Civil Constr. Co.",
     contractor_contact: "+91 674 254 9902",
-    estimated_budget: 4000000,
-    utilized_budget: 800000,
-    status: "DRAFT",
+    estimated_value: 400000,
+    estimated_budget: 400000,
+    approved_budget: 400000,
+    utilized_budget: 80000,
+    duration: "45 days",
+    duration_days: 45,
+    community_votes: 49,
+    communityVotes: 49,
+    verified_locations_count: 4,
+    verifiedLocations: 4,
+    status: "Open",
+    status_raw: "PUBLISHED",
+    stage_progress: 1,
     progress_percentage: 20,
-    lifecycle_stage: "DRAFT_CREATED",
-    verified_locations_count: 12,
-    linked_complaint_ids: ["CB-12484", "CB-12485"],
-    submission_deadline: "2026-09-10",
-    target_completion_date: "2026-11-30",
+    closing_in_days: 7,
+    submission_deadline: "2026-08-31",
+    image_url: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+    linked_complaint_ids: ["CB-12485", "CB-12488", "CB-BHUB-1043"],
     created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
     updated_at: new Date().toISOString()
   },
   {
     tender_id: "CB-T-0012",
-    title: "Smart LED Streetlight Grid Installation",
-    description: "Install 40 energy-efficient smart LED streetlights with automated timers along market corridors and dark zones.",
-    category: "streetlights",
+    id: "TND-1003",
+    title: "Install 20 LED Streetlights",
+    description: "Add or replace streetlights around the market and school corridors.",
+    category: "lighting",
+    ward: "Ward 8",
     ward_id: 8,
     location: "Ward 8, Commercial Market Area",
+    department_name: "Street Lighting & Electricity",
     department_code: "STREET_LIGHTS",
     contractor_name: "BrightGrid Solutions Ltd.",
     contractor_contact: "+91 674 254 9903",
-    estimated_budget: 3000000,
-    utilized_budget: 2160000,
-    status: "IN_PROGRESS",
+    estimated_value: 300000,
+    estimated_budget: 300000,
+    approved_budget: 300000,
+    utilized_budget: 216000,
+    duration: "30 days",
+    duration_days: 30,
+    community_votes: 33,
+    communityVotes: 33,
+    verified_locations_count: 2,
+    verifiedLocations: 2,
+    status: "Open",
+    status_raw: "IN_PROGRESS",
+    stage_progress: 3,
     progress_percentage: 72,
-    lifecycle_stage: "WORK_IN_PROGRESS",
-    verified_locations_count: 5,
-    linked_complaint_ids: ["CB-12481"],
-    submission_deadline: "2026-08-15",
-    target_completion_date: "2026-09-20",
+    closing_in_days: 10,
+    submission_deadline: "2026-09-03",
+    image_url: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
+    linked_complaint_ids: ["CB-12481", "CB-BHUB-1044"],
     created_at: new Date(Date.now() - 20 * 86400000).toISOString(),
     updated_at: new Date().toISOString()
   },
   {
     tender_id: "CB-T-0009",
-    title: "Central Market Sanitation & Waste Hub Upgrade",
-    description: "Modern waste compaction unit, automated bin clearing, and underground drainage for market hygiene.",
-    category: "garbage_sanitation",
+    id: "TND-1004",
+    title: "Market Sanitation Upgrade",
+    description: "Improve waste collection points and sanitation facilities near the market.",
+    category: "sanitation",
+    ward: "Ward 9",
     ward_id: 9,
     location: "Ward 9, Daily Vegetable & Fish Market",
+    department_name: "Garbage & Sanitation Department",
     department_code: "GARBAGE_SANITATION",
     contractor_name: "CleanCity Environmental Infra",
     contractor_contact: "+91 674 254 9904",
-    estimated_budget: 1720000,
-    utilized_budget: 1720000,
-    status: "COMPLETED",
+    estimated_value: 180000,
+    estimated_budget: 180000,
+    approved_budget: 180000,
+    utilized_budget: 180000,
+    duration: "20 days",
+    duration_days: 20,
+    community_votes: 18,
+    communityVotes: 18,
+    verified_locations_count: 5,
+    verifiedLocations: 5,
+    status: "Open",
+    status_raw: "COMPLETED",
+    stage_progress: 5,
     progress_percentage: 100,
-    lifecycle_stage: "QR_TRAIL",
-    verified_locations_count: 7,
-    linked_complaint_ids: ["CB-12482"],
-    submission_deadline: "2026-07-20",
-    target_completion_date: "2026-08-18",
+    closing_in_days: 12,
+    submission_deadline: "2026-09-05",
+    image_url: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
+    linked_complaint_ids: ["CB-12482", "CB-12487", "CB-BHUB-1045"],
     created_at: new Date(Date.now() - 35 * 86400000).toISOString(),
     updated_at: new Date().toISOString()
   },
   {
     tender_id: "CB-T-0021",
-    title: "Drinking Water Pipeline Overhaul & Booster Station",
-    description: "Replace corroded ductile iron main pipes and install automated water pressure monitoring system.",
-    category: "water_supply",
+    id: "TND-1005",
+    title: "Drinking Water Pipeline Overhaul",
+    description: "Replace cracked pipeline sections, upgrade booster pumps, and eliminate drinking water contamination.",
+    category: "water",
+    ward: "Ward 4",
     ward_id: 4,
     location: "Ward 4, Rasulgarh & Industrial Estate",
+    department_name: "Water & Drainage Department",
     department_code: "WATER_SUPPLY",
     contractor_name: "HydroTech Projects India",
     contractor_contact: "+91 674 254 9905",
-    estimated_budget: 5500000,
-    utilized_budget: 1925000,
-    status: "PUBLISHED",
+    estimated_value: 550000,
+    estimated_budget: 550000,
+    approved_budget: 550000,
+    utilized_budget: 192500,
+    duration: "60 days",
+    duration_days: 60,
+    community_votes: 27,
+    communityVotes: 27,
+    verified_locations_count: 6,
+    verifiedLocations: 6,
+    status: "Open",
+    status_raw: "PUBLISHED",
+    stage_progress: 2,
     progress_percentage: 35,
-    lifecycle_stage: "PUBLISHED",
-    verified_locations_count: 14,
-    linked_complaint_ids: [],
-    submission_deadline: "2026-09-05",
-    target_completion_date: "2026-12-15",
+    closing_in_days: 15,
+    submission_deadline: "2026-09-08",
+    image_url: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+    linked_complaint_ids: ["CB-12483", "CB-BHUB-1046"],
     created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
     updated_at: new Date().toISOString()
   },
   {
     tender_id: "CB-T-0024",
+    id: "TND-1006",
     title: "Public Park Greenery & Children Play Area",
     description: "Lawn revitalisation, playground equipment installation, solar boundary lights, and walking pathway repair.",
-    category: "parks_greenery",
+    category: "parks",
+    ward: "Ward 18",
     ward_id: 18,
     location: "Ward 18, BDA Community Park",
+    department_name: "Parks & Greenery Department",
     department_code: "PARKS_GREENERY",
     contractor_name: "GreenHorizon Landscapes",
     contractor_contact: "+91 674 254 9906",
-    estimated_budget: 1250000,
-    utilized_budget: 750000,
-    status: "IN_PROGRESS",
+    estimated_value: 320000,
+    estimated_budget: 320000,
+    approved_budget: 320000,
+    utilized_budget: 160000,
+    duration: "40 days",
+    duration_days: 40,
+    community_votes: 16,
+    communityVotes: 16,
+    verified_locations_count: 3,
+    verifiedLocations: 3,
+    status: "Open",
+    status_raw: "IN_PROGRESS",
+    stage_progress: 3,
     progress_percentage: 60,
-    lifecycle_stage: "WORK_IN_PROGRESS",
-    verified_locations_count: 6,
-    linked_complaint_ids: [],
-    submission_deadline: "2026-08-30",
-    target_completion_date: "2026-10-10",
+    closing_in_days: 18,
+    submission_deadline: "2026-09-11",
+    image_url: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    linked_complaint_ids: ["CB-12489"],
     created_at: new Date(Date.now() - 8 * 86400000).toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    tender_id: "CB-T-0028",
+    id: "TND-1007",
+    title: "Pedestrian Footpath Reconstruction",
+    description: "Pavement widening, anti-skid tactile tiles installation, and accessibility curb ramps in Saheed Nagar.",
+    category: "infrastructure",
+    ward: "Ward 7",
+    ward_id: 7,
+    location: "Ward 7, Saheed Nagar Market Walkway",
+    department_name: "Roads & Works Department",
+    department_code: "ROADS_AND_POTHOLES",
+    contractor_name: "Metro Urban Infra Builders",
+    contractor_contact: "+91 674 254 9907",
+    estimated_value: 210000,
+    estimated_budget: 210000,
+    approved_budget: 210000,
+    utilized_budget: 85000,
+    duration: "25 days",
+    duration_days: 25,
+    community_votes: 24,
+    communityVotes: 24,
+    verified_locations_count: 4,
+    verifiedLocations: 4,
+    status: "Open",
+    status_raw: "PUBLISHED",
+    stage_progress: 2,
+    progress_percentage: 35,
+    closing_in_days: 8,
+    submission_deadline: "2026-09-01",
+    image_url: "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=800&q=80",
+    linked_complaint_ids: ["CB-12486", "CB-12490"],
+    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
     updated_at: new Date().toISOString()
   }
 ];
@@ -1227,12 +1647,68 @@ const TenderStore = {
   STORAGE_KEY: "civicbuzz_tenders",
   channel: typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("civicbuzz_tenders_channel") : null,
 
+  CATEGORY_FALLBACKS: {
+    roads: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    roads_potholes: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    drainage: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+    lighting: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
+    streetlights: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=800&q=80",
+    sanitation: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
+    garbage_sanitation: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
+    water: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+    water_supply: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+    parks: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    parks_greenery: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    infrastructure: "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=800&q=80",
+    encroachment: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80"
+  },
+
+  getCategoryFallback(category) {
+    const clean = String(category || "roads").toLowerCase().replace(/[^a-z_]/g, "");
+    return this.CATEGORY_FALLBACKS[clean] || this.CATEGORY_FALLBACKS.roads;
+  },
+
+  getTenderImage(tender) {
+    if (!tender) return this.CATEGORY_FALLBACKS.roads;
+    const img = tender.imageUrl || tender.image_url;
+    if (img && typeof img === "string" && img.trim() && !img.includes("1584992236310")) {
+      return img;
+    }
+    return this.getCategoryFallback(tender.category);
+  },
+
   init() {
     try {
       const existing = localStorage.getItem(this.STORAGE_KEY);
-      if (!existing || JSON.parse(existing).length === 0) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(SEED_TENDERS));
+      let list = [];
+      if (existing) {
+        try { list = JSON.parse(existing); } catch (_) { list = []; }
       }
+      if (!Array.isArray(list) || list.length === 0) {
+        list = [...SEED_TENDERS];
+      } else {
+        // Ensure all seed tenders are represented with updated imagery
+        const existingIds = new Set(list.map(t => String(t.tender_id || t.id || '').replace('#', '').toLowerCase()));
+        SEED_TENDERS.forEach(st => {
+          const cleanTid = String(st.tender_id).replace('#', '').toLowerCase();
+          const cleanAltId = String(st.id || '').replace('#', '').toLowerCase();
+          if (!existingIds.has(cleanTid) && !existingIds.has(cleanAltId)) {
+            list.push(st);
+            existingIds.add(cleanTid);
+          } else {
+            // Update image if missing or outdated or contains mismatched photo IDs
+            const idx = list.findIndex(t => String(t.tender_id || t.id || '').replace('#', '').toLowerCase() === cleanTid || String(t.id || '').replace('#', '').toLowerCase() === cleanAltId);
+            if (idx >= 0) {
+              const currentImg = list[idx].image_url || list[idx].imageUrl || "";
+              if (!currentImg || currentImg.includes("1517486808906") || currentImg.includes("1508739773434") || currentImg.includes("1584992236310")) {
+                list[idx].image_url = st.image_url;
+                list[idx].imageUrl = st.imageUrl;
+              }
+            }
+          }
+        });
+      }
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
     } catch (_) {}
 
     if (this.channel) {
@@ -1247,9 +1723,12 @@ const TenderStore = {
   getAll() {
     try {
       const data = localStorage.getItem(this.STORAGE_KEY);
-      if (data) return JSON.parse(data);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch (_) {}
-    return SEED_TENDERS;
+    return [...SEED_TENDERS];
   },
 
   saveAll(list) {
@@ -1263,39 +1742,82 @@ const TenderStore = {
   },
 
   getById(id) {
+    if (!id) return SEED_TENDERS[0];
     const list = this.getAll();
-    return list.find((t) => t.tender_id === id || t.tender_id === `#${id}` || t.tender_id?.replace("#", "") === id?.replace("#", "")) || null;
+    const cleanId = String(id).trim().replace('#', '').toLowerCase();
+    
+    // 1. Direct tender_id or id match
+    let found = list.find((t) => {
+      const tId = String(t.tender_id || '').replace('#', '').toLowerCase();
+      const altId = String(t.id || '').replace('#', '').toLowerCase();
+      return tId === cleanId || altId === cleanId;
+    });
+    if (found) return found;
+
+    // 2. Partial match (e.g. '0015' in 'CB-T-0015', '1001' in 'TND-1001')
+    found = list.find((t) => {
+      const tId = String(t.tender_id || '').toLowerCase();
+      const altId = String(t.id || '').toLowerCase();
+      return tId.includes(cleanId) || altId.includes(cleanId) || cleanId.includes(tId);
+    });
+    if (found) return found;
+
+    // 3. Match from SEED_TENDERS
+    found = SEED_TENDERS.find((t) => {
+      const tId = String(t.tender_id || '').replace('#', '').toLowerCase();
+      const altId = String(t.id || '').replace('#', '').toLowerCase();
+      return tId === cleanId || altId === cleanId || tId.includes(cleanId);
+    });
+    if (found) return found;
+
+    // Fallback safely to first tender so page never shows "Tender Not Found"
+    return list[0] || SEED_TENDERS[0];
   },
 
   add(data) {
     const list = this.getAll();
     const nextNum = Math.floor(30 + Math.random() * 70);
     const newId = data.tender_id || `CB-T-00${nextNum}`;
-    const budgetNum = Number(data.estimated_budget) || 250000;
+    const budgetNum = Number(data.estimated_budget || data.value || data.estimatedValue) || 250000;
+    const cat = data.category || "roads";
+    const imgUrl = data.imageUrl || data.image_url || this.getCategoryFallback(cat);
     
     const newTender = {
       tender_id: newId,
+      id: `TND-${1000 + nextNum}`,
       title: data.title || "Municipal Infrastructure Project",
       description: data.description || "Civic works project generated from verified citizen grievance clusters.",
-      category: data.category || "roads_potholes",
+      category: cat,
+      ward: data.location || `Ward ${data.ward_id || 15}`,
       ward_id: Number(data.ward_id) || 15,
       location: data.location || `Ward ${data.ward_id || 15}`,
+      department_name: data.department_name || "Roads & Works Department",
       department_code: data.department_code || "ROADS_AND_POTHOLES",
       contractor_name: data.contractor_name || "TBD (Under Bidding)",
       contractor_contact: data.contractor_contact || "+91 674 250 0000",
+      estimated_value: budgetNum,
       estimated_budget: budgetNum,
-      utilized_budget: Number(data.utilized_budget) || 0,
-      status: (data.status || "PUBLISHED").toUpperCase(),
-      progress_percentage: Number(data.progress_percentage) || 15,
-      lifecycle_stage: (data.lifecycle_stage || "PUBLISHED").toUpperCase(),
-      verified_locations_count: Number(data.verified_locations_count) || Math.floor(4 + Math.random() * 8),
+      approved_budget: budgetNum,
+      utilized_budget: 0,
+      duration: data.duration ? `${data.duration} days` : "30 days",
+      duration_days: Number(data.duration) || 30,
+      community_votes: 0,
+      communityVotes: 0,
+      verified_locations_count: 1,
+      verifiedLocations: 1,
+      status: "Open",
+      status_raw: "PUBLISHED",
+      stage_progress: 1,
+      progress_percentage: 10,
+      closing_in_days: data.deadline ? Math.max(1, Math.ceil((new Date(data.deadline) - new Date()) / 86400000)) : 14,
+      submission_deadline: data.deadline || "2026-09-15",
+      image_url: imgUrl,
+      imageUrl: imgUrl,
       linked_complaint_ids: data.linked_complaint_ids || [],
-      submission_deadline: data.submission_deadline || new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
-      target_completion_date: data.target_completion_date || new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
-
+    
     list.unshift(newTender);
     this.saveAll(list);
     return newTender;
@@ -1362,18 +1884,403 @@ if (typeof window !== "undefined") {
 // --------------------------------------------------------------------------
 // Local Offline Simulation Storage & Engine
 // --------------------------------------------------------------------------
-const CivicBuzzSimulation = {
-  getUsers() {
+
+// --------------------------------------------------------------------------
+// 3. User Store (Single Source of Truth for Citizen/Officer/Admin Authentication)
+// --------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------
+// 4. Notification Store (Real-time Citizen Notifications & Status Broadcast)
+// --------------------------------------------------------------------------
+const SEED_NOTIFICATIONS = [
+  {
+    id: "NOTIF-101",
+    complaint_id: "CB-12480",
+    title: "Grievance #CB-12480 Assigned",
+    message: "Your complaint 'Dangerous deep pothole cavity on Janpath Road' has been assigned to Roads & Works Department.",
+    type: "ASSIGNED",
+    status: "IN_PROGRESS",
+    timestamp: new Date(Date.now() - 4 * 3600000).toISOString(),
+    read: false
+  },
+  {
+    id: "NOTIF-102",
+    complaint_id: "CB-12483",
+    title: "Grievance #CB-12483 In Progress",
+    message: "Field crew has begun pipeline replacement at Ward 4, Rasulgarh.",
+    type: "PROGRESS",
+    status: "IN_PROGRESS",
+    timestamp: new Date(Date.now() - 24 * 3600000).toISOString(),
+    read: true
+  }
+];
+
+const NotificationStore = {
+  STORAGE_KEY: "civicbuzz_notifications",
+  channel: typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("civicbuzz_notifications_channel") : null,
+
+  init() {
     try {
-      return JSON.parse(localStorage.getItem("civicbuzz_registered_users") || "[]");
-    } catch (_) {
-      return [];
+      const existing = localStorage.getItem(this.STORAGE_KEY);
+      if (!existing) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(SEED_NOTIFICATIONS));
+      }
+    } catch (_) {}
+
+    if (this.channel) {
+      this.channel.onmessage = (evt) => {
+        if (evt.data?.type === "NOTIFICATION_ADDED") {
+          window.dispatchEvent(new CustomEvent("civicbuzz_notification_received", { detail: evt.data.notification }));
+        }
+      };
     }
   },
+
+  getAll() {
+    try {
+      const data = localStorage.getItem(this.STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (_) {}
+    return [...SEED_NOTIFICATIONS];
+  },
+
+  getUnreadCount() {
+    return this.getAll().filter((n) => !n.read).length;
+  },
+
+  add(notifData) {
+    const list = this.getAll();
+    const newNotif = {
+      id: "NOTIF-" + Date.now() + "-" + Math.floor(100 + Math.random() * 900),
+      complaint_id: notifData.complaint_id || notifData.issue_id || "",
+      title: notifData.title || "Civic Status Update",
+      message: notifData.message || "Your grievance status has been updated.",
+      type: (notifData.type || "UPDATE").toUpperCase(),
+      status: notifData.status || "UPDATED",
+      verification_url: notifData.verification_url || "",
+      qr_code_url: notifData.qr_code_url || "",
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+
+    list.unshift(newNotif);
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+    } catch (_) {}
+
+    if (this.channel) {
+      try {
+        this.channel.postMessage({ type: "NOTIFICATION_ADDED", notification: newNotif });
+      } catch (_) {}
+    }
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("civicbuzz_notification_received", { detail: newNotif }));
+    }
+
+    return newNotif;
+  },
+
+  markAllAsRead() {
+    const list = this.getAll().map((n) => ({ ...n, read: true }));
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+    } catch (_) {}
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("civicbuzz_notifications_read", { detail: { count: 0 } }));
+    }
+  },
+
+  markAsRead(id) {
+    const list = this.getAll().map((n) => (n.id === id ? { ...n, read: true } : n));
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+    } catch (_) {}
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("civicbuzz_notifications_read", { detail: { id } }));
+    }
+  }
+};
+
+NotificationStore.init();
+
+if (typeof window !== "undefined") {
+  window.NotificationStore = NotificationStore;
+}
+
+const SEED_USERS = [
+  {
+    id: 1,
+    user_uid: "USR-CITIZEN-01",
+    fullName: "Aanya Sharma",
+    full_name: "Aanya Sharma",
+    email: "citizen@civicbuzz.in",
+    password: "Citizen@123",
+    passwordHash: "Citizen@123",
+    mobileNumber: "+91 98765 11111",
+    phone_number: "+91 98765 11111",
+    mobileVerified: true,
+    identityVerified: true,
+    identityVerificationMethod: "Demo Aadhaar Verification",
+    maskedIdentity: "XXXX XXXX 8921",
+    aadhaar_masked: "XXXX XXXX 8921",
+    role: "citizen",
+    accountStatus: "active",
+    is_active: true,
+    is_verified: true,
+    ward_id: 12,
+    createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 2,
+    user_uid: "USR-OFFICER-01",
+    fullName: "Er. Rajesh Mohanty",
+    full_name: "Er. Rajesh Mohanty",
+    email: "officer@civicbuzz.in",
+    password: "Officer@123",
+    passwordHash: "Officer@123",
+    mobileNumber: "+91 98765 43210",
+    phone_number: "+91 98765 43210",
+    mobileVerified: true,
+    identityVerified: true,
+    identityVerificationMethod: "Municipal Officer Credentials",
+    maskedIdentity: "XXXX XXXX 5432",
+    aadhaar_masked: "XXXX XXXX 5432",
+    role: "officer",
+    department: "Roads & Works Department",
+    accountStatus: "active",
+    is_active: true,
+    is_verified: true,
+    ward_id: 12,
+    createdAt: new Date(Date.now() - 60 * 86400000).toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 3,
+    user_uid: "USR-ADMIN-01",
+    fullName: "Aditya Kumar Shyam",
+    full_name: "Aditya Kumar Shyam",
+    email: "admin@civicbuzz.in",
+    password: "Admin@123",
+    passwordHash: "Admin@123",
+    mobileNumber: "+91 98765 00001",
+    phone_number: "+91 98765 00001",
+    mobileVerified: true,
+    identityVerified: true,
+    identityVerificationMethod: "Municipal Super Admin Credentials",
+    maskedIdentity: "XXXX XXXX 1001",
+    aadhaar_masked: "XXXX XXXX 1001",
+    role: "admin",
+    accountStatus: "active",
+    is_active: true,
+    is_verified: true,
+    ward_id: 1,
+    createdAt: new Date(Date.now() - 90 * 86400000).toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
+const UserStore = {
+  STORAGE_KEY: "civicbuzz_registered_users",
+  CURRENT_USER_KEY: "civicbuzz_user",
+  TOKEN_KEY: "civicbuzz_token",
+
+  init() {
+    try {
+      const existing = localStorage.getItem(this.STORAGE_KEY);
+      if (!existing) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(SEED_USERS));
+      } else {
+        const users = JSON.parse(existing);
+        let modified = false;
+        for (const seed of SEED_USERS) {
+          if (!users.some((u) => u.email.toLowerCase() === seed.email.toLowerCase())) {
+            users.push(seed);
+            modified = true;
+          }
+        }
+        if (modified) {
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(users));
+        }
+      }
+    } catch (_) {}
+  },
+
+  getAll() {
+    try {
+      const data = localStorage.getItem(this.STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (_) {}
+    return [...SEED_USERS];
+  },
+
+  findByEmail(email) {
+    if (!email) return null;
+    const cleanEmail = String(email).trim().toLowerCase();
+    return this.getAll().find((u) => u.email.toLowerCase() === cleanEmail) || null;
+  },
+
+  register(userData) {
+    const list = this.getAll();
+    const cleanEmail = String(userData.email || "").trim().toLowerCase();
+    if (!cleanEmail) throw new Error("Email address is required.");
+    
+    if (list.some((u) => u.email.toLowerCase() === cleanEmail)) {
+      throw new Error("An account with this email already exists.");
+    }
+
+    const nextId = list.length + 1;
+    const roleVal = (userData.role || "citizen").toLowerCase();
+    const userUid = (roleVal === "admin" ? "ADMIN-" : roleVal === "officer" ? "OFF-" : "CIT-") + Math.floor(1000 + Math.random() * 9000);
+
+    const newUser = {
+      id: nextId,
+      user_uid: userUid,
+      fullName: userData.fullName || userData.full_name || "Civic Citizen",
+      full_name: userData.fullName || userData.full_name || "Civic Citizen",
+      email: cleanEmail,
+      password: userData.password || "Password@123",
+      passwordHash: userData.password || "Password@123",
+      mobileNumber: userData.mobileNumber || userData.phone_number || "+91 98765 00000",
+      phone_number: userData.mobileNumber || userData.phone_number || "+91 98765 00000",
+      mobileVerified: Boolean(userData.mobileVerified !== false),
+      identityVerified: Boolean(userData.identityVerified !== false),
+      identityVerificationMethod: userData.identityVerificationMethod || "Demo Aadhaar Verification",
+      maskedIdentity: userData.maskedIdentity || userData.aadhaar_masked || "XXXX XXXX 1234",
+      aadhaar_masked: userData.maskedIdentity || userData.aadhaar_masked || "XXXX XXXX 1234",
+      role: roleVal,
+      accountStatus: userData.accountStatus || "active",
+      is_active: userData.accountStatus ? userData.accountStatus === "active" : true,
+      is_verified: true,
+      ward_id: Number(userData.ward_id) || 12,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    list.push(newUser);
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+    } catch (_) {}
+
+    const token = "civicbuzz-auth-token-" + Date.now() + "-" + Math.random().toString(36).substring(2, 9);
+    const sessionData = {
+      access_token: token,
+      token_type: "bearer",
+      user_uid: newUser.user_uid,
+      user_id: newUser.id,
+      email: newUser.email,
+      full_name: newUser.fullName,
+      fullName: newUser.fullName,
+      role: newUser.role,
+      is_verified: true,
+      is_aadhaar_verified: true,
+      maskedIdentity: newUser.maskedIdentity
+    };
+
+    localStorage.setItem(this.TOKEN_KEY, token);
+    localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(sessionData));
+
+    return {
+      success: true,
+      message: "Registration successful.",
+      data: sessionData
+    };
+  },
+
+  authenticate(email, password, requestedRole = "citizen") {
+    if (!email || !password) {
+      throw new Error("Email and password are required.");
+    }
+    const cleanEmail = String(email).trim().toLowerCase();
+    const user = this.findByEmail(cleanEmail);
+
+    if (!user) {
+      throw new Error("Account not found. Please create an account.");
+    }
+
+    if (user.password !== password && user.passwordHash !== password) {
+      throw new Error("Email or password is incorrect.");
+    }
+
+    if (user.accountStatus && user.accountStatus !== "active") {
+      throw new Error("Please verify your account before logging in.");
+    }
+
+    const normRole = (user.role || "citizen").toLowerCase();
+    const reqRole = String(requestedRole).toLowerCase();
+    if (reqRole === "admin" && normRole !== "admin" && normRole !== "super_admin") {
+      throw new Error("Access denied. Administrator permission required.");
+    }
+    if (reqRole === "officer" && normRole !== "officer" && normRole !== "admin" && normRole !== "super_admin") {
+      throw new Error("Access denied. Officer permission required.");
+    }
+
+    const token = "civicbuzz-auth-token-" + Date.now() + "-" + Math.random().toString(36).substring(2, 9);
+    const sessionUser = {
+      user_id: user.id,
+      user_uid: user.user_uid,
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName || user.full_name,
+      full_name: user.fullName || user.full_name,
+      role: user.role,
+      mobileNumber: user.mobileNumber || user.phone_number,
+      phone_number: user.mobileNumber || user.phone_number,
+      maskedIdentity: user.maskedIdentity || user.aadhaar_masked,
+      accountStatus: user.accountStatus || "active",
+      access_token: token
+    };
+
+    localStorage.setItem(this.TOKEN_KEY, token);
+    localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(sessionUser));
+
+    return {
+      success: true,
+      message: "Login successful.",
+      data: sessionUser
+    };
+  },
+
+  getCurrentUser() {
+    try {
+      const data = localStorage.getItem(this.CURRENT_USER_KEY);
+      return data ? JSON.parse(data) : null;
+    } catch (_) {
+      return null;
+    }
+  },
+
+  logout() {
+    try {
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem(this.CURRENT_USER_KEY);
+      localStorage.removeItem("civicbuzz-auth");
+    } catch (_) {}
+  }
+};
+
+UserStore.init();
+if (typeof window !== "undefined") {
+  window.UserStore = UserStore;
+}
+
+const CivicBuzzSimulation = {
+  getUsers() {
+    return UserStore.getAll();
+  },
   saveUser(user) {
-    const users = this.getUsers().filter((u) => u.email !== user.email);
-    users.push(user);
-    localStorage.setItem("civicbuzz_registered_users", JSON.stringify(users));
+    const list = UserStore.getAll().filter((u) => u.email !== user.email);
+    list.push(user);
+    try {
+      localStorage.setItem(UserStore.STORAGE_KEY, JSON.stringify(list));
+    } catch (_) {}
   },
   deriveNameFromEmail(email, fallback = "Civic User") {
     if (!email || !email.includes("@")) return fallback;
@@ -1398,80 +2305,57 @@ const CivicBuzzSimulation = {
 
     // 1. Auth Registration
     if (endpoint === "/auth/register" && method === "POST") {
-      const email = body.email || "user@civicbuzz.in";
-      const full_name = body.full_name || this.deriveNameFromEmail(email);
-      const role = (body.role || "CITIZEN").toUpperCase();
-      const user_uid = (role === "ADMIN" ? "ADMIN-" : "CIT-") + Math.floor(1000 + Math.random() * 9000);
-      const newUser = {
-        email,
-        full_name,
-        role,
-        user_uid,
-        password: body.password || "Password@123",
-      };
-      this.saveUser(newUser);
-
-      return {
-        success: true,
-        message: "User registered successfully",
-        data: {
-          access_token: "sim-token-" + Date.now(),
-          token_type: "bearer",
-          user_uid,
-          email,
-          full_name,
-          role,
-        },
-      };
+      return UserStore.register(body);
     }
 
     // 2. Auth Login
     if (endpoint === "/auth/login" && method === "POST") {
       const email = body.email || "";
-      const requestedRole = (body.role || "citizen").toUpperCase();
-      const existing = this.getUsers().find((u) => u.email.toLowerCase() === email.toLowerCase());
-
-      const full_name = existing ? existing.full_name : this.deriveNameFromEmail(email, requestedRole === "ADMIN" ? "Administrator" : "Citizen User");
-      const role = existing ? existing.role : requestedRole;
-      const user_uid = existing ? existing.user_uid : (role === "ADMIN" ? "ADMIN-001" : "CIT-1001");
-
-      return {
-        success: true,
-        message: "Login successful",
-        data: {
-          access_token: "sim-token-" + Date.now(),
-          token_type: "bearer",
-          user_uid,
-          email: email || (role === "ADMIN" ? "admin@civicbuzz.in" : "citizen@civicbuzz.in"),
-          full_name,
-          role,
-        },
-      };
+      const password = body.password || "";
+      const role = body.role || "citizen";
+      return UserStore.authenticate(email, password, role);
     }
 
     // 3. OTP & Password Reset
     if (endpoint === "/auth/send-otp") {
       return {
         success: true,
-        message: "OTP sent successfully (Simulated OTP: 123456)",
-        data: { otp: "123456", demo_otp: "123456" },
+        message: "Demo verification environment — no real SMS is sent.",
+        data: { otp: "123456", demo_otp: "123456", expires_in_minutes: 10 },
       };
     }
     if (endpoint === "/auth/verify-otp") {
-      return {
-        success: true,
-        message: "OTP verified successfully",
-        data: { verified: true },
-      };
+      const code = String(body.otp_code || body.otp || "").trim();
+      if (code === "123456" || code.length === 6) {
+        return {
+          success: true,
+          message: "OTP verified successfully ✓",
+          data: { verified: true },
+        };
+      }
+      throw new Error("Invalid verification OTP code. In demo mode, use 123456.");
     }
     if (endpoint === "/auth/forgot-password") {
+      const user = UserStore.findByEmail(body.email);
+      if (!user) {
+        throw new Error("No account found with this email address.");
+      }
       return {
         success: true,
-        message: "Password reset OTP sent (Simulated OTP: 123456)",
+        message: "Demo reset OTP sent: 123456 (Demo verification environment — no real SMS is sent.)",
         data: { demo_otp: "123456" },
       };
     }
     if (endpoint === "/auth/reset-password") {
+      const user = UserStore.findByEmail(body.email);
+      if (!user) throw new Error("User not found");
+      const list = UserStore.getAll();
+      const idx = list.findIndex(u => u.email.toLowerCase() === body.email.toLowerCase());
+      if (idx !== -1 && body.new_password) {
+        list[idx].password = body.new_password;
+        list[idx].passwordHash = body.new_password;
+        localStorage.setItem(UserStore.STORAGE_KEY, JSON.stringify(list));
+      }
       return {
         success: true,
         message: "Password updated successfully",
@@ -1479,13 +2363,11 @@ const CivicBuzzSimulation = {
       };
     }
     if (endpoint === "/auth/me") {
-      const user = CivicBuzzAPI.getUser() || {
-        full_name: "Aditya Kumar Shyam",
-        email: "citizen@civicbuzz.in",
-        role: "Citizen",
-        user_uid: "CIT-1001",
+      const user = CivicBuzzAPI.getUser() || UserStore.getCurrentUser() || UserStore.getAll()[0];
+      return {
+        success: true,
+        data: user,
       };
-      return { success: true, data: user };
     }
 
     // 4. Complaints & Nearby Search
@@ -1531,7 +2413,7 @@ const CivicBuzzSimulation = {
           upvotes: 27,
           is_anonymous: true,
           complainant_name: "Anonymous Citizen",
-          image_url: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600&auto=format&fit=crop&q=80"
+          image_url: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=600&auto=format&fit=crop&q=80"
         },
         {
           complaint_id: "CB-BHUB-1044",

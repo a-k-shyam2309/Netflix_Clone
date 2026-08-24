@@ -11,6 +11,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 	<link rel="stylesheet" href="style.css">
 </head>
 
@@ -921,137 +922,69 @@
 
 
 		<!-- ============================= -->
-		<!-- NEARBY ISSUES -->
+		<!-- NEARBY ISSUES & INTERACTIVE MAP -->
 		<!-- ============================= -->
 
 		<section class="nearby-issues-section" id="nearbyMap">
 
 			<div class="section-header-row">
 
-				<h2>
-					Issues Around You
-				</h2>
+				<div class="section-title-wrap">
+					<h2>
+						<i class="fa-solid fa-map-location-dot" style="color:var(--primary); margin-right:8px;"></i> Issues Around You
+					</h2>
+					<span class="live-radar-tag">
+						<span class="radar-dot"></span> Live Civic Radar
+					</span>
+				</div>
 
-				<a href="Map_Frontend/index.html" class="view-all-button" id="viewMapButton">
-					View on Map
-				</a>
+				<div class="header-actions-wrap">
+					<button type="button" class="btn-location-action" id="btnUseMyLocation" title="Detect location & sort by distance">
+						<i class="fa-solid fa-crosshairs"></i> Use My Location
+					</button>
+					<a href="Map_Frontend/index.html" class="view-all-button" id="viewMapButton">
+						View on Map <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:12px; margin-left:4px;"></i>
+					</a>
+				</div>
 
 			</div>
 
+			<!-- Category Quick Filters Bar -->
+			<div class="nearby-filter-bar" id="nearbyCategoryFilters">
+				<button class="filter-pill active" data-category="all">All Issues (<span id="countAll">0</span>)</button>
+				<button class="filter-pill" data-category="ROADS">🕳️ Roads</button>
+				<button class="filter-pill" data-category="LIGHTING">💡 Streetlights</button>
+				<button class="filter-pill" data-category="WATER">🚰 Water & Drainage</button>
+				<button class="filter-pill" data-category="SANITATION">🗑️ Sanitation</button>
+				<button class="filter-pill" data-category="PARKS">🌳 Parks</button>
+			</div>
 
 			<div class="nearby-content">
 
-
-				<!-- Map -->
-				<a href="Map_Frontend/index.html" class="nearby-map" title="Open Interactive Bhubaneswar Map Dashboard" style="display:block; text-decoration:none; cursor:pointer;">
-
-					<img src="Assets/map-placeholder.png" alt="Map showing nearby civic issues" id="nearbyMapImage"
-						class="nearby-map-image" onerror="this.style.background='#e2e8f0'; this.style.minHeight='220px'">
-
-					<div class="map-location-center">
-						●
+				<!-- Real Interactive Map -->
+				<div class="nearby-map-wrapper">
+					<div id="nearbyIssuesMap" class="nearby-interactive-map" role="region" aria-label="Interactive Map of Bhubaneswar Civic Issues"></div>
+					<div class="map-status-overlay" id="mapStatusOverlay">
+						<span id="mapIssueSummary"><i class="fa-solid fa-location-pin" style="color:#ef4444;"></i> Loading Bhubaneswar civic issues...</span>
+						<button class="btn-reset-map-view" id="btnResetMapView" title="Reset to City Center"><i class="fa-solid fa-expand"></i> Reset View</button>
 					</div>
+				</div>
 
-					<div class="map-marker marker-one">
-						📍
-					</div>
-
-					<div class="map-marker marker-two">
-						📍
-					</div>
-
-					<div class="map-marker marker-three">
-						📍
-					</div>
-
-				</a>
-
-
-				<!-- Nearby Issue List -->
-
-				<div class="nearby-list">
-
-
-					<!-- Nearby Issue 1 -->
-
-					<div class="nearby-issue">
-
-						<div class="nearby-icon">
-							📍
+				<!-- Dynamic Nearby Issue List -->
+				<div class="nearby-list-wrapper">
+					<div class="nearby-list-header">
+						<div class="list-heading">
+							<strong>Reported Civic Grievances</strong>
+							<span id="nearbyListSubtext">Click any issue to pinpoint on map</span>
 						</div>
-
-						<div class="nearby-info">
-
-							<strong>
-								Road Pothole
-							</strong>
-
-							<span>
-								150m away • Patia Main Road
-							</span>
-
-						</div>
-
-						<span class="nearby-status open-status">
-							Open
-						</span>
-
+						<span class="badge-count" id="badgeReportedCount">0</span>
 					</div>
 
-
-					<!-- Nearby Issue 2 -->
-
-					<div class="nearby-issue">
-
-						<div class="nearby-icon">
-							💡
+					<div class="nearby-list" id="nearbyIssuesList">
+						<div class="nearby-loading-skeleton">
+							<i class="fa-solid fa-circle-notch fa-spin"></i> Loading local civic complaints...
 						</div>
-
-						<div class="nearby-info">
-
-							<strong>
-								Street Light Not Working
-							</strong>
-
-							<span>
-								300m away • Kalinga Vihar
-							</span>
-
-						</div>
-
-						<span class="nearby-status progress-status">
-							In Progress
-						</span>
-
 					</div>
-
-
-					<!-- Nearby Issue 3 -->
-
-					<div class="nearby-issue">
-
-						<div class="nearby-icon">
-							🗑
-						</div>
-
-						<div class="nearby-info">
-
-							<strong>
-								Garbage Overflow
-							</strong>
-
-							<span>
-								500m away • Jayadev Vihar
-							</span>
-
-						</div>
-
-						<span class="nearby-status open-status">
-							Open
-						</span>
-
-					</div>
-
 				</div>
 
 			</div>
@@ -1612,6 +1545,7 @@
 			document.write('<script src="../../api-config.js"><\/script>');
 		}
 	</script>
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 	<script src="navbar-loader.js"></script>
 	<script src="script.js"></script>
 

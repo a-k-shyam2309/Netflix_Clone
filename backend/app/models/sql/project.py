@@ -109,6 +109,7 @@ class Tender(Base):
     closing_in_days: Mapped[int] = mapped_column(Integer, default=7)
     submission_deadline: Mapped[Optional[str]] = mapped_column(String(100), default="24 Aug 2026")
     contractor_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    image_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     qr_code_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

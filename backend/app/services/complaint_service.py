@@ -173,6 +173,7 @@ async def create_new_complaint(
         "severity": severity,
         "priority": priority_info,
         "ai_analysis": ai_triage,
+        "ai_triage": ai_triage,
         "duplicate_info": dup_info,
         "evidence": evidence_list,
         "timeline": timeline,

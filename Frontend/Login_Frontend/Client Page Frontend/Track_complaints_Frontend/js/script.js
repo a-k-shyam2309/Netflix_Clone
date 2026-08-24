@@ -210,6 +210,9 @@ function renderComplaintCards() {
     const catLabel = formatCategoryLabel(c.category, c.sub_category);
     const urgency = c.urgency_score || (c.priority?.score || 85);
 
+    const fallbackImg = window.ComplaintStore?.getCategoryFallback ? window.ComplaintStore.getCategoryFallback(c.category) : "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80";
+    const cardImgUrl = (c.image_url && typeof c.image_url === 'string' && c.image_url.trim() && !c.image_url.includes('1584992236310')) ? c.image_url : fallbackImg;
+
     return `
       <article class="complaint-card" id="card_${c.complaint_id}" data-priority="${rawPriority.toLowerCase()}" onclick="openComplaintDetails('${c.complaint_id}')" style="cursor: pointer;">
         <header class="complaint-head">
@@ -231,15 +234,16 @@ function renderComplaintCards() {
           </div>
         </header>
 
+        <div class="complaint-card-image-wrap" onclick="event.stopPropagation(); openComplaintDetails('${c.complaint_id}')" title="Click to view full complaint details & evidence">
+          <img src="${cardImgUrl}" alt="${c.title}" class="complaint-card-image" onerror="this.onerror=null; this.src='${fallbackImg}';" />
+          <div class="complaint-image-tag">
+            <i class="fa-solid fa-camera"></i> ${c.image_url ? 'Verified Evidence' : 'Civic Record Photo'}
+          </div>
+        </div>
+
         ${c.ai_summary ? `
           <div style="font-size:12px; color:var(--secondary); line-height:1.4; margin: 4px 0 12px; background:rgba(0,0,0,0.02); padding:8px 12px; border-radius:8px; border-left:3px solid var(--blue);">
             <span style="font-weight:700; color:var(--blue);">AI Triage Analysis:</span> ${c.ai_summary}
-          </div>
-        ` : ''}
-
-        ${c.image_url ? `
-          <div style="margin-bottom:12px;">
-            <img src="${c.image_url}" alt="Citizen Evidence" style="max-height:100px; width:100%; max-width:280px; border-radius:8px; object-fit:cover; border:1px solid var(--border);" />
           </div>
         ` : ''}
 

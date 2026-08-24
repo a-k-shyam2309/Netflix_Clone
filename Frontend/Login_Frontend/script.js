@@ -948,102 +948,120 @@ async function loadDashboardData() {
 // ============================================================
 
 function setupLogin() {
-
-  const loginForm =
-    $("#login-form");
-
-
+  const loginForm = $("#login-form");
   if (!loginForm) return;
 
-  const errorMessageEl =
-    $("#login-error-message");
+  const errorMessageEl = $("#login-error-message");
+  const submitBtn = loginForm.querySelector("button[type='submit']");
+  const originalBtnHtml = submitBtn ? submitBtn.innerHTML : "";
 
-  const submitBtn =
-    loginForm.querySelector("button[type='submit']");
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  const originalBtnHtml =
-    submitBtn ? submitBtn.innerHTML : "";
+    const emailInput = loginForm.querySelector("input[type='email']")?.value?.trim() || "";
+    const passwordInput = loginForm.querySelector("#password")?.value || "";
 
+    if (errorMessageEl) {
+      errorMessageEl.textContent = "";
+      errorMessageEl.classList.add("hidden");
+      errorMessageEl.style.color = "";
+      errorMessageEl.style.background = "";
+      errorMessageEl.style.borderColor = "";
+    }
 
-  loginForm.addEventListener(
-    "submit",
-    async event => {
-
-      event.preventDefault();
-
-      const emailInput = loginForm.querySelector("input[type='email']")?.value?.trim() || "";
-      const passwordInput = loginForm.querySelector("#password")?.value || "";
-
+    // 1. Mandatory format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailInput || !emailRegex.test(emailInput)) {
       if (errorMessageEl) {
-        errorMessageEl.textContent = "";
-        errorMessageEl.classList.add("hidden");
-        errorMessageEl.style.color = "";
-        errorMessageEl.style.background = "";
-        errorMessageEl.style.borderColor = "";
+        errorMessageEl.textContent = language === "hi" ? "कृपया एक वैध ईमेल पता दर्ज करें।" : "Please enter a valid email address.";
+        errorMessageEl.classList.remove("hidden");
       }
+      return;
+    }
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span>${language === "hi" ? "साइन इन हो रहा है..." : "Signing in..."}</span>`;
+    if (!passwordInput) {
+      if (errorMessageEl) {
+        errorMessageEl.textContent = language === "hi" ? "कृपया अपना पासवर्ड दर्ज करें।" : "Please enter your password.";
+        errorMessageEl.classList.remove("hidden");
       }
+      return;
+    }
 
-      // Derive readable name from email if not already present
-      let derivedName = "";
-      if (emailInput && emailInput.includes("@")) {
-        const usernamePart = emailInput.split("@")[0];
-        derivedName = usernamePart
-          .replace(/[._-]/g, " ")
-          .split(" ")
-          .filter(Boolean)
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-          .join(" ");
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>${language === "hi" ? "साइन इन हो रहा है..." : "Signing in..."}</span>`;
+    }
+
+    let authResult = null;
+    try {
+      if (window.CivicBuzzAPI?.auth?.login) {
+        authResult = await window.CivicBuzzAPI.auth.login(emailInput, passwordInput, role);
+      } else if (window.UserStore?.authenticate) {
+        authResult = window.UserStore.authenticate(emailInput, passwordInput, role);
       }
-      let userFullName = derivedName || (role === "admin" ? "Administrator" : "Citizen User");
-
-      if (window.CivicBuzzAPI && emailInput && passwordInput) {
-        try {
-          const res = await window.CivicBuzzAPI.auth.login(emailInput, passwordInput, role);
-          if (res.data?.full_name) {
-            userFullName = res.data.full_name;
-          }
-        } catch (err) {
-          if (errorMessageEl) {
-            errorMessageEl.textContent = err.message || (language === "hi" ? "अमान्य ईमेल या पासवर्ड।" : "Invalid email or password.");
-            errorMessageEl.classList.remove("hidden");
-          }
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnHtml;
-          }
-          return;
+    } catch (err) {
+      if (errorMessageEl) {
+        let msg = err.message || "Invalid email or password.";
+        if (msg.toLowerCase().includes("not found")) {
+          msg = language === "hi" ? "खाता नहीं मिला। कृपया पहले नया खाता बनाएं।" : "Account not found. Please create an account.";
+        } else if (msg.toLowerCase().includes("incorrect") || msg.toLowerCase().includes("invalid")) {
+          msg = language === "hi" ? "ईमेल या पासवर्ड गलत है।" : "Email or password is incorrect.";
+        } else if (msg.toLowerCase().includes("denied") || msg.toLowerCase().includes("permission")) {
+          msg = language === "hi" ? "पहुंच अस्वीकृत। आवश्यक अनुमति नहीं है।" : msg;
         }
+        errorMessageEl.textContent = msg;
+        errorMessageEl.classList.remove("hidden");
       }
-
-      // Persist logged-in user profile in localStorage
-      const sessionUser = {
-        full_name: userFullName,
-        email: emailInput || (role === "admin" ? "admin@civicbuzz.in" : "citizen@civicbuzz.in"),
-        role: role === "admin" ? "Super Admin" : "Citizen",
-        user_uid: role === "admin" ? "ADMIN-001" : "CIT-1001",
-      };
-      localStorage.setItem("civicbuzz_user", JSON.stringify(sessionUser));
-
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHtml;
       }
-
-      if (role === "admin") {
-        window.location.href = "Admin Page Frontend/index.html";
-      } else {
-        window.location.href = "Client Page Frontend/index.html";
-      }
-
+      return;
     }
-  );
 
+    if (!authResult || !authResult.data) {
+      if (errorMessageEl) {
+        errorMessageEl.textContent = language === "hi" ? "ईमेल या पासवर्ड गलत है।" : "Email or password is incorrect.";
+        errorMessageEl.classList.remove("hidden");
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+      }
+      return;
+    }
+
+    const userData = authResult.data;
+    const userRole = String(userData.role || role || "citizen").toLowerCase();
+
+    // Persist authenticated session
+    const sessionUser = {
+      user_id: userData.user_id || userData.id || 1,
+      user_uid: userData.user_uid || "CIT-1001",
+      full_name: userData.full_name || userData.fullName || "Civic Citizen",
+      fullName: userData.full_name || userData.fullName || "Civic Citizen",
+      email: userData.email || emailInput,
+      role: userRole === "admin" || userRole === "super_admin" ? "Super Admin" : (userRole === "officer" ? "Officer" : "Citizen"),
+      accountStatus: "active"
+    };
+
+    localStorage.setItem("civicbuzz_user", JSON.stringify(sessionUser));
+    if (userData.access_token) {
+      localStorage.setItem("civicbuzz_token", userData.access_token);
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnHtml;
+    }
+
+    if (userRole === "admin" || userRole === "super_admin" || userRole === "officer") {
+      window.location.href = "Admin Page Frontend/index.html";
+    } else {
+      window.location.href = "Client Page Frontend/index.html";
+    }
+  });
 }
-
 
 // ============================================================
 // LOGOUT
@@ -1179,7 +1197,6 @@ function setupRegistrationPasswordRules() {
 function setupRegisterForm() {
   const form = $("#register-form");
   const registerModal = $("#register-modal");
-
   if (!form) return;
 
   const message = $("#password-message");
@@ -1190,32 +1207,44 @@ function setupRegisterForm() {
     event.preventDefault();
 
     const fullNameInput =
+      $("#reg-fullname")?.value?.trim() ||
       form.querySelector("input[data-placeholder='full_name']")?.value?.trim() ||
       form.querySelectorAll("input")[0]?.value?.trim() ||
       "";
 
     const emailInput =
-      form.querySelector("input[type='email']")?.value?.trim() || "";
+      $("#reg-email")?.value?.trim() ||
+      form.querySelector("input[type='email']")?.value?.trim() ||
+      "";
 
     const password = $("#new-password")?.value || "";
     const confirmation = $("#confirm-password")?.value || "";
 
-    if (password !== confirmation) {
+    if (!fullNameInput) {
       if (message) {
-        message.textContent =
-          language === "hi"
-            ? "पासवर्ड मेल नहीं खाते।"
-            : "Passwords do not match.";
+        message.textContent = language === "hi" ? "कृपया अपना पूरा नाम दर्ज करें।" : "Please enter your full name.";
+      }
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailInput || !emailRegex.test(emailInput)) {
+      if (message) {
+        message.textContent = language === "hi" ? "कृपया एक वैध ईमेल पता दर्ज करें।" : "Please enter a valid email address.";
       }
       return;
     }
 
     if (password.length < 8) {
       if (message) {
-        message.textContent =
-          language === "hi"
-            ? "पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।"
-            : "Password must contain at least 8 characters.";
+        message.textContent = language === "hi" ? "पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।" : "Password must contain at least 8 characters.";
+      }
+      return;
+    }
+
+    if (password !== confirmation) {
+      if (message) {
+        message.textContent = language === "hi" ? "पासवर्ड मेल नहीं खाते।" : "Passwords do not match.";
       }
       return;
     }
@@ -1226,105 +1255,75 @@ function setupRegisterForm() {
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent =
-        language === "hi"
-          ? "खाता बनाया जा रहा है..."
-          : "Creating account...";
+      submitBtn.textContent = language === "hi" ? "खाता बनाया जा रहा है..." : "Creating account...";
     }
 
-    let userFullName = fullNameInput || (role === "admin" ? "Administrator" : "Citizen User");
-    let regResponse = null;
-
-    if (window.CivicBuzzAPI && emailInput && password) {
-      try {
-        const regRole = (role || "citizen").toUpperCase();
-        regResponse = await window.CivicBuzzAPI.auth.register({
-          full_name: fullNameInput || "Civic User",
-          email: emailInput,
-          password: password,
-          role: regRole,
-        });
-        if (regResponse.data?.full_name) {
-          userFullName = regResponse.data.full_name;
-        }
-      } catch (err) {
-        // If already exists, pre-fill main login email and offer quick sign in
-        const mainEmailInput = $("#login-form input[type='email']");
-        if (mainEmailInput && emailInput) {
-          mainEmailInput.value = emailInput;
-        }
-
-        if (message) {
-          if (err.message && err.message.includes("already exists")) {
-            message.innerHTML = `${language === "hi" ? "इस ईमेल से खाता पहले से मौजूद है।" : "An account with this email already exists."} <button type="button" style="background:none;border:none;color:#2563eb;text-decoration:underline;cursor:pointer;font-weight:600;padding:0;margin-left:4px;" onclick="document.getElementById('register-modal').classList.add('hidden');document.getElementById('register-modal').style.display='none';document.getElementById('password')?.focus();">${language === "hi" ? "साइन इन करें →" : "Sign In →"}</button>`;
-          } else {
-            message.textContent = err.message || (language === "hi" ? "पंजीकरण विफल हुआ।" : "Registration failed.");
-          }
-        }
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalBtnText;
-        }
-        return;
-      }
-    }
-
-    // Persist registered user profile in localStorage directly from database
-    const regUser = {
-      full_name: regResponse?.data?.full_name || userFullName || fullNameInput,
-      email: regResponse?.data?.email || emailInput,
-      role: (regResponse?.data?.role === "ADMIN" || role === "admin") ? "Super Admin" : "Citizen",
-      user_uid: regResponse?.data?.user_uid || (role === "admin" ? "ADMIN-001" : "CIT-1001"),
+    const payload = {
+      full_name: fullNameInput,
+      fullName: fullNameInput,
+      email: emailInput,
+      password: password,
+      role: (role || "citizen").toLowerCase(),
+      accountStatus: "active"
     };
-    localStorage.setItem("civicbuzz_user", JSON.stringify(regUser));
-    if (regResponse?.data?.access_token) {
-      localStorage.setItem("civicbuzz_token", regResponse.data.access_token);
+
+    let regResponse = null;
+    try {
+      if (window.CivicBuzzAPI?.auth?.register) {
+        regResponse = await window.CivicBuzzAPI.auth.register(payload);
+      } else if (window.UserStore?.register) {
+        regResponse = window.UserStore.register(payload);
+      }
+    } catch (err) {
+      if (message) {
+        if (err.message && err.message.includes("already exists")) {
+          message.innerHTML = `${language === "hi" ? "इस ईमेल से खाता पहले से मौजूद है।" : "An account with this email already exists."} <button type="button" style="background:none;border:none;color:#2563eb;text-decoration:underline;cursor:pointer;font-weight:600;padding:0;margin-left:4px;" onclick="document.getElementById('register-modal').classList.add('hidden');document.getElementById('password')?.focus();">${language === "hi" ? "साइन इन करें →" : "Sign In →"}</button>`;
+        } else {
+          message.textContent = err.message || (language === "hi" ? "पंजीकरण विफल हुआ।" : "Registration failed.");
+        }
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+      return;
     }
 
-    // 1. Immediately close the modal
+    // Close modal
     if (registerModal) {
       registerModal.classList.add("hidden");
       registerModal.style.display = "none";
     }
 
-    // 2. Pre-fill main login form with registered credentials
+    // Pre-fill login inputs
     const mainEmailInput = $("#login-form input[type='email']");
-    if (mainEmailInput && emailInput) {
-      mainEmailInput.value = emailInput;
-    }
+    if (mainEmailInput) mainEmailInput.value = emailInput;
     const mainPasswordInput = $("#password");
-    if (mainPasswordInput && password) {
-      mainPasswordInput.value = password;
-    }
+    if (mainPasswordInput) mainPasswordInput.value = password;
 
-    // 3. Show clear success message on login page
+    // Show positive confirmation message on login card
     const loginMsg = $("#login-error-message");
     if (loginMsg) {
       loginMsg.classList.remove("hidden");
       loginMsg.style.color = "#15803d";
       loginMsg.style.background = "#f0fdf4";
       loginMsg.style.borderColor = "#bbf7d0";
-      loginMsg.textContent =
-        language === "hi"
-          ? `✓ ${fullNameInput || "उपयोगकर्ता"} का खाता सफलतापूर्वक बन गया! कृपया "Sign in" पर क्लिक करें।`
-          : `✓ Account created for ${fullNameInput || "user"}! Please click Sign In below.`;
+      loginMsg.textContent = language === "hi"
+        ? `✓ ${fullNameInput} का खाता बन गया! कृपया "Sign in" पर क्लिक करें।`
+        : `✓ Account created for ${fullNameInput}! Please click Sign In below.`;
     }
 
-    // 4. Reset register form state
+    // Reset register state
     form.reset();
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
     }
 
-    // 5. Highlight & focus the login sign-in button
     const loginSubmitBtn = $("#login-form button[type='submit']");
-    if (loginSubmitBtn) {
-      loginSubmitBtn.focus();
-    }
+    if (loginSubmitBtn) loginSubmitBtn.focus();
   });
 }
-
 
 // ============================================================
 // FORGOT PASSWORD ELEMENTS

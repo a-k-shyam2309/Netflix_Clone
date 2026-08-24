@@ -332,7 +332,7 @@
         distance_meters: 420,
         created_at: new Date(Date.now() - 3600000 * 32).toISOString(),
         upvotes: 27,
-        image_url: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600&auto=format&fit=crop&q=80"
+        image_url: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=600&auto=format&fit=crop&q=80"
       },
       {
         complaint_id: "CB-BHUB-1044",

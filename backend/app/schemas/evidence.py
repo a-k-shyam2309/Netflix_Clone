@@ -89,6 +89,7 @@ class TenderCreateRequest(BaseModel):
     verified_locations_count: int = 3
     submission_deadline: Optional[str] = "24 Aug 2026"
     status: str = "PUBLISHED"
+    image_url: Optional[str] = None
 
 
 class TenderUpdateRequest(BaseModel):
@@ -98,6 +99,7 @@ class TenderUpdateRequest(BaseModel):
     stage_progress: Optional[int] = None
     progress_percentage: Optional[int] = None
     contractor_name: Optional[str] = None
+    image_url: Optional[str] = None
 
 
 class TenderResponse(BaseModel):
@@ -119,6 +121,7 @@ class TenderResponse(BaseModel):
     closing_in_days: int
     submission_deadline: Optional[str] = None
     contractor_name: Optional[str] = None
+    image_url: Optional[str] = None
     qr_code_url: Optional[str] = None
     created_at: str
 

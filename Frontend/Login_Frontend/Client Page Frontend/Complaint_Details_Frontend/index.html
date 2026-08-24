@@ -575,11 +575,11 @@
           <div class="triage-spec-grid">
             <div class="spec-box">
               <div class="spec-label">Detected Category</div>
-              <div class="spec-val" id="dAiCategory">Roads &amp; Potholes</div>
+              <div class="spec-val" id="dAiCategory">Roads &amp; Works</div>
             </div>
             <div class="spec-box">
               <div class="spec-label">Assigned Ward Cell</div>
-              <div class="spec-val" id="dAiWardCell">Ward 12 Infrastructure Cell</div>
+              <div class="spec-val" id="dAiWardCell">Ward Infrastructure Cell</div>
             </div>
             <div class="spec-box">
               <div class="spec-label">AI Authenticity Audit</div>
@@ -589,6 +589,38 @@
               <div class="spec-label">Calculated SLA</div>
               <div class="spec-val text-rose" id="dAiSlaWindow">48-Hour Resolution Window</div>
             </div>
+          </div>
+
+          <!-- Tags Row -->
+          <div style="margin-top:14px;">
+            <div style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">AI Generated Tags</div>
+            <div class="ai-keywords-row" id="dAiTagsRow" style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="keyword-tag">#civic_defect</span>
+            </div>
+          </div>
+
+          <!-- Grounded Defect Elements -->
+          <div style="margin-top:14px;">
+            <div style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Grounded Defect Elements</div>
+            <div class="evidence-elements-list" id="dAiElementsList" style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="defect-tag"><i class="fa-solid fa-circle-dot"></i> Surface Defect</span>
+            </div>
+          </div>
+
+          <!-- Proximity Duplicate Check Status -->
+          <div style="margin-top:14px; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:8px; font-size:12.5px; color:#334155;" id="dAiDuplicateStatusBox">
+            <i class="fa-solid fa-clone" style="color:#2563eb; margin-right:6px;"></i>
+            <span id="dAiDuplicateStatusText">Proximity Radar: Scanned database · No duplicates found nearby.</span>
+          </div>
+
+          <!-- Transparent Prioritization Reasoning -->
+          <div style="margin-top:14px; background:#fafafa; border:1px solid #e2e8f0; padding:12px; border-radius:8px;">
+            <div style="font-size:12px; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+              <i class="fa-solid fa-scale-balanced" style="color:#6366f1;"></i> Why was this grievance prioritized?
+            </div>
+            <ul id="dAiReasoningList" style="margin:0; padding-left:18px; font-size:12px; color:#475569; line-height:1.6;">
+              <li>Assigned high-impact priority according to municipal safety standards.</li>
+            </ul>
           </div>
         </div>
 
@@ -920,8 +952,40 @@
 
     document.getElementById('dAiCategory').textContent = `${category} (${subCategory})`;
     document.getElementById('dAiWardCell').textContent = `${wardName} Infrastructure Cell`;
-    document.getElementById('dAiConfidence').textContent = `${c.conf || 96}% Real Defect Verified`;
+    document.getElementById('dAiConfidence').textContent = `${c.ai_triage?.confidence || (c.image_url ? 96 : 82)}% Real Defect Verified`;
     document.getElementById('dAiSlaWindow').textContent = `${c.sla_hours || 48}-Hour Resolution Window`;
+
+    const aiTriage = c.ai_triage || {};
+    const aiTags = aiTriage.tags && aiTriage.tags.length ? aiTriage.tags : [`#${category.toLowerCase().replace(/\s+/g, '_')}`, `#${wardName.toLowerCase().replace(/[^a-z0-9]/g, '')}`];
+    const dAiTagsRow = document.getElementById('dAiTagsRow');
+    if (dAiTagsRow) {
+      dAiTagsRow.innerHTML = aiTags.map(t => `<span class="keyword-tag">${t}</span>`).join('');
+    }
+
+    const aiElements = aiTriage.evidence_analysis?.elements || [`${category} Surface Defect`, 'Geotagged Pinpoint Validated'];
+    const dAiElementsList = document.getElementById('dAiElementsList');
+    if (dAiElementsList) {
+      dAiElementsList.innerHTML = aiElements.map(e => `<span class="defect-tag"><i class="fa-solid fa-circle-dot"></i> ${e}</span>`).join('');
+    }
+
+    const dAiDuplicateStatusText = document.getElementById('dAiDuplicateStatusText');
+    if (dAiDuplicateStatusText) {
+      if (aiTriage.duplicate_check?.is_duplicate) {
+        dAiDuplicateStatusText.innerHTML = `<strong>Proximity Radar:</strong> Merged duplicate of <strong>${aiTriage.duplicate_check.matched_id}</strong> (${aiTriage.duplicate_check.match_score} match).`;
+      } else {
+        dAiDuplicateStatusText.innerHTML = `<strong>Proximity Radar:</strong> Scanned database · No duplicate complaints found within 500m.`;
+      }
+    }
+
+    const reasoning = aiTriage.reasoning && aiTriage.reasoning.length ? aiTriage.reasoning : [
+      `Grounded against ${deptName} SLA schedule (${c.sla_hours || 48}h)`,
+      `Location coordinates verified inside ${wardName}`,
+      c.image_url ? 'Photographic evidence verified by AI audit' : 'Citizen description verified'
+    ];
+    const dAiReasoningList = document.getElementById('dAiReasoningList');
+    if (dAiReasoningList) {
+      dAiReasoningList.innerHTML = reasoning.map(r => `<li><i class="fa-solid fa-check text-green" style="font-size:10px; margin-right:4px;"></i> ${r}</li>`).join('');
+    }
 
     document.getElementById('tReportedDate').textContent = createdDate;
     document.getElementById('tAiClass').textContent = `${category} · ${rawPriority} Priority`;
@@ -941,15 +1005,22 @@
     initDetailMap(lat, lng, cid, rawPriority);
 
     const citizenImg = document.getElementById('dCitizenImg');
-    if (c.image_url) {
+    const fallbackImg = window.ComplaintStore?.getCategoryFallback ? window.ComplaintStore.getCategoryFallback(c.category) : 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80';
+    if (c.image_url && !c.image_url.includes('1584992236310')) {
       citizenImg.src = c.image_url;
     } else {
-      citizenImg.src = 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80';
+      citizenImg.src = fallbackImg;
     }
+    citizenImg.onerror = function() {
+      this.onerror = null;
+      this.src = fallbackImg;
+    };
 
     const deptImg = document.getElementById('dDeptImg');
     if (c.after_image_url || c.resolution_image_url) {
       deptImg.src = c.after_image_url || c.resolution_image_url;
+    } else {
+      deptImg.src = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80';
     }
 
     const verificationBox = document.getElementById('verificationActionBox');

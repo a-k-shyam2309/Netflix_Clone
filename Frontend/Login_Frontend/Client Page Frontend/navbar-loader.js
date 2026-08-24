@@ -616,11 +616,25 @@
 			</div>
 		</div>
 
-		<!-- NOTIFICATION BUTTON -->
-		<button class="icon-btn notification-btn" id="notificationBtn" type="button" aria-label="Notifications">
-			<i class="fa-regular fa-bell"></i>
-			<span class="notification-dot"></span>
-		</button>
+		<!-- NOTIFICATION BUTTON & DROPDOWN -->
+		<div class="notification-wrapper" style="position:relative;">
+			<button class="icon-btn notification-btn" id="notificationBtn" type="button" aria-label="Notifications" aria-expanded="false" style="position:relative;">
+				<i class="fa-regular fa-bell"></i>
+				<span class="notification-dot" id="navNotificationDot" style="display:none;"></span>
+				<span class="notification-badge-count" id="navNotificationBadge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; border-radius:10px; min-width:17px; height:17px; line-height:17px; text-align:center; padding:0 3px; border:2px solid #ffffff; box-shadow:0 2px 4px rgba(0,0,0,0.15);">0</span>
+			</button>
+			<div class="notification-dropdown" id="notificationDropdown" style="display:none; position:absolute; right:0; top:calc(100% + 10px); width:340px; max-width:90vw; background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; box-shadow:0 12px 32px rgba(0,0,0,0.14); z-index:1100; overflow:hidden;">
+				<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #f1f5f9; background:#f8fafc;">
+					<strong style="font-size:13px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:6px;">
+						<i class="fa-regular fa-bell" style="color:#2563eb;"></i> Live Updates
+					</strong>
+					<button type="button" id="markAllReadBtn" style="background:none; border:none; color:#2563eb; font-size:11.5px; font-weight:600; cursor:pointer; padding:2px 6px; border-radius:4px;">Mark all as read</button>
+				</div>
+				<div id="notificationList" style="max-height:320px; overflow-y:auto; padding:6px 0;">
+					<!-- Dynamic notifications -->
+				</div>
+			</div>
+		</div>
 
 		<!-- PROFILE DROPDOWN -->
 		<div class="profile-wrapper">
@@ -956,16 +970,26 @@
 			});
 		}
 
-		// Sync Logged In User Profile
+		// Sync Logged In User Profile & Route Protection
 		try {
 			const savedUser = JSON.parse(localStorage.getItem("civicbuzz_user") || "null");
-			if (savedUser && savedUser.full_name) {
-				const initials = savedUser.full_name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+			if (!savedUser || !savedUser.email) {
+				// Redirect unauthenticated visitors to login
+				window.location.href = `${env.basePath}../index.html`;
+				return;
+			}
+			if (savedUser && (savedUser.full_name || savedUser.fullName)) {
+				const uName = savedUser.full_name || savedUser.fullName || "Civic Citizen";
+				const initials = uName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 				if (profileBtn) profileBtn.textContent = initials;
 				const avatarLarge = navbar.querySelector(".profile-avatar-large");
 				if (avatarLarge) avatarLarge.textContent = initials;
 				const nameEl = navbar.querySelector('[data-i18n="accountName"]');
-				if (nameEl) nameEl.textContent = savedUser.full_name;
+				if (nameEl) nameEl.textContent = uName;
+				const statusEl = navbar.querySelector('[data-i18n="accountStatus"]');
+				if (statusEl) {
+					statusEl.textContent = savedUser.role === "Super Admin" || savedUser.role === "Admin" ? "Administrator Account" : (savedUser.role === "Officer" ? "Officer Account" : "Verified Citizen");
+				}
 			}
 		} catch (_) {}
 
@@ -1013,14 +1037,105 @@
 			});
 		}
 
-		/* --- Notification Bell --- */
-		if (notificationBtn) {
+		/* --- Notification Bell & Real-time Citizen Dispatch --- */
+		const notificationDropdown = document.getElementById("notificationDropdown");
+		const notificationList = document.getElementById("notificationList");
+		const navNotificationDot = document.getElementById("navNotificationDot");
+		const navNotificationBadge = document.getElementById("navNotificationBadge");
+		const markAllReadBtn = document.getElementById("markAllReadBtn");
+
+		function updateNotificationUI() {
+			if (!window.NotificationStore) return;
+			const notifs = window.NotificationStore.getAll ? window.NotificationStore.getAll() : [];
+			const unread = window.NotificationStore.getUnreadCount ? window.NotificationStore.getUnreadCount() : notifs.filter(n => !n.read).length;
+
+			if (navNotificationBadge) {
+				if (unread > 0) {
+					navNotificationBadge.textContent = unread > 9 ? "9+" : String(unread);
+					navNotificationBadge.style.display = "block";
+				} else {
+					navNotificationBadge.style.display = "none";
+				}
+			}
+
+			if (navNotificationDot) {
+				navNotificationDot.style.display = unread > 0 ? "block" : "none";
+			}
+
+			if (notificationList) {
+				if (notifs.length === 0) {
+					notificationList.innerHTML = `
+						<div style="padding:24px 16px; text-align:center; color:#64748b; font-size:13px;">
+							<div style="font-size:24px; margin-bottom:6px;">🔕</div>
+							<p style="margin:0;">No notifications yet.</p>
+						</div>
+					`;
+				} else {
+					const trackBasePath = (window.location.pathname.includes("/Track_complaints_Frontend/") || window.location.pathname.includes("/Tenders/"))
+						? "../Track_complaints_Frontend/details.html"
+						: "Track_complaints_Frontend/details.html";
+
+					notificationList.innerHTML = notifs.slice(0, 10).map(n => {
+						const isUnread = !n.read;
+						const bgStyle = isUnread ? "background:#f0f7ff;" : "background:#ffffff;";
+						const iconEmoji = n.type === "RESOLVED" ? "✅" : (n.type === "ASSIGNED" ? "📌" : "ℹ️");
+						const timeAgo = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Just now";
+						const cid = n.complaint_id || "";
+						const link = cid ? `${trackBasePath}?id=${encodeURIComponent(cid)}` : "#";
+
+						return `
+							<div class="notification-item" style="padding:10px 14px; border-bottom:1px solid #f1f5f9; cursor:pointer; transition:background 0.2s; ${bgStyle}" onclick="if (window.NotificationStore?.markAsRead) window.NotificationStore.markAsRead('${n.id}'); if ('${cid}') window.location.href='${link}';">
+								<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:3px;">
+									<strong style="font-size:12.5px; color:#0f172a; display:flex; align-items:center; gap:5px;">
+										<span>${iconEmoji}</span> ${n.title}
+									</strong>
+									<small style="font-size:10.5px; color:#94a3b8;">${timeAgo}</small>
+								</div>
+								<p style="font-size:12px; color:#475569; margin:0 0 4px 0; line-height:1.35;">${n.message}</p>
+								${cid ? `<span style="display:inline-block; font-size:10.5px; color:#2563eb; font-weight:600;">View Grievance & QR →</span>` : ""}
+							</div>
+						`;
+					}).join("");
+				}
+			}
+		}
+
+		if (notificationBtn && notificationDropdown) {
 			notificationBtn.addEventListener("click", (e) => {
 				e.stopPropagation();
+				const isCurrentlyOpen = notificationDropdown.style.display === "block";
 				closeDropdowns();
-				showToast(translations.noNotifications[currentLang]);
+				if (!isCurrentlyOpen) {
+					notificationDropdown.style.display = "block";
+					notificationBtn.setAttribute("aria-expanded", "true");
+					updateNotificationUI();
+				}
+			});
+
+			markAllReadBtn?.addEventListener("click", (e) => {
+				e.stopPropagation();
+				if (window.NotificationStore?.markAllAsRead) {
+					window.NotificationStore.markAllAsRead();
+				}
+				updateNotificationUI();
 			});
 		}
+
+		// Listen for Real-time Dispatch from Municipal Admin
+		window.addEventListener("civicbuzz_notification_received", (e) => {
+			updateNotificationUI();
+			const notif = e.detail;
+			if (notif && notif.title) {
+				showToast(`🔔 ${notif.title}: ${notif.message}`);
+			}
+		});
+
+		window.addEventListener("civicbuzz_notifications_read", () => {
+			updateNotificationUI();
+		});
+
+		// Initial notification state load
+		updateNotificationUI();
 
 		/* --- Mobile Menu --- */
 		function closeMobileMenu() {

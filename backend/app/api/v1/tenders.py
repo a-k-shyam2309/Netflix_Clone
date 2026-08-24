@@ -66,6 +66,7 @@ async def list_tenders(
             closing_in_days=t.closing_in_days,
             submission_deadline=t.submission_deadline,
             contractor_name=t.contractor_name,
+            image_url=t.image_url,
             qr_code_url=t.qr_code_url,
             created_at=t.created_at.isoformat() if t.created_at else "",
         )
@@ -105,6 +106,7 @@ async def get_tender_detail(
         closing_in_days=t.closing_in_days,
         submission_deadline=t.submission_deadline,
         contractor_name=t.contractor_name,
+        image_url=t.image_url,
         qr_code_url=t.qr_code_url,
         created_at=t.created_at.isoformat() if t.created_at else "",
     )

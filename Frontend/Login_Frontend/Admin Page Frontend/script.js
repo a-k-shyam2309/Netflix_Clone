@@ -1324,7 +1324,77 @@ function setupIssueQueue() {
   categoryFilter?.addEventListener("change", filterIssues);
   dateFilter?.addEventListener("change", filterIssues);
 
-  function openIssueDetails(issueData) {
+    // Helper to render Resolution QR Code
+  function renderResolvedQrCode(issueId, status) {
+    const qrSection = $("#panelResolvedQrSection");
+    const qrImg = $("#panelQrImg");
+    const isResolved = String(status || "").toLowerCase().includes("resolv") || String(status || "").toLowerCase().includes("verif");
+
+    if (!qrSection || !qrImg) return;
+
+    if (isResolved && issueId) {
+      const cleanId = String(issueId).replace("#", "");
+      const hostUrl = window.location.origin + window.location.pathname.replace("Admin Page Frontend/index.html", "");
+      const verifyUrl = `${hostUrl}Client Page Frontend/Track_complaints_Frontend/details.html?id=${encodeURIComponent(cleanId)}`;
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(verifyUrl)}&color=059669&bgcolor=ffffff`;
+
+      qrImg.src = qrApiUrl;
+      qrSection.style.display = "block";
+
+      const copyBtn = $("#copyQrLinkBtn");
+      if (copyBtn) {
+        copyBtn.onclick = (e) => {
+          e.preventDefault();
+          if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(verifyUrl).then(() => {
+              showToast("✓ Verification link copied to clipboard!");
+            });
+          } else {
+            showToast(`Verification Link: ${verifyUrl}`);
+          }
+        };
+      }
+
+      const downloadBtn = $("#downloadQrBtn");
+      if (downloadBtn) {
+        downloadBtn.onclick = (e) => {
+          e.preventDefault();
+          const a = document.createElement("a");
+          a.href = qrApiUrl;
+          a.download = `CivicBuzz-Resolution-QR-${cleanId}.png`;
+          a.target = "_blank";
+          a.click();
+          showToast("📥 QR Code downloaded!");
+        };
+      }
+
+      const customUpload = $("#customQrUpload");
+      if (customUpload) {
+        customUpload.onchange = (e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              const customSrc = evt.target.result;
+              qrImg.src = customSrc;
+              if (window.ComplaintStore?.update) {
+                window.ComplaintStore.update(cleanId, {
+                  resolution_qr_url: customSrc,
+                  resolution_image_url: customSrc
+                });
+              }
+              showToast("✓ Custom Resolution QR / Proof photo uploaded!");
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+      }
+    } else {
+      qrSection.style.display = "none";
+    }
+  }
+
+function openIssueDetails(issueData) {
     if (!sidePanel || !panelOverlay) return;
 
     currentActiveIssueId = issueData.rawId || (issueData.id ? issueData.id.replace("#", "") : "ISS-1024");
@@ -1411,6 +1481,7 @@ function setupIssueQueue() {
       }
     }
 
+    renderResolvedQrCode(currentActiveIssueId, issueData.status || matchDoc?.status);
     sidePanel.classList.add("open");
     panelOverlay.classList.add("active");
     translatePage(currentLanguage());
@@ -1465,45 +1536,155 @@ function setupIssueQueue() {
     }
   });
 
-  $("#assignIssueBtn")?.addEventListener("click", async () => {
-    if (currentActiveIssueId && window.CivicBuzzAPI?.admin?.complaintAction) {
+    $("#assignIssueBtn")?.addEventListener("click", async () => {
+    if (!currentActiveIssueId) return;
+    const cleanId = currentActiveIssueId.replace("#", "");
+    const title = $("#panelTitle")?.textContent || "Reported Issue";
+    const dept = $("#panelAssigned")?.textContent || "Roads & Works Department";
+
+    // 1. Update Complaint Store
+    if (window.ComplaintStore?.update) {
+      window.ComplaintStore.update(cleanId, {
+        status: "IN_PROGRESS",
+        department_name: dept
+      });
+      window.ComplaintStore.addTimelineEvent(cleanId, {
+        action: "Assigned to Department",
+        notes: `Grievance assigned to ${dept} with 48h municipal resolution SLA.`,
+        actor: "Admin (Aditya Kumar Shyam)",
+        role: "Administrator",
+        status: "IN_PROGRESS"
+      });
+    }
+
+    // 2. Dispatch Real-time Notification to Citizen
+    if (window.NotificationStore?.add) {
+      window.NotificationStore.add({
+        complaint_id: cleanId,
+        title: `📌 Grievance #${cleanId} Assigned`,
+        message: `Your grievance "${title}" has been assigned to ${dept}. A field maintenance unit has been dispatched.`,
+        type: "ASSIGNED",
+        status: "IN_PROGRESS"
+      });
+    }
+
+    if (window.CivicBuzzAPI?.admin?.complaintAction) {
       try {
-        await window.CivicBuzzAPI.admin.complaintAction(currentActiveIssueId, "ASSIGN", "ROADS_AND_POTHOLES");
+        await window.CivicBuzzAPI.admin.complaintAction(cleanId, "ASSIGN", "ROADS_AND_POTHOLES");
       } catch (_) {}
     }
-    showToast("Assigned issue to recommended department.");
-    closeIssueDetails();
+
+    showToast(`✓ Issue #${cleanId} assigned to ${dept}! Immediate notification sent to citizen.`);
+    renderResolvedQrCode(cleanId, "IN_PROGRESS");
+    const pSt = $("#panelStatus");
+    if (pSt) {
+      pSt.className = "status-badge progress in-progress";
+      pSt.textContent = "In Progress";
+    }
     renderRealMetricsAndStats();
     updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
   $("#rejectIssueBtn")?.addEventListener("click", async () => {
-    if (currentActiveIssueId && window.CivicBuzzAPI?.admin?.complaintAction) {
+    if (!currentActiveIssueId) return;
+    const cleanId = currentActiveIssueId.replace("#", "");
+    const title = $("#panelTitle")?.textContent || "Reported Issue";
+
+    if (window.ComplaintStore?.update) {
+      window.ComplaintStore.update(cleanId, {
+        status: "REJECTED"
+      });
+      window.ComplaintStore.addTimelineEvent(cleanId, {
+        action: "Marked Rejected",
+        notes: "Grievance rejected or merged as duplicate during municipal review.",
+        actor: "Admin (Aditya Kumar Shyam)",
+        role: "Administrator",
+        status: "REJECTED"
+      });
+    }
+
+    if (window.NotificationStore?.add) {
+      window.NotificationStore.add({
+        complaint_id: cleanId,
+        title: `⚠️ Grievance #${cleanId} Update`,
+        message: `Your grievance "${title}" was reviewed and marked as Rejected/Duplicate.`,
+        type: "REJECTED",
+        status: "REJECTED"
+      });
+    }
+
+    if (window.CivicBuzzAPI?.admin?.complaintAction) {
       try {
-        await window.CivicBuzzAPI.admin.complaintAction(currentActiveIssueId, "REJECT");
+        await window.CivicBuzzAPI.admin.complaintAction(cleanId, "REJECT");
       } catch (_) {}
     }
-    showToast("Issue marked as rejected.");
-    closeIssueDetails();
+
+    showToast(`Issue #${cleanId} rejected. Notification dispatched.`);
+    renderResolvedQrCode(cleanId, "REJECTED");
+    const pSt = $("#panelStatus");
+    if (pSt) {
+      pSt.className = "status-badge rejected";
+      pSt.textContent = "Rejected";
+    }
+
     renderRealMetricsAndStats();
     updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
   });
 
   $("#resolveIssueBtn")?.addEventListener("click", async () => {
-    if (currentActiveIssueId && window.CivicBuzzAPI?.admin?.complaintAction) {
+    if (!currentActiveIssueId) return;
+    const cleanId = currentActiveIssueId.replace("#", "");
+    const title = $("#panelTitle")?.textContent || "Reported Issue";
+
+    // 1. Update Complaint Store
+    if (window.ComplaintStore?.update) {
+      window.ComplaintStore.update(cleanId, {
+        status: "RESOLVED",
+        resolved_at: new Date().toISOString(),
+        progress_percentage: 100
+      });
+      window.ComplaintStore.addTimelineEvent(cleanId, {
+        action: "Marked Resolved",
+        notes: "Remediation completed by municipal department. Citizen verification QR code generated.",
+        actor: "Admin (Aditya Kumar Shyam)",
+        role: "Administrator",
+        status: "RESOLVED"
+      });
+    }
+
+    // 2. Dispatch Real-time Notification to Citizen
+    if (window.NotificationStore?.add) {
+      window.NotificationStore.add({
+        complaint_id: cleanId,
+        title: `🎉 Grievance #${cleanId} Resolved!`,
+        message: `Municipal repairs for "${title}" are completed. Please scan the QR code to verify on-site.`,
+        type: "RESOLVED",
+        status: "RESOLVED"
+      });
+    }
+
+    if (window.CivicBuzzAPI?.admin?.complaintAction) {
       try {
-        await window.CivicBuzzAPI.admin.complaintAction(currentActiveIssueId, "RESOLVE");
+        await window.CivicBuzzAPI.admin.complaintAction(cleanId, "RESOLVE");
       } catch (_) {}
     }
-    showToast("Issue marked as resolved. Waiting for citizen verification.");
+
+    showToast(`✓ Issue #${cleanId} marked as Resolved! QR verification code generated & citizen notified.`);
+    renderResolvedQrCode(cleanId, "RESOLVED");
+
+    const pSt = $("#panelStatus");
+    if (pSt) {
+      pSt.className = "status-badge resolved";
+      pSt.textContent = "Resolved";
+    }
     const verRep = $("#verRep");
     if (verRep) {
       verRep.textContent = "Verified ✓";
       verRep.className = "ver-badge verified";
     }
-    closeIssueDetails();
+
     renderRealMetricsAndStats();
     updateTrendChart($("#trendRange")?.value || "week");
     loadLiveComplaints();
@@ -2934,26 +3115,26 @@ function setupProfileMenu() {
     return;
   }
 
-  // Populate dynamic logged-in user profile from localStorage
+  // Populate dynamic logged-in user profile from localStorage & Enforce Role Protection
   try {
     const savedUser = JSON.parse(localStorage.getItem("civicbuzz_user") || "null");
-    let name = "Aditya Kumar Shyam";
-    let roleText = "Super Administrator";
-    let email = "admin@civicbuzz.in";
-    let uid = "ADMIN-001";
-    let jurisdiction = "Bhubaneswar Central Ward";
-
-    if (savedUser) {
-      if (savedUser.full_name) {
-        name = savedUser.full_name;
-      } else if (savedUser.email && savedUser.email.includes("@")) {
-        name = savedUser.email.split("@")[0].replace(/[._-]/g, " ").split(" ").filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
-      }
-      if (savedUser.role) roleText = savedUser.role;
-      if (savedUser.email) email = savedUser.email;
-      if (savedUser.user_uid) uid = savedUser.user_uid;
-      if (savedUser.jurisdiction) jurisdiction = savedUser.jurisdiction;
+    if (!savedUser || !savedUser.email) {
+      window.location.href = "../index.html";
+      return;
     }
+
+    const normRole = String(savedUser.role || "Citizen").toLowerCase();
+    if (normRole === "citizen") {
+      alert("Access denied. Administrator or Officer credentials required.");
+      window.location.href = "../Client Page Frontend/index.html";
+      return;
+    }
+
+    let name = savedUser.full_name || savedUser.fullName || "Aditya Kumar Shyam";
+    let roleText = normRole.includes("admin") ? "Super Administrator" : "Department Officer";
+    let email = savedUser.email || "admin@civicbuzz.in";
+    let uid = savedUser.user_uid || "ADMIN-001";
+    let jurisdiction = savedUser.jurisdiction || "Bhubaneswar Central Ward";
 
     let initials = "AK";
     if (name) {
@@ -2991,6 +3172,34 @@ function setupProfileMenu() {
     
     const sideAvatar = $(".admin-mini .avatar-small");
     if (sideAvatar) sideAvatar.textContent = initials;
+
+    // Dynamic Time-of-Day Greeting and Admin Name
+    const hour = new Date().getHours();
+    let timeGreeting = "Good morning";
+    if (hour >= 12 && hour < 17) {
+      timeGreeting = "Good afternoon";
+    } else if (hour >= 17 || hour < 5) {
+      timeGreeting = "Good evening";
+    }
+
+    const greetingPrefix = $("#greetingPrefix");
+    if (greetingPrefix) greetingPrefix.textContent = timeGreeting;
+
+    const adminGreetingName = $("#adminGreetingName");
+    if (adminGreetingName) adminGreetingName.textContent = name;
+
+    const greetingHeading = $("#dashboardGreeting") || $("#section-dashboard .dashboard-heading h1");
+    if (greetingHeading && !greetingPrefix) {
+      greetingHeading.innerHTML = `<span>${timeGreeting}</span>, <span>${name}</span> <span>✦</span>`;
+    }
+
+    // Dynamic current date in dashboard eyebrow
+    const dateEyebrow = $("#dashboardDate") || $("#section-dashboard .dashboard-heading .eyebrow");
+    if (dateEyebrow) {
+      const now = new Date();
+      const options = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+      dateEyebrow.textContent = now.toLocaleDateString("en-GB", options).toUpperCase();
+    }
   } catch (_) {}
 
   const closeMenu = () => {

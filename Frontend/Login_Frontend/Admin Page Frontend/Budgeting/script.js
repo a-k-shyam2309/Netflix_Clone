@@ -17,9 +17,9 @@ function showToast(message) {
 
 function formatINR(val) {
   const num = Number(val) || 0;
-  if (num >= 10000000) return `₹${(num / 10000000).toFixed(2)} Cr`;
-  if (num >= 100000) return `₹${(num / 100000).toFixed(1)} L`;
-  return `₹${num.toLocaleString("en-IN")}`;
+  if (num >= 10000000) return "₹" + (num / 10000000).toFixed(2) + " Cr";
+  if (num >= 100000) return "₹" + (num / 100000).toFixed(1) + " L";
+  return "₹" + num.toLocaleString("en-IN");
 }
 
 // Load & Render Tenders
@@ -40,10 +40,10 @@ async function loadLiveTenders() {
   }
 
   // KPIs
-  const openCount = tenders.filter(t => (t.status || "").toUpperCase() === "PUBLISHED").length;
+  const openCount = tenders.filter(t => (t.status || "").toUpperCase() === "PUBLISHED" || (t.status || "").toUpperCase() === "OPEN").length;
   const draftCount = tenders.filter(t => (t.status || "").toUpperCase() === "DRAFT").length;
-  const inProgressCount = tenders.filter(t => (t.status || "").toUpperCase() === "IN_PROGRESS").length;
-  const totalAllocated = tenders.reduce((acc, t) => acc + (Number(t.estimated_budget) || 0), 0);
+  const inProgressCount = tenders.filter(t => (t.status || "").toUpperCase() === "IN_PROGRESS" || (t.status || "").toUpperCase() === "PROGRESS").length;
+  const totalAllocated = tenders.reduce((acc, t) => acc + (Number(t.estimated_budget || t.estimated_value) || 0), 0);
 
   const statOpn = document.getElementById("statOpenTenders");
   const statDrf = document.getElementById("statDraftTenders");
@@ -58,11 +58,16 @@ async function loadLiveTenders() {
   // Filter
   const filtered = tenders.filter(t => {
     const st = (t.status || "PUBLISHED").toUpperCase();
-    return activeFilter === "all" || st === activeFilter.toUpperCase();
+    if (activeFilter === "all") return true;
+    if (activeFilter === "published" || activeFilter === "open") return st === "PUBLISHED" || st === "OPEN";
+    if (activeFilter === "draft") return st === "DRAFT";
+    if (activeFilter === "progress" || activeFilter === "in_progress") return st === "IN_PROGRESS" || st === "PROGRESS";
+    if (activeFilter === "completed") return st === "COMPLETED";
+    return st === activeFilter.toUpperCase();
   });
 
   if (filtered.length === 0) {
-    tenderTrack.innerHTML = `<div style="padding:30px;text-align:center;color:var(--muted);width:100%;">No tenders found for this filter.</div>`;
+    tenderTrack.innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);width:100%;">No tenders found for this filter.</div>';
     return;
   }
 
@@ -70,32 +75,41 @@ async function loadLiveTenders() {
   filtered.forEach(t => {
     const rawSt = (t.status || "PUBLISHED").toUpperCase();
     const stClass = rawSt.toLowerCase();
-    const progress = Number(t.progress_percentage) || 10;
+    const progress = Number(t.progress_percentage || (t.stage_progress ? t.stage_progress * 15 : 25));
     const deadline = t.submission_deadline || t.target_completion_date || "24 Aug 2026";
+    const budgetVal = t.estimated_budget || t.estimated_value || 250000;
+    const cat = t.category || "roads";
+    const fallbackImg = window.TenderStore?.getCategoryFallback ? window.TenderStore.getCategoryFallback(cat) : "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80";
+    const imgUrl = t.imageUrl || t.image_url || fallbackImg;
 
     cardsHtml += `
-      <article class="tender-card" data-status="${stClass}">
-        <div class="card-topline"><span class="status ${stClass}">${rawSt.replace('_', ' ')}</span><span class="tender-id">${t.tender_id}</span></div>
-        <h3>${t.title}</h3>
-        <p class="card-description">${t.description || 'Civic infrastructure project generated from verified citizen clusters.'}</p>
-        <div class="card-meta"><span>📍 ${t.location || `Ward ${t.ward_id || 15}`}</span><span>✓ ${t.verified_locations_count || 6} verified complaints</span></div>
-        <div class="budget-row">
-          <div><span>Estimated budget</span><strong>${formatINR(t.estimated_budget)}</strong></div>
-          <div><span>Target deadline</span><strong>${deadline}</strong></div>
+      <article class="tender-card" data-status="${stClass}" style="overflow:hidden; padding:0; display:flex; flex-direction:column;">
+        <div style="width:100%; height:130px; overflow:hidden; position:relative; background:#1e293b; flex-shrink:0;">
+          <img src="${imgUrl}" alt="${t.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='${fallbackImg}'" />
+          <span style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); color:#fff; font-size:10px; font-weight:600; padding:2px 8px; border-radius:12px;">${cat}</span>
         </div>
-        <div class="mini-progress"><span style="width:${progress}%"></span></div>
-        <p class="progress-label">Work progress · ${progress}% · ${t.contractor_name || 'Bidding open'}</p>
-        <button class="outline-button view-tender" data-tender="${t.tender_id}">Manage Tender</button>
+        <div style="padding:16px; display:flex; flex-direction:column; flex:1;">
+          <div class="card-topline"><span class="status ${stClass}">${rawSt.replace("_", " ")}</span><span class="tender-id">${t.tender_id || t.id}</span></div>
+          <h3>${t.title}</h3>
+          <p class="card-description">${t.description || "Civic infrastructure project generated from verified citizen clusters."}</p>
+          <div class="card-meta"><span>📍 ${t.location || t.ward || ("Ward " + (t.ward_id || 15))}</span><span>✓ ${t.verified_locations_count || 6} verified complaints</span></div>
+          <div class="budget-row">
+            <div><span>Estimated budget</span><strong>${formatINR(budgetVal)}</strong></div>
+            <div><span>Target deadline</span><strong>${deadline}</strong></div>
+          </div>
+          <div class="mini-progress"><span style="width:${progress}%"></span></div>
+          <p class="progress-label">Work progress · ${progress}% · ${t.contractor_name || "Bidding open"}</p>
+          <button class="outline-button view-tender" data-tender="${t.tender_id || t.id}">Manage Tender</button>
+        </div>
       </article>
     `;
   });
 
   tenderTrack.innerHTML = cardsHtml;
 
-  // Attach button listeners
   document.querySelectorAll(".view-tender").forEach((button) => {
     button.addEventListener("click", () => {
-      showToast(`Managing tender ${button.dataset.tender}. Status synced with database.`);
+      showToast("Managing tender " + button.dataset.tender + ". Status synced with database.");
     });
   });
 }
