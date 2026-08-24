@@ -218,9 +218,15 @@
   async function loadComplaintsData() {
     let complaintsList = [];
 
-    // 1. Fetch from backend API if available
+    // 1. Fetch from backend API / Universal API Client
     try {
-      if (window.CivicBuzzAPI && window.CivicBuzzAPI.complaints) {
+      if (window.CivicBuzzAPI && window.CivicBuzzAPI.public) {
+        const res = await window.CivicBuzzAPI.public.listComplaints();
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          complaintsList = res.data;
+        }
+      }
+      if (complaintsList.length === 0 && window.CivicBuzzAPI && window.CivicBuzzAPI.complaints) {
         const res = await window.CivicBuzzAPI.complaints.getNearby(currentCity.center[0], currentCity.center[1], 20000);
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
           complaintsList = res.data;
@@ -230,16 +236,15 @@
       console.warn("API complaints fetch note:", err.message);
     }
 
-    // 2. If API was empty, use realistic pre-seeded Bhubaneswar complaints
-    if (complaintsList.length === 0) {
-      complaintsList = getFallbackComplaints();
+    // 2. If API was empty, use ComplaintStore if available
+    if (complaintsList.length === 0 && window.CivicBuzzAPI?.store) {
+      complaintsList = window.CivicBuzzAPI.store.getAll();
     }
 
     // 3. Merge locally registered complaints from localStorage (submitted by user)
     try {
-      const localStored = JSON.parse(localStorage.getItem("civicbuzz_registered_complaints") || "[]");
+      const localStored = JSON.parse(localStorage.getItem("civicbuzz_complaints") || localStorage.getItem("civicbuzz_registered_complaints") || "[]");
       if (Array.isArray(localStored) && localStored.length > 0) {
-        // Prepend user-registered issues without duplicate IDs
         const existingIds = new Set(complaintsList.map(c => c.complaint_id));
         localStored.forEach(item => {
           if (!existingIds.has(item.complaint_id)) {
@@ -250,6 +255,10 @@
       }
     } catch (err) {
       console.warn("Local storage parse note:", err);
+    }
+
+    if (complaintsList.length === 0) {
+      complaintsList = getFallbackComplaints();
     }
 
     // Normalize categories on all records
@@ -264,9 +273,13 @@
   /* Cross-tab and in-page live sync listener */
   function setupLiveStorageSync() {
     window.addEventListener("storage", (e) => {
-      if (e.key === "civicbuzz_registered_complaints") {
+      if (e.key === "civicbuzz_registered_complaints" || e.key === "civicbuzz_complaints" || e.key === "civicbuzz_complaints_tick") {
         loadComplaintsData();
       }
+    });
+
+    window.addEventListener("civicbuzz_data_updated", () => {
+      loadComplaintsData();
     });
 
     window.addEventListener("civicbuzz:complaint_created", (e) => {

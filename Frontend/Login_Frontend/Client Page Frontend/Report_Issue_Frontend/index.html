@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<!-- Leaflet CSS for interactive GIS mini map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <link rel="stylesheet" href="../style.css" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -96,11 +98,17 @@
         Geo-Pinpoint Location &amp; Ward
       </div>
       <div class="map-box" id="mapBox">
-        <div class="map-pin" id="mapPin"></div>
-        <div class="map-radar-ring"></div>
-        <div class="coords mono" id="coordDisplay">20.2961, 85.8245 (Ward 12 · Janpath)</div>
+        <div id="miniMap" class="mini-map-container"></div>
+        <div class="map-interactive-hint">
+          <i class="fa-solid fa-location-crosshairs"></i> Drag pin or click map to relocate
+        </div>
+        <div class="coords mono" id="coordDisplay">
+          <i class="fa-solid fa-location-dot" style="color:var(--rose);"></i>
+          <span id="coordLatLng">20.2961, 85.8245</span>
+          <span class="ward-pill" id="coordWardText">Ward 12 · Janpath</span>
+        </div>
         <button type="button" class="gps-refresh-btn" id="refreshGpsBtn" title="Detect Current GPS">
-          <i class="fa-solid fa-crosshairs"></i> Current GPS
+          <i class="fa-solid fa-crosshairs"></i> <span id="gpsBtnText">Current GPS</span>
         </button>
       </div>
     </div>
@@ -344,6 +352,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="../../api-config.js"></script>
 <script>
   if (typeof window.CivicBuzzAPI === "undefined") {

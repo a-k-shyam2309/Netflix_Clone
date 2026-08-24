@@ -185,7 +185,12 @@
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="../../../api-config.js"></script>
+<script src="../../api-config.js"></script>
+<script>
+  if (typeof window.CivicBuzzAPI === "undefined") {
+    document.write('<script src="../../../api-config.js"><\/script>');
+  }
+</script>
 <script src="script.js"></script>
 </body>
 </html>

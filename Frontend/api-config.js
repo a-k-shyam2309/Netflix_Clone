@@ -16,135 +16,295 @@ window.API_CONFIG = API_CONFIG;
 
 const SEED_COMPLAINTS = [
   {
-    complaint_id: "CB-12480",
-    title: "Damaged Road & Potholes near Metro Station",
-    description: "Deep potholes causing severe traffic jams and water stagnation on Janpath Road near Metro Station.",
+    complaint_id: "CB-BHUB-1042",
+    title: "Deep crater-sized pothole near KIIT Square",
+    description: "Large pothole causing vehicle damage and traffic hazards near KIIT Campus 6 road.",
+    category: "roads_potholes",
+    sub_category: "potholes",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 94 },
+    urgency_score: 94,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 48,
+    upvotes: 42,
+    image_url: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
+    latitude: 20.3533,
+    longitude: 85.8189,
+    ward: "Ward 1 (Patia & KIIT)",
+    location: { ward_name: "Ward 1 (Patia & KIIT)", address: "KIIT Square, Patia Main Road, Bhubaneswar", latitude: 20.3533, longitude: 85.8189 },
+    location_point: { type: "Point", coordinates: [85.8189, 20.3533] },
+    department_name: "Roads & Works Department",
+    department_code: "ROADS_AND_POTHOLES",
+    user_uid: "CIT-2041",
+    timeline: [
+      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 3 * 86400000).toISOString(), notes: "Grievance registered with GPS coordinates." },
+      { step: "AI Triage & Urgency Ranked", status: "ASSIGNED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Severity ranked CRITICAL (94/100). Auto-routed to Roads & Works." },
+      { step: "Crew Dispatched", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "BMC Road maintenance squad on site for asphalt patching." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1043",
+    title: "Blocked stormwater drain causing waterlogging in Patia",
+    description: "Debris and plastic waste blocking primary stormwater culvert, causing road flooding during rain.",
+    category: "drainage",
+    sub_category: "blocked_drain",
+    severity: "HIGH",
+    priority_level: "HIGH",
+    priority: { level: "HIGH", score: 82 },
+    urgency_score: 82,
+    status: "SUBMITTED",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 18,
+    image_url: null,
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.3548,
+    longitude: 85.8184,
+    ward: "Ward 2 (Patia Corridor)",
+    location: { ward_name: "Ward 2 (Patia Corridor)", address: "Near Infocity Square, Patia Corridor", latitude: 20.3548, longitude: 85.8184 },
+    location_point: { type: "Point", coordinates: [85.8184, 20.3548] },
+    department_name: "Water & Drainage Department",
+    department_code: "WATER_AND_DRAINAGE",
+    user_uid: "CIT-1892",
+    timeline: [
+      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Grievance received. Awaiting department triage." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1044",
+    title: "Broken high-mast streetlight pole in Saheed Nagar",
+    description: "Streetlight fixture completely non-functional for 4 consecutive nights, creating dark danger zone.",
+    category: "streetlights",
+    sub_category: "broken_light",
+    severity: "HIGH",
+    priority_level: "HIGH",
+    priority: { level: "HIGH", score: 80 },
+    urgency_score: 80,
+    status: "RESOLVED",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 29,
+    image_url: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
+    resolved_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.2905,
+    longitude: 85.8450,
+    ward: "Ward 7 (Saheed Nagar)",
+    location: { ward_name: "Ward 7 (Saheed Nagar)", address: "Saheed Nagar Main Market, Ward 7", latitude: 20.2905, longitude: 85.8450 },
+    location_point: { type: "Point", coordinates: [85.8450, 20.2905] },
+    department_name: "Street Lighting & Electricity",
+    department_code: "STREET_LIGHTS_AND_ELECTRICITY",
+    user_uid: "CIT-3301",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 4 * 86400000).toISOString(), notes: "Reported dark streetlight." },
+      { step: "Repaired & New LED installed", status: "READY_FOR_CITIZEN_VERIFICATION", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Bulb replaced by Electrical maintenance crew." },
+      { step: "Citizen Confirmed & Resolved", status: "RESOLVED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Resolution confirmed by citizen verification." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1045",
+    title: "Overflowing garbage accumulation near Market Building",
+    description: "Solid waste overflowing on pedestrian walkways with severe foul odor and stray animals.",
+    category: "garbage_sanitation",
+    sub_category: "garbage_dump",
+    severity: "HIGH",
+    priority_level: "HIGH",
+    priority: { level: "HIGH", score: 78 },
+    urgency_score: 78,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 35,
+    image_url: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.2741,
+    longitude: 85.8362,
+    ward: "Ward 8 (Market Corridor)",
+    location: { ward_name: "Ward 8 (Market Corridor)", address: "Market Building Corridor, Ward 8", latitude: 20.2741, longitude: 85.8362 },
+    location_point: { type: "Point", coordinates: [85.8362, 20.2741] },
+    department_name: "Garbage & Sanitation Department",
+    department_code: "GARBAGE_AND_SANITATION",
+    user_uid: "CIT-4412",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Grievance filed with photo evidence." },
+      { step: "Waste Clearance Team Dispatched", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Compactor truck assigned for disposal." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1046",
+    title: "Drinking water pipeline leak near Chandrasekharpur",
+    description: "Main drinking water pipeline cracked, flooding street and reducing water pressure to households.",
+    category: "water_supply",
+    sub_category: "pipe_leak",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 92 },
+    urgency_score: 92,
+    status: "ASSIGNED",
+    is_overdue: false,
+    sla_hours: 12,
+    upvotes: 53,
+    image_url: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.3241,
+    longitude: 85.8152,
+    ward: "Ward 1 (Chandrasekharpur)",
+    location: { ward_name: "Ward 1 (Chandrasekharpur)", address: "Damana Square, Chandrasekharpur, Ward 1", latitude: 20.3241, longitude: 85.8152 },
+    location_point: { type: "Point", coordinates: [85.8152, 20.3241] },
+    department_name: "Water & Drainage Department",
+    department_code: "WATER_AND_DRAINAGE",
+    user_uid: "CIT-1120",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Emergency water leak logged." },
+      { step: "Assigned to WATCO Hydro Division", status: "ASSIGNED", timestamp: new Date(Date.now() - 12 * 3600000).toISOString(), notes: "Priority ticket dispatched to field engineers." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1047",
+    title: "Damaged pedestrian footpath near Khandagiri Caves",
+    description: "Broken paving slabs and exposed concrete rebar on tourist pedestrian walkway.",
+    category: "roads_potholes",
+    sub_category: "damaged_sidewalk",
+    severity: "MEDIUM",
+    priority_level: "MEDIUM",
+    priority: { level: "MEDIUM", score: 62 },
+    urgency_score: 62,
+    status: "SUBMITTED",
+    is_overdue: false,
+    sla_hours: 72,
+    upvotes: 14,
+    image_url: null,
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.2584,
+    longitude: 85.7865,
+    ward: "Ward 13 (Khandagiri)",
+    location: { ward_name: "Ward 13 (Khandagiri)", address: "Khandagiri Caves Entrance, Jagamara Road, Ward 13", latitude: 20.2584, longitude: 85.7865 },
+    location_point: { type: "Point", coordinates: [85.7865, 20.2584] },
+    department_name: "Roads & Works Department",
+    department_code: "ROADS_AND_POTHOLES",
+    user_uid: "CIT-9081",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Reported by citizen." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1048",
+    title: "Overflowing sewer drain in Old Town",
+    description: "Sewage discharge leaking from open drain near heritage temple corridor.",
+    category: "drainage",
+    sub_category: "sewage_leak",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 91 },
+    urgency_score: 91,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 18,
+    upvotes: 61,
+    image_url: null,
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.2412,
+    longitude: 85.8341,
+    ward: "Ward 11 (Old Town Heritage)",
+    location: { ward_name: "Ward 11 (Old Town Heritage)", address: "Bindu Sagar Road, Old Town, Ward 11", latitude: 20.2412, longitude: 85.8341 },
+    location_point: { type: "Point", coordinates: [85.8341, 20.2412] },
+    department_name: "Water & Drainage Department",
+    department_code: "WATER_AND_DRAINAGE",
+    user_uid: "CIT-2041",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Urgent sanitation defect logged." },
+      { step: "Suction Tanker Dispatched", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "BMC Drainage squad addressing blockage." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1049",
+    title: "Broken park swing and damaged bench in BDA Community Park",
+    description: "Children playground swing chains broken and metal bench detached from concrete base.",
+    category: "parks",
+    sub_category: "broken_equipment",
+    severity: "LOW",
+    priority_level: "LOW",
+    priority: { level: "LOW", score: 45 },
+    urgency_score: 45,
+    status: "RESOLVED",
+    is_overdue: false,
+    sla_hours: 72,
+    upvotes: 8,
+    image_url: null,
+    created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
+    resolved_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.3155,
+    longitude: 85.8521,
+    ward: "Ward 5 (Mancheswar)",
+    location: { ward_name: "Ward 5 (Mancheswar)", address: "BDA Community Park, Mancheswar, Ward 5", latitude: 20.3155, longitude: 85.8521 },
+    location_point: { type: "Point", coordinates: [85.8521, 20.3155] },
+    department_name: "Parks & Public Spaces",
+    department_code: "PARKS_AND_PUBLIC_SPACES",
+    user_uid: "CIT-1892",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 5 * 86400000).toISOString(), notes: "Reported by citizen." },
+      { step: "Equipment welded and repainted", status: "RESOLVED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Repaired and verified safe." }
+    ]
+  },
+  {
+    complaint_id: "CB-BHUB-1050",
+    title: "Severe road asphalt damage near Rasulgarh Overbridge",
+    description: "Heavy vehicle traffic caused multiple deep asphalt fissures and loose gravel on service road.",
     category: "roads_potholes",
     sub_category: "potholes",
     severity: "HIGH",
     priority_level: "HIGH",
-    priority: { level: "HIGH", score: 85 },
-    status: "RESOLVED",
+    priority: { level: "HIGH", score: 76 },
+    urgency_score: 76,
+    status: "ASSIGNED",
     is_overdue: false,
-    image_url: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
-    created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
-    resolved_at: new Date(Date.now() - 1 * 86400000).toISOString(),
-    location: { ward_name: "Ward 12", address: "Near Metro Station, Janpath Road", latitude: 20.2961, longitude: 85.8245 },
-    department_name: "Roads & Potholes Department",
-    department_code: "ROADS_AND_POTHOLES",
-    user_uid: "CIT-2041",
-    timeline: [
-      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 4 * 86400000).toISOString(), notes: "Issue logged with geotag." },
-      { step: "Assigned to Department", status: "ASSIGNED", timestamp: new Date(Date.now() - 3 * 86400000).toISOString(), notes: "Dispatched to Road Maintenance Crew." },
-      { step: "Work Completed & Resolved", status: "RESOLVED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Patchwork asphalt completed." }
-    ]
-  },
-  {
-    complaint_id: "CB-12481",
-    title: "Broken Streetlight & Dark Stretch",
-    description: "Street lights not functioning on 16th Main Road causing safety hazard for pedestrians at night.",
-    category: "streetlights",
-    sub_category: "non_functional",
-    severity: "CRITICAL",
-    priority_level: "CRITICAL",
-    priority: { level: "CRITICAL", score: 92 },
-    status: "PENDING",
-    is_overdue: true,
-    image_url: null,
-    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
-    location: { ward_name: "Ward 08", address: "16th Main Road, Sector 4", latitude: 20.2980, longitude: 85.8210 },
-    department_name: "Street Lights Department",
-    department_code: "STREET_LIGHTS",
-    user_uid: "CIT-1892",
-    timeline: [
-      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 3 * 86400000).toISOString(), notes: "Grievance received." }
-    ]
-  },
-  {
-    complaint_id: "CB-12482",
-    title: "Overflowing Garbage Dump near Community Park",
-    description: "Garbage bin overflowing for over 3 days, foul smell and health hazard near Sector 15 Park.",
-    category: "garbage_sanitation",
-    sub_category: "overflowing_dump",
-    severity: "HIGH",
-    priority_level: "HIGH",
-    priority: { level: "HIGH", score: 88 },
-    status: "REJECTED",
-    is_overdue: false,
+    sla_hours: 48,
+    upvotes: 22,
     image_url: null,
     created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-    location: { ward_name: "Ward 15", address: "Sector 15, Nehru Park", latitude: 20.2910, longitude: 85.8310 },
-    department_name: "Garbage & Sanitation Department",
-    department_code: "GARBAGE_SANITATION",
+    latitude: 20.2912,
+    longitude: 85.8641,
+    ward: "Ward 6 (Rasulgarh)",
+    location: { ward_name: "Ward 6 (Rasulgarh)", address: "Rasulgarh Square Service Lane, Ward 6", latitude: 20.2912, longitude: 85.8641 },
+    location_point: { type: "Point", coordinates: [85.8641, 20.2912] },
+    department_name: "Roads & Works Department",
+    department_code: "ROADS_AND_POTHOLES",
     user_uid: "CIT-3301",
     timeline: [
-      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Waste overflow reported." },
-      { step: "Rejected by Administrator", status: "REJECTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Duplicate grievance reported for same park zone." }
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Logged with photo evidence." },
+      { step: "Assigned to Ward 6 Road Cell", status: "ASSIGNED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Scheduled for road roller resurfacing." }
     ]
   },
   {
-    complaint_id: "CB-12483",
-    title: "Main Water Pipeline Leakage",
-    description: "Drinking water pipeline ruptured with high volume water wastage flooding the street.",
-    category: "water_supply",
-    sub_category: "pipe_burst",
-    severity: "HIGH",
-    priority_level: "HIGH",
-    priority: { level: "HIGH", score: 81 },
-    status: "RESOLVED",
-    is_overdue: false,
-    image_url: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80",
-    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-    resolved_at: new Date(Date.now() - 6 * 3600000).toISOString(),
-    location: { ward_name: "Ward 04", address: "Block A, Green View Apartments", latitude: 20.3010, longitude: 85.8150 },
-    department_name: "Water Supply & Sewerage",
-    department_code: "WATER_SUPPLY",
-    user_uid: "CIT-4412",
-    timeline: [
-      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Leakage logged." },
-      { step: "Pipeline Replaced & Verified", status: "RESOLVED", timestamp: new Date(Date.now() - 6 * 3600000).toISOString(), notes: "Valve repaired." }
-    ]
-  },
-  {
-    complaint_id: "CB-12484",
-    title: "Clogged Stormwater Drain Overflowing",
-    description: "Stormwater drain blocked by debris leading to localized waterlogging after recent rain.",
+    complaint_id: "CB-BHUB-1051",
+    title: "Severe monsoon waterlogging near Jayadev Vihar Junction",
+    description: "Water accumulation over 1.5 feet deep halting vehicle traffic near Jayadev Vihar flyover.",
     category: "drainage",
-    sub_category: "blocked_drain",
-    severity: "MEDIUM",
-    priority_level: "MEDIUM",
-    priority: { level: "MEDIUM", score: 65 },
-    status: "PENDING",
-    is_overdue: false,
-    image_url: null,
-    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
-    location: { ward_name: "Ward 09", address: "5th Cross Road, BTM Layout", latitude: 20.2850, longitude: 85.8400 },
-    department_name: "Drainage & Sewerage",
-    department_code: "DRAINAGE",
-    user_uid: "CIT-1120",
-    timeline: [
-      { step: "Reported by Citizen", status: "PENDING", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Grievance received." }
-    ]
-  },
-  {
-    complaint_id: "CB-12485",
-    title: "Open Manhole on Pedestrian Sidewalk",
-    description: "Uncovered manhole on main pedestrian walkway posing extreme danger to children and citizens.",
-    category: "drainage",
-    sub_category: "open_manhole",
+    sub_category: "waterlogging",
     severity: "CRITICAL",
     priority_level: "CRITICAL",
     priority: { level: "CRITICAL", score: 96 },
+    urgency_score: 96,
     status: "IN_PROGRESS",
-    is_overdue: true,
-    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-    location: { ward_name: "Ward 12", address: "Near City Central Mall, MG Road", latitude: 20.2940, longitude: 85.8260 },
-    department_name: "Drainage & Sewerage",
-    department_code: "DRAINAGE",
-    user_uid: "CIT-9081",
+    is_overdue: false,
+    sla_hours: 12,
+    upvotes: 74,
+    image_url: null,
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.3012,
+    longitude: 85.8234,
+    ward: "Ward 4 (Jayadev Vihar)",
+    location: { ward_name: "Ward 4 (Jayadev Vihar)", address: "Jayadev Vihar Overbridge, Ward 4", latitude: 20.3012, longitude: 85.8234 },
+    location_point: { type: "Point", coordinates: [85.8234, 20.3012] },
+    department_name: "Water & Drainage Department",
+    department_code: "WATER_AND_DRAINAGE",
+    user_uid: "CIT-4412",
     timeline: [
-      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Critical emergency flagged." },
-      { step: "Barricaded & Repair in progress", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Safety barricade installed." }
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Emergency traffic waterlogging reported." },
+      { step: "Mobile Dewatering Pump Deployed", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 8 * 3600000).toISOString(), notes: "Emergency pumping in progress." }
     ]
   }
 ];
@@ -157,13 +317,7 @@ const ComplaintStore = {
       const existing = localStorage.getItem("civicbuzz_complaints");
       if (!existing || JSON.parse(existing).length === 0) {
         localStorage.setItem("civicbuzz_complaints", JSON.stringify(SEED_COMPLAINTS));
-      } else {
-        const parsed = JSON.parse(existing);
-        const cb82 = parsed.find(c => c.complaint_id === "CB-12482");
-        if (cb82 && cb82.status !== "REJECTED") {
-          cb82.status = "REJECTED";
-          localStorage.setItem("civicbuzz_complaints", JSON.stringify(parsed));
-        }
+        localStorage.setItem("civicbuzz_registered_complaints", JSON.stringify(SEED_COMPLAINTS));
       }
     } catch (_) {
       // Storage fallback
@@ -192,6 +346,7 @@ const ComplaintStore = {
   saveAll(list) {
     try {
       localStorage.setItem("civicbuzz_complaints", JSON.stringify(list));
+      localStorage.setItem("civicbuzz_registered_complaints", JSON.stringify(list));
       localStorage.setItem("civicbuzz_complaints_tick", String(Date.now()));
     } catch (_) {}
 
@@ -206,52 +361,75 @@ const ComplaintStore = {
 
   add(complaintData) {
     const list = this.getAll();
-    const id = complaintData.complaint_id || `CB-${Math.floor(10000 + Math.random() * 90000)}`;
+    const id = complaintData.complaint_id || `CB-BHUB-${Math.floor(1000 + Math.random() * 9000)}`;
     const now = new Date().toISOString();
 
     const categoryNames = {
-      roads_potholes: "Roads & Potholes Department",
-      road: "Roads & Potholes Department",
-      streetlights: "Street Lights Department",
-      electricity: "Street Lights Department",
-      water_supply: "Water Supply & Sewerage",
-      water: "Water Supply & Sewerage",
+      roads_potholes: "Roads & Works Department",
+      road: "Roads & Works Department",
+      streetlights: "Street Lighting & Electricity",
+      electricity: "Street Lighting & Electricity",
+      water_supply: "Water & Drainage Department",
+      water: "Water & Drainage Department",
       garbage_sanitation: "Garbage & Sanitation Department",
       garbage: "Garbage & Sanitation Department",
-      drainage: "Drainage & Sewerage",
+      drainage: "Water & Drainage Department",
+      parks: "Parks & Public Spaces",
+      infrastructure: "Roads & Works Department"
     };
 
-    const cleanCategory = (complaintData.category || "roads_potholes").toLowerCase().replace(/[^a-z_]/g, "");
-    const deptName = categoryNames[cleanCategory] || "Municipal Administration";
+    const rawCat = (complaintData.category || "roads_potholes").toLowerCase().replace(/[^a-z_]/g, "");
+    const cleanCategory = rawCat || "roads_potholes";
+    const deptName = complaintData.department_name || categoryNames[cleanCategory] || "Municipal Administration";
+
+    const urgencyScore = complaintData.urgency_score || (complaintData.severity === "CRITICAL" ? 94 : complaintData.severity === "HIGH" ? 82 : 65);
+    const wardName = complaintData.ward || complaintData.location?.ward_name || "Ward 1 (Patia & KIIT)";
+    const address = complaintData.address || complaintData.location?.address || `${wardName}, Bhubaneswar`;
+    const lat = Number(complaintData.latitude || complaintData.location?.latitude || 20.3533);
+    const lng = Number(complaintData.longitude || complaintData.location?.longitude || 85.8189);
 
     const newDoc = {
       complaint_id: id,
       title: complaintData.title || (complaintData.description ? complaintData.description.slice(0, 50) + (complaintData.description.length > 50 ? "…" : "") : "Citizen Reported Grievance"),
       description: complaintData.description || "",
+      ai_summary: complaintData.ai_summary || complaintData.description || "",
       category: cleanCategory,
-      sub_category: complaintData.sub_category || "general",
+      sub_category: complaintData.sub_category || "pothole",
       severity: complaintData.severity || "HIGH",
-      priority_level: complaintData.priority_level || "HIGH",
-      priority: { level: complaintData.priority_level || "HIGH", score: 85 },
+      priority_level: complaintData.priority_level || (urgencyScore >= 90 ? "CRITICAL" : urgencyScore >= 75 ? "HIGH" : "MEDIUM"),
+      priority: { level: complaintData.priority_level || (urgencyScore >= 90 ? "CRITICAL" : urgencyScore >= 75 ? "HIGH" : "MEDIUM"), score: urgencyScore },
+      urgency_score: urgencyScore,
+      sla_hours: complaintData.sla_hours || 48,
+      is_pb_candidate: complaintData.is_pb_candidate || false,
+      language: complaintData.language || "en",
+      is_anonymous: complaintData.is_anonymous !== undefined ? complaintData.is_anonymous : true,
+      upvotes: 1,
       status: complaintData.status || "SUBMITTED",
       is_overdue: false,
       image_url: complaintData.image_url || complaintData.media_url || null,
       created_at: complaintData.created_at || now,
+      latitude: lat,
+      longitude: lng,
+      ward: wardName,
       location: {
-        ward_name: complaintData.ward || "Ward 12",
-        address: complaintData.address || "Janpath Road, Bhubaneswar",
-        latitude: complaintData.latitude || 20.2961,
-        longitude: complaintData.longitude || 85.8245
+        ward_name: wardName,
+        address: address,
+        latitude: lat,
+        longitude: lng
+      },
+      location_point: {
+        type: "Point",
+        coordinates: [lng, lat]
       },
       department_name: deptName,
       department_code: cleanCategory.toUpperCase(),
       user_uid: complaintData.user_uid || "CIT-1001",
       timeline: [
         {
-          step: "Reported by Citizen",
+          step: "Reported & AI Triaged",
           status: "SUBMITTED",
           timestamp: now,
-          notes: "Issue reported via citizen portal and automatically routed to AI triage."
+          notes: `Grievance registered. AI Urgency Score: ${urgencyScore}/100. Target SLA: ${complaintData.sla_hours || 48}h.`
         }
       ]
     };
@@ -259,6 +437,25 @@ const ComplaintStore = {
     list.unshift(newDoc);
     this.saveAll(list);
     return newDoc;
+  },
+
+  upvote(complaintId) {
+    const list = this.getAll();
+    const item = list.find((c) => c.complaint_id === complaintId || c.complaint_id === `#${complaintId}` || c.complaint_id?.replace("#", "") === complaintId?.replace("#", ""));
+    if (!item) return null;
+
+    item.upvotes = (item.upvotes || 1) + 1;
+    item.urgency_score = Math.min(100, (item.urgency_score || 80) + 3);
+    if (!item.timeline) item.timeline = [];
+    item.timeline.push({
+      step: `Community Upvote & Merge (+1)`,
+      status: item.status,
+      timestamp: new Date().toISOString(),
+      notes: `Citizen merged duplicate report and elevated urgency to ${item.urgency_score}/100.`
+    });
+
+    this.saveAll(list);
+    return item;
   },
 
   updateStatus(complaintId, newStatus, notes = "") {
@@ -1300,15 +1497,33 @@ const CivicBuzzSimulation = {
       const newId = "CB-BHUB-" + Math.floor(1000 + Math.random() * 9000);
       return {
         success: true,
-        message: "Complaint reported successfully",
-        data: {
-          complaint_id: newId,
-          status: "REPORTED",
-          priority: "HIGH",
-          responsible_department: "BMC Civic Redressal Cell",
-          created_at: new Date().toISOString(),
-          ...body,
-        },
+    // 4. Complaints & Grievance Simulation (Single Unified Store)
+    if (endpoint.startsWith("/complaints/nearby") || endpoint === "/public/complaints" || endpoint === "/complaints" || endpoint === "/complaints/my/list") {
+      const all = ComplaintStore.getAll();
+      return {
+        success: true,
+        message: "Fetched live civic complaints for Bhubaneswar",
+        data: all,
+      };
+    }
+
+    if (endpoint.startsWith("/complaints/") && endpoint.includes("/upvote")) {
+      const parts = endpoint.split("/");
+      const cid = parts[2];
+      const updated = ComplaintStore.upvote(cid);
+      return {
+        success: true,
+        message: `Upvoted #${cid}`,
+        data: updated,
+      };
+    }
+
+    if (endpoint.startsWith("/complaints") && method === "POST") {
+      const saved = ComplaintStore.add(body || {});
+      return {
+        success: true,
+        message: "Complaint reported and registered successfully",
+        data: saved,
       };
     }
 
@@ -1341,14 +1556,14 @@ const CivicBuzzSimulation = {
       return {
         success: true,
         data: {
-          latitude: 20.2961,
-          longitude: 85.8245,
-          address: "Bhubaneswar, Odisha, India",
+          latitude: 20.3533,
+          longitude: 85.8189,
+          address: "KIIT Square, Patia Main Road, Bhubaneswar",
           city: "Bhubaneswar",
           municipality: "Bhubaneswar Municipal Corporation (BMC)",
-          ward_id: 3,
-          ward_name: "Ward 3 (Jayadev Vihar)",
-          responsible_department: "BMC Civic Redressal",
+          ward_id: 1,
+          ward_name: "Ward 1 (Patia & KIIT Area)",
+          responsible_department: "Roads & Works Department",
           location_confidence: "high"
         }
       };
@@ -1374,32 +1589,38 @@ const CivicBuzzSimulation = {
 
     // 8. Public Stats & Transparency
     if (endpoint === "/public/stats") {
+      const all = ComplaintStore.getAll();
+      const resolved = all.filter(c => c.status === "RESOLVED").length;
+      const active = all.filter(c => c.status !== "RESOLVED" && c.status !== "REJECTED").length;
+      const overdue = all.filter(c => c.is_overdue || c.priority_level === "CRITICAL" || c.priority?.level === "CRITICAL").length;
       return {
         success: true,
         data: {
-          active_reports: 24,
-          total_resolved: 189,
+          total_reported: all.length,
+          total_resolved: resolved,
+          active_reports: active,
+          overdue_reports: overdue,
           active_citizens: 4210,
-          resolution_rate: "91%",
+          resolution_rate: `${Math.round((resolved / (all.length || 1)) * 100)}%`,
         },
       };
     }
 
-    if (endpoint === "/public/complaints") {
+    if (endpoint === "/public/clusters") {
+      const all = ComplaintStore.getAll();
       return {
         success: true,
-        data: [
-          {
-            complaint_id: "CB-BHUB-1042",
-            title: "Deep crater-sized pothole near KIIT Square",
-            category: "Road & Pothole",
-            status: "IN_PROGRESS",
-            responsible_department: "BMC Works & Road Division",
-            approximate_location: "KIIT Square, Patia Main Road",
-            ward: "Ward 1 (Patia)",
-            created_at: new Date().toISOString(),
-          },
-        ],
+        data: all.slice(0, 10).map(c => ({
+          cluster_id: `IC-${c.complaint_id}`,
+          primary_complaint_id: c.complaint_id,
+          problem: c.title,
+          category: c.category,
+          ward: c.ward || c.location?.ward_name,
+          reports_count: c.upvotes || 1,
+          priority: c.priority_level || c.priority?.level || "HIGH",
+          department: c.department_name,
+          status: c.status
+        }))
       };
     }
 
@@ -1560,6 +1781,15 @@ const CivicBuzzAPI = {
         if (res && res.data) return res;
       } catch (_) {}
       return { data: localDoc, message: "Complaint created successfully." };
+    },
+    async upvote(complaintId) {
+      const updated = ComplaintStore.upvote(complaintId);
+      try {
+        await CivicBuzzAPI.request(`/complaints/${complaintId}/upvote`, {
+          method: "POST",
+        });
+      } catch (_) {}
+      return { data: updated, message: "Upvote recorded." };
     },
     async getMyComplaints() {
       try {

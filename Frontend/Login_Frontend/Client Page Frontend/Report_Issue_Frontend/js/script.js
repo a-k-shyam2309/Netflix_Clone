@@ -12,13 +12,18 @@
     pothole_en: {
       text: 'Deep 2-foot asphalt pothole on Janpath Road near Ram Mandir square causing severe vehicle damage and traffic hazards.',
       lang: 'en',
+      lat: 20.2961,
+      lng: 85.8245,
+      ward: 'Ward 12',
+      ward_label: 'Ward 12 · Janpath',
+      address: 'Janpath Road, Ram Mandir Square, Bhubaneswar',
       category: 'road',
       sub_category: 'pothole',
       severity: 'CRITICAL',
       urgency: 88,
       sla: '48-Hour Resolution Window',
       dept: 'Roads & Potholes Dept.',
-      ward: 'Ward 12 Infrastructure Cell',
+      ward_cell: 'Ward 12 Infrastructure Cell',
       elements: ['Road Cavity (~1.5m)', 'Asphalt Degradation', 'Two-Wheeler Hazard'],
       auth: '96% Real Civic Defect',
       conf: 96,
@@ -35,13 +40,18 @@
     regional_hi: {
       text: 'जनपथ रोड पर राम मंदिर के पास एक बड़ा 2 फीट गहरा गड्ढा है जिससे गाड़ियाँ टकरा रही हैं और बड़ा हादसा होने का खतरा है।',
       lang: 'hi',
+      lat: 20.2961,
+      lng: 85.8245,
+      ward: 'Ward 12',
+      ward_label: 'Ward 12 · Janpath',
+      address: 'Janpath Road, Ram Mandir Square, Bhubaneswar',
       category: 'road',
       sub_category: 'pothole',
       severity: 'CRITICAL',
       urgency: 92,
       sla: '24-Hour Urgent Safety SLA',
       dept: 'Roads & Potholes Dept.',
-      ward: 'Ward 12 Infrastructure Cell',
+      ward_cell: 'Ward 12 Infrastructure Cell',
       elements: ['Asphalt Defect', 'High Traffic Corridor', 'Immediate Collision Risk'],
       auth: '98% Real Civic Defect',
       conf: 98,
@@ -59,13 +69,18 @@
     pothole_hi: {
       text: 'जनपथ रोड पर राम मंदिर के पास एक बड़ा 2 फीट गहरा गड्ढा है जिससे गाड़ियाँ टकरा रही हैं और बड़ा हादसा होने का खतरा है।',
       lang: 'hi',
+      lat: 20.2961,
+      lng: 85.8245,
+      ward: 'Ward 12',
+      ward_label: 'Ward 12 · Janpath',
+      address: 'Janpath Road, Ram Mandir Square, Bhubaneswar',
       category: 'road',
       sub_category: 'pothole',
       severity: 'CRITICAL',
       urgency: 92,
       sla: '24-Hour Urgent Safety SLA',
       dept: 'Roads & Potholes Dept.',
-      ward: 'Ward 12 Infrastructure Cell',
+      ward_cell: 'Ward 12 Infrastructure Cell',
       elements: ['Asphalt Defect', 'High Traffic Corridor', 'Immediate Collision Risk'],
       auth: '98% Real Civic Defect',
       conf: 98,
@@ -83,13 +98,18 @@
     garbage_en: {
       text: 'Community waste bins overflowing near Saheed Nagar market with foul odor and waste spilling across pedestrian walkways.',
       lang: 'en',
+      lat: 20.2905,
+      lng: 85.8450,
+      ward: 'Ward 5',
+      ward_label: 'Ward 5 · Saheed Nagar',
+      address: 'Saheed Nagar Market, Bhubaneswar',
       category: 'garbage_sanitation',
       sub_category: 'overflowing_bin',
       severity: 'HIGH',
       urgency: 78,
       sla: '24-Hour Sanitation Clearance',
       dept: 'Garbage & Sanitation Dept.',
-      ward: 'Ward 12 Sanitation Wing',
+      ward_cell: 'Ward 5 Sanitation Wing',
       elements: ['Debris Overflow', 'Public Walkway Blocked', 'Vector Breeding Risk'],
       auth: '94% Real Civic Defect',
       conf: 94,
@@ -100,22 +120,27 @@
     streetlight_en: {
       text: 'Streetlights have been completely dark for 4 consecutive nights along Patia Infocity road, creating serious nighttime safety risks.',
       lang: 'en',
+      lat: 20.3553,
+      lng: 85.8189,
+      ward: 'Ward 1',
+      ward_label: 'Ward 1 · Patia Infocity',
+      address: 'Patia Infocity Road, Bhubaneswar',
       category: 'streetlights',
       sub_category: 'broken_pole',
       severity: 'HIGH',
       urgency: 82,
       sla: '36-Hour Electrical Maintenance',
       dept: 'Street Lighting & Electrical Cell',
-      ward: 'Ward 8 North Division',
+      ward_cell: 'Ward 1 North Division',
       elements: ['Dark Corridor (400m)', 'Power Line Issue', 'Night Safety Hazard'],
       auth: '92% Real Civic Defect',
       conf: 92,
       is_pb: true,
-      pb_text: 'Recurring blackout zone. Qualified for Ward 8 Smart LED Corridor participatory budgeting proposal.',
+      pb_text: 'Recurring blackout zone. Qualified for Ward 1 Smart LED Corridor participatory budgeting proposal.',
       dup_match: {
         id: '#ISS-1024',
-        title: 'Street Light Not Working near Sector 4',
-        desc: 'Reported yesterday · Ward 8',
+        title: 'Street Light Not Working near Infocity Sector 4',
+        desc: 'Reported yesterday · Ward 1',
         score: '84% Match Found'
       },
       image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80'
@@ -123,13 +148,18 @@
     water_pipe: {
       text: 'Main drinking water pipeline burst on Khandagiri square, clean water gushing onto the road and flooding basements.',
       lang: 'en',
+      lat: 20.2580,
+      lng: 85.7865,
+      ward: 'Ward 7',
+      ward_label: 'Ward 7 · Khandagiri',
+      address: 'Khandagiri Square, Bhubaneswar',
       category: 'water_supply',
       sub_category: 'pipe_burst',
       severity: 'CRITICAL',
       urgency: 95,
       sla: '12-Hour Emergency Pipeline Fix',
       dept: 'Water Supply & Sewerage Board',
-      ward: 'Ward 4 Hydro Division',
+      ward_cell: 'Ward 7 Hydro Division',
       elements: ['Pressurized Water Loss', 'Basement Inundation', 'Road Erosion Hazard'],
       auth: '99% Real Civic Defect',
       conf: 99,
@@ -139,11 +169,61 @@
     }
   };
 
+  // --- Bhubaneswar Municipal Corporation (BMC) 15 Ward Reference ---
+  const BHUBANESWAR_WARDS = [
+    { id: 1, name: 'Ward 1 - Patia & KIIT Area', label: 'Ward 1 · Patia Infocity', zone: 'North', center: [20.3553, 85.8189], address: 'Patia Infocity Road, Bhubaneswar' },
+    { id: 2, name: 'Ward 2 - Chandrasekharpur', label: 'Ward 2 · Damana', zone: 'North', center: [20.3242, 85.8152], address: 'Chandrasekharpur, Bhubaneswar' },
+    { id: 3, name: 'Ward 3 - Jayadev Vihar', label: 'Ward 3 · Jayadev Vihar', zone: 'Central', center: [20.3015, 85.8195], address: 'Jayadev Vihar & IRC Village, Bhubaneswar' },
+    { id: 4, name: 'Ward 4 - Nayapalli & CRPF', label: 'Ward 4 · Nayapalli', zone: 'Central', center: [20.2934, 85.8080], address: 'Nayapalli, CRPF Square, Bhubaneswar' },
+    { id: 5, name: 'Ward 5 - Saheed Nagar', label: 'Ward 5 · Saheed Nagar', zone: 'Central', center: [20.2905, 85.8450], address: 'Saheed Nagar, Vani Vihar, Bhubaneswar' },
+    { id: 6, name: 'Ward 6 - Master Canteen & Station', label: 'Ward 6 · Station Sq.', zone: 'Central', center: [20.2668, 85.8436], address: 'Master Canteen Square, Bhubaneswar' },
+    { id: 7, name: 'Ward 7 - Khandagiri & Jagamara', label: 'Ward 7 · Khandagiri', zone: 'West', center: [20.2580, 85.7865], address: 'Khandagiri Square, Bhubaneswar' },
+    { id: 8, name: 'Ward 8 - Old Town & Lingaraj', label: 'Ward 8 · Old Town', zone: 'South', center: [20.2390, 85.8340], address: 'Old Town, Lingaraj Area, Bhubaneswar' },
+    { id: 9, name: 'Ward 9 - Rasulgarh & Bomikhal', label: 'Ward 9 · Rasulgarh', zone: 'East', center: [20.2980, 85.8670], address: 'Rasulgarh Square, Bhubaneswar' },
+    { id: 10, name: 'Ward 10 - Mancheswar', label: 'Ward 10 · Mancheswar', zone: 'East', center: [20.3300, 85.8650], address: 'Mancheswar Industrial Area, Bhubaneswar' },
+    { id: 11, name: 'Ward 11 - Laxmisagar', label: 'Ward 11 · Laxmisagar', zone: 'South-East', center: [20.2620, 85.8580], address: 'Laxmisagar & Badagada, Bhubaneswar' },
+    { id: 12, name: 'Ward 12 - Janpath & Ashok Nagar', label: 'Ward 12 · Janpath', zone: 'Central', center: [20.2961, 85.8245], address: 'Janpath Road, Ram Mandir, Bhubaneswar' },
+    { id: 13, name: 'Ward 13 - Baramunda & ISBT', label: 'Ward 13 · Baramunda', zone: 'West', center: [20.2800, 85.7950], address: 'Baramunda ISBT, Bhubaneswar' },
+    { id: 14, name: 'Ward 14 - Infocity & DLF', label: 'Ward 14 · Infocity', zone: 'North', center: [20.3700, 85.8120], address: 'DLF Cybercity, Patia, Bhubaneswar' },
+    { id: 15, name: 'Ward 15 - Satya Nagar & Unit-9', label: 'Ward 15 · Satya Nagar', zone: 'Central', center: [20.2780, 85.8400], address: 'Satya Nagar, Unit-9, Bhubaneswar' }
+  ];
+
+  // Helper to determine the closest ward from coordinates
+  function findClosestWard(lat, lng) {
+    let minDistance = Infinity;
+    let closest = BHUBANESWAR_WARDS[11]; // Default Ward 12
+    BHUBANESWAR_WARDS.forEach(w => {
+      const dLat = w.center[0] - lat;
+      const dLng = w.center[1] - lng;
+      const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closest = w;
+      }
+    });
+    return closest;
+  }
+
   // State
   let currentUploadedImageUrl = 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80';
   let isRecordingVoice = false;
   let activeDuplicateMatch = null;
   let triageDebounceTimer = null;
+
+  // Pin Location State
+  let currentPinLocation = {
+    lat: 20.2961,
+    lng: 85.8245,
+    ward: 'Ward 12',
+    wardLabel: 'Ward 12 · Janpath',
+    wardCell: 'Ward 12 Infrastructure Cell',
+    address: 'Janpath Road, Ram Mandir Square, Bhubaneswar',
+    source: 'GPS_LIVE'
+  };
+
+  // Leaflet Mini Map State
+  let miniMap = null;
+  let miniMapMarker = null;
 
   // DOM Elements
   const descTextarea = document.getElementById('issueDescription');
@@ -231,6 +311,9 @@
     const text = descTextarea ? descTextarea.value.trim() : '';
 
     if (customData) {
+      if (customData.lat && customData.lng) {
+        setPinLocation(customData.lat, customData.lng, true, 'SAMPLE_PRESET');
+      }
       applyTriageResult(customData);
       return;
     }
@@ -583,24 +666,158 @@
     });
   }
 
-  // --- GPS Refresh ---
+  // --- Leaflet Custom Pin Icon Generator ---
+  function createCustomPinIcon() {
+    if (typeof window === 'undefined' || !window.L) return null;
+    return window.L.divIcon({
+      className: 'leaflet-custom-civic-pin',
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -38],
+      html: `
+        <div class="mini-map-pin-container" title="Drag to adjust issue location">
+          <div class="mini-pin-pulse"></div>
+          <svg class="mini-pin-svg" viewBox="0 0 36 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="18" cy="46.5" rx="6" ry="2" fill="rgba(0,0,0,0.3)" />
+            <path d="M18 0C8.06 0 0 8.06 0 18C0 30.5 15.6 44.8 17.2 46.2C17.7 46.6 18.3 46.6 18.8 46.2C20.4 44.8 36 30.5 36 18C36 8.06 27.94 0 18 0Z" fill="#EA4335"/>
+            <path d="M18 0.75C8.47 0.75 0.75 8.47 0.75 18C0.75 29.8 15.9 43.6 17.6 45.1C17.8 45.3 18.2 45.3 18.4 45.1C20.1 43.6 35.25 29.8 35.25 18C35.25 8.47 27.53 0.75 18 0.75Z" stroke="#B31412" stroke-width="1.2"/>
+            <circle cx="18" cy="16.5" r="6.5" fill="#FFFFFF"/>
+            <circle cx="18" cy="16.5" r="3" fill="#EA4335"/>
+          </svg>
+        </div>
+      `
+    });
+  }
+
+  // --- Initialize Mini Map ---
+  function initMiniMap() {
+    const mapElement = document.getElementById('miniMap');
+    if (!mapElement || !window.L) return;
+
+    try {
+      miniMap = window.L.map('miniMap', {
+        center: [currentPinLocation.lat, currentPinLocation.lng],
+        zoom: 15,
+        zoomControl: false,
+        attributionControl: false
+      });
+
+      // Google Maps Tile Layer
+      window.L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['0', '1', '2', '3'],
+        maxZoom: 20
+      }).addTo(miniMap);
+
+      // Create Initial Pin Marker
+      const pinIcon = createCustomPinIcon();
+      miniMapMarker = window.L.marker([currentPinLocation.lat, currentPinLocation.lng], {
+        icon: pinIcon,
+        draggable: true,
+        autoPan: true
+      }).addTo(miniMap);
+
+      // Marker drag event
+      miniMapMarker.on('dragend', function (e) {
+        const pos = e.target.getLatLng();
+        setPinLocation(pos.lat, pos.lng, false, 'PIN_DRAG');
+        showToast(`Pinpoint updated: ${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)} (${currentPinLocation.wardLabel})`);
+      });
+
+      // Map click event
+      miniMap.on('click', function (e) {
+        setPinLocation(e.latlng.lat, e.latlng.lng, true, 'PIN_CLICK');
+        showToast(`Issue location selected: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)} (${currentPinLocation.wardLabel})`);
+      });
+
+      // Recalculate dimensions once layout settles
+      setTimeout(() => {
+        if (miniMap) miniMap.invalidateSize();
+      }, 300);
+    } catch (err) {
+      console.warn('MiniMap initialization notice:', err);
+    }
+  }
+
+  // --- Set Pin Location & Synchronize Coordinates + Ward ---
+  function setPinLocation(lat, lng, fly = true, source = 'GPS_LIVE') {
+    const numLat = parseFloat(lat);
+    const numLng = parseFloat(lng);
+    if (isNaN(numLat) || isNaN(numLng)) return;
+
+    const closestWard = findClosestWard(numLat, numLng);
+    currentPinLocation = {
+      lat: numLat,
+      lng: numLng,
+      ward: closestWard.name.split(' - ')[0],
+      wardLabel: closestWard.label,
+      wardCell: `${closestWard.name} Infrastructure Cell`,
+      address: closestWard.address,
+      source: source
+    };
+
+    if (miniMapMarker) {
+      miniMapMarker.setLatLng([numLat, numLng]);
+    }
+
+    if (fly && miniMap) {
+      miniMap.flyTo([numLat, numLng], Math.max(miniMap.getZoom(), 15), {
+        animate: true,
+        duration: 0.8
+      });
+    }
+
+    const coordLatLng = document.getElementById('coordLatLng');
+    const coordWardText = document.getElementById('coordWardText');
+    if (coordLatLng) {
+      coordLatLng.textContent = `${numLat.toFixed(4)}, ${numLng.toFixed(4)}`;
+    }
+    if (coordWardText) {
+      coordWardText.textContent = source === 'GPS_LIVE' ? `${closestWard.label} · GPS Live` : closestWard.label;
+    }
+
+    if (aiWardJurisdiction) {
+      aiWardJurisdiction.textContent = `${closestWard.name} Infrastructure Cell`;
+    }
+  }
+
+  // --- GPS Refresh / Live Geolocation ---
   if (refreshGpsBtn) {
     refreshGpsBtn.addEventListener('click', function () {
+      const gpsBtnText = document.getElementById('gpsBtnText');
+      if (gpsBtnText) gpsBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating…';
+      refreshGpsBtn.disabled = true;
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           pos => {
-            const lat = pos.coords.latitude.toFixed(4);
-            const lng = pos.coords.longitude.toFixed(4);
-            const coordDisplay = document.getElementById('coordDisplay');
-            if (coordDisplay) coordDisplay.textContent = `${lat}, ${lng} (Ward 12 · GPS Live)`;
-            showToast(`GPS Pin updated: ${lat}, ${lng}`);
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            setPinLocation(lat, lng, true, 'GPS_LIVE');
+            showToast(`✓ Current GPS detected: ${lat.toFixed(4)}, ${lng.toFixed(4)} (${currentPinLocation.wardLabel})`);
+            if (gpsBtnText) gpsBtnText.innerHTML = '<i class="fa-solid fa-check"></i> GPS Live';
+            setTimeout(() => {
+              if (gpsBtnText) gpsBtnText.textContent = 'Current GPS';
+              refreshGpsBtn.disabled = false;
+            }, 2500);
           },
-          () => {
-            showToast('Using default coordinates (20.2961, 85.8245 - Ward 12).');
+          err => {
+            console.warn('Geolocation lookup notice:', err);
+            showToast('Precise GPS not accessible. Using default coordinates in Ward 12 (Janpath).', true);
+            setPinLocation(20.2961, 85.8245, true, 'PIN_DROP');
+            if (gpsBtnText) gpsBtnText.textContent = 'Current GPS';
+            refreshGpsBtn.disabled = false;
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
           }
         );
       } else {
-        showToast('GPS coordinates locked to Ward 12.');
+        showToast('Geolocation is not supported by your browser.', true);
+        setPinLocation(20.2961, 85.8245, true, 'PIN_DROP');
+        if (gpsBtnText) gpsBtnText.textContent = 'Current GPS';
+        refreshGpsBtn.disabled = false;
       }
     });
   }
@@ -628,11 +845,11 @@
       const payload = {
         title: description.slice(0, 50) + (description.length > 50 ? '…' : ''),
         description: description,
-        latitude: 20.2961,
-        longitude: 85.8245,
-        location_source: 'GPS_PINPOINT',
-        address: 'Janpath Road, Bhubaneswar, Odisha',
-        ward: 'Ward 12',
+        latitude: currentPinLocation.lat,
+        longitude: currentPinLocation.lng,
+        location_source: currentPinLocation.source || 'GPS_PINPOINT',
+        address: currentPinLocation.address || 'Janpath Road, Bhubaneswar, Odisha',
+        ward: currentPinLocation.ward || 'Ward 12',
         category: category,
         sub_category: 'pothole',
         severity: aiSeverityChip?.textContent || 'CRITICAL',
@@ -660,7 +877,7 @@
         if (modalComplaintId) modalComplaintId.textContent = `#${cid}`;
         if (modalDept) modalDept.textContent = aiDeptName?.textContent || 'Roads & Potholes';
         if (modalSla) modalSla.textContent = `${aiSeverityChip?.textContent || 'CRITICAL'} · 48h SLA`;
-        if (modalWard) modalWard.textContent = 'Ward 12 (Janpath)';
+        if (modalWard) modalWard.textContent = currentPinLocation.wardLabel || 'Ward 12 (Janpath)';
         if (modalAuth) modalAuth.textContent = aiEvidenceStatusChip?.textContent?.trim() || '96% Verified';
 
         if (successModal) successModal.style.display = 'flex';
@@ -673,6 +890,7 @@
         console.warn('Submission note:', err);
         const fallbackId = `CB-${Math.floor(1000 + Math.random() * 9000)}`;
         if (modalComplaintId) modalComplaintId.textContent = `#${fallbackId}`;
+        if (modalWard) modalWard.textContent = currentPinLocation.wardLabel || 'Ward 12 (Janpath)';
         if (successModal) successModal.style.display = 'flex';
       } finally {
         submitBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Run AI Triage &amp; Submit Grievance';
@@ -694,6 +912,7 @@
     });
   }
 
-  // Initial Run with default sample
+  // Initialize Map & Default Sample Triage
+  initMiniMap();
   runLiveTriageAnalysis(SAMPLE_DATA.pothole_en);
 })();

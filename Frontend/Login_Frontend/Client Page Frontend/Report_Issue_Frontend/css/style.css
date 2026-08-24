@@ -342,81 +342,169 @@ textarea:focus {
   display: inline-block;
 }
 
-/* Map Box */
+/* Map Box - Interactive Mini Map */
 .map-box {
-  height: 110px;
-  border-radius: 12px;
+  height: 195px;
+  border-radius: 14px;
   border: 1px solid var(--glass-border);
-  background:
-    radial-gradient(circle at 50% 50%, rgba(5, 150, 105, 0.08), transparent 70%),
-    linear-gradient(rgba(37,99,235,0.04), rgba(37,99,235,0.04)),
-    repeating-linear-gradient(0deg, var(--row-border) 0 1px, transparent 1px 20px),
-    repeating-linear-gradient(90deg, var(--row-border) 0 1px, transparent 1px 20px);
   position: relative;
+  overflow: hidden;
+  background: #e2e8f0;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.mini-map-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+body.dark-mode .mini-map-container .leaflet-tile-pane {
+  filter: brightness(0.85) invert(1) contrast(3) hue-rotate(200deg) saturate(0.35);
+}
+
+.map-interactive-hint {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  z-index: 400;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  pointer-events: none;
   display: flex;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  gap: 5px;
+  letter-spacing: 0.02em;
 }
 
-.map-pin {
-  width: 16px;
-  height: 16px;
-  border-radius: 50% 50% 50% 0;
-  background: var(--rose);
-  transform: rotate(-45deg);
-  box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.2);
-  z-index: 2;
-}
-
-.map-radar-ring {
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  border: 1.5px solid var(--rose);
-  border-radius: 50%;
-  animation: radarWave 2s infinite ease-out;
-}
-
-@keyframes radarWave {
-  0% { transform: scale(0.3); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
+.map-interactive-hint i {
+  color: #34d399;
+  font-size: 11px;
 }
 
 .coords {
   position: absolute;
-  bottom: 8px;
-  left: 10px;
+  bottom: 9px;
+  left: 9px;
+  z-index: 400;
   font-size: 11px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  background: rgba(255,255,255,0.8);
-  padding: 2px 7px;
-  border-radius: 6px;
+  color: var(--text-primary);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 body.dark-mode .coords {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.92);
+  border-color: var(--glass-border);
+  color: #f1f5f9;
+}
+
+.ward-pill {
+  background: var(--emerald-bg);
+  color: var(--emerald-text);
+  border: 1px solid var(--emerald-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 2px;
 }
 
 .gps-refresh-btn {
   position: absolute;
-  top: 8px;
-  right: 10px;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  color: var(--text-primary);
+  top: 9px;
+  right: 9px;
+  z-index: 400;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--emerald-border);
+  color: var(--emerald-text);
   font-size: 11px;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 6px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gps-refresh-btn:hover {
-  background: var(--emerald-bg);
-  color: var(--emerald-text);
+  background: var(--emerald);
+  color: #ffffff;
+  border-color: var(--emerald);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.25);
+}
+
+body.dark-mode .gps-refresh-btn {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #34d399;
+}
+
+body.dark-mode .gps-refresh-btn:hover {
+  background: var(--emerald);
+  color: #ffffff;
+}
+
+/* Custom Mini Map Pin Marker */
+.mini-map-pin-container {
+  position: relative;
+  width: 32px;
+  height: 42px;
+  cursor: grab;
+}
+
+.mini-map-pin-container:active {
+  cursor: grabbing;
+}
+
+.mini-pin-pulse {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, 50%);
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.4);
+  animation: radarWave 2s infinite ease-out;
+  pointer-events: none;
+}
+
+.mini-pin-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 42px;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
+  transition: transform 0.15s ease;
+}
+
+.mini-map-pin-container:hover .mini-pin-svg {
+  transform: scale(1.1);
 }
 
 .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
