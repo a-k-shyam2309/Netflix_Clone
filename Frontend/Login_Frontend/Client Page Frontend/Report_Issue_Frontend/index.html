@@ -79,12 +79,13 @@
     </div>
 
     <!-- Issue Description -->
-    <div class="field-group">
+    <div class="field-group" id="groupDescription">
       <div class="field-label">
         <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
         Describe the Issue <span class="req-star">*</span>
       </div>
       <textarea id="issueDescription" placeholder="e.g. Deep 2-foot asphalt pothole on Janpath Road near Ram Mandir square causing severe vehicle damage and traffic hazards. Type in Hindi, Odia or English..."></textarea>
+      <div id="descError" class="inline-field-error" style="display:none;"></div>
       <div class="typing-status" id="typingStatus">
         <span class="typing-indicator-dot"></span>
         <span id="typingStatusText">AI listening to input...</span>
@@ -92,10 +93,10 @@
     </div>
 
     <!-- Map & GPS Coordinates -->
-    <div class="field-group">
+    <div class="field-group" id="groupLocation">
       <div class="field-label">
         <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-        Geo-Pinpoint Location &amp; Ward
+        Geo-Pinpoint Location &amp; Ward <span class="req-star">*</span>
       </div>
       <div class="map-box" id="mapBox">
         <div id="miniMap" class="mini-map-container"></div>
@@ -104,28 +105,44 @@
         </div>
         <div class="coords mono" id="coordDisplay">
           <i class="fa-solid fa-location-dot" style="color:var(--rose);"></i>
-          <span id="coordLatLng">20.2961, 85.8245</span>
-          <span class="ward-pill" id="coordWardText">Ward 12 · Janpath</span>
+          <span id="coordLatLng">Click map or Current GPS</span>
+          <span class="ward-pill" id="coordWardText">Unselected</span>
         </div>
         <button type="button" class="gps-refresh-btn" id="refreshGpsBtn" title="Detect Current GPS">
           <i class="fa-solid fa-crosshairs"></i> <span id="gpsBtnText">Current GPS</span>
         </button>
       </div>
+
+      <!-- Real-time Location Confirmation Box -->
+      <div class="location-confirmation-box" id="locationConfirmationBox" style="display:none;">
+        <div class="loc-confirm-header">
+          <i class="fa-solid fa-circle-check"></i> Location selected successfully
+        </div>
+        <div class="loc-confirm-coords mono">
+          <span>Latitude: <strong id="locLatDisplay">20.2961</strong></span>
+          <span>Longitude: <strong id="locLngDisplay">85.8245</strong></span>
+        </div>
+        <div class="loc-confirm-address" id="locAddressDisplay">
+          📍 Ward 12 · Janpath (Janpath Road, Ram Mandir Square, Bhubaneswar)
+        </div>
+      </div>
+
+      <div id="locationError" class="inline-field-error" style="display:none;"></div>
     </div>
 
     <!-- Photo Evidence & Voice Note -->
     <div class="row-2 field-group">
-      <div>
+      <div id="groupPhoto">
         <div class="field-label">
           <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>
           Photo Evidence <span class="req-star">*</span>
         </div>
         <div class="upload-box" id="uploadBox">
-          <input type="file" id="evidenceFileInput" accept="image/*" style="display:none;" />
+          <input type="file" id="evidenceFileInput" accept="image/jpeg,image/jpg,image/png,image/webp" style="display:none;" />
           <div id="uploadBoxDefault">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
             <div id="uploadLabel">Drop image or click to browse</div>
-            <small class="upload-subtext">JPEG, PNG · AI Defect Audit</small>
+            <small class="upload-subtext">JPG, JPEG, PNG, WEBP · AI Defect Audit</small>
           </div>
           <div id="uploadPreviewWrapper" style="display:none;">
             <img id="uploadPreviewImg" src="" alt="Uploaded Evidence" />
@@ -133,12 +150,13 @@
             <button type="button" class="remove-img-btn" id="removeImgBtn" title="Remove image">✕</button>
           </div>
         </div>
+        <div id="photoError" class="inline-field-error" style="display:none;"></div>
       </div>
 
-      <div>
+      <div id="groupVoice">
         <div class="field-label">
           <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-          Voice Grievance
+          Voice Grievance <span style="font-size:10.5px; font-weight:normal; color:var(--text-muted);">(Optional)</span>
         </div>
         <div class="voice-box" id="voiceBox">
           <div class="voice-icon-wrap">
@@ -307,42 +325,49 @@
 
 </main>
 
-<!-- Success Modal -->
+<!-- Success Confirmation Modal -->
 <div class="modal-overlay" id="successModal" style="display:none;">
   <div class="modal-card">
     <div class="modal-header">
       <div class="modal-icon-success">
-        <i class="fa-solid fa-check"></i>
+        <i class="fa-solid fa-circle-check"></i>
       </div>
-      <h3>Grievance Triaged &amp; Registered!</h3>
-      <p>Complaint ID: <strong class="mono" id="modalComplaintId">#CB-0145</strong></p>
+      <h3>Grievance Submitted Successfully!</h3>
+      <p style="font-size:12.5px; opacity:0.95; margin-top:4px;">Your complaint has been securely recorded and forwarded for municipal review.</p>
+      <div style="margin-top:8px; font-size:13px; font-weight:700; background:rgba(255,255,255,0.18); display:inline-block; padding:3px 12px; border-radius:6px;" class="mono" id="modalComplaintId">#CB-0145</div>
     </div>
     <div class="modal-body">
       <div class="modal-summary-grid">
         <div>
-          <label>Department</label>
-          <strong id="modalDept">Roads &amp; Potholes</strong>
+          <label>Category</label>
+          <strong id="modalCategory">Roads &amp; Potholes</strong>
         </div>
         <div>
-          <label>Severity / SLA</label>
+          <label>Priority / SLA</label>
           <strong class="text-rose" id="modalSla">CRITICAL &middot; 48h</strong>
+        </div>
+        <div>
+          <label>Assigned Department</label>
+          <strong id="modalDept">Roads &amp; Potholes Dept.</strong>
         </div>
         <div>
           <label>Ward Jurisdiction</label>
           <strong id="modalWard">Ward 12 (Janpath)</strong>
         </div>
-        <div>
-          <label>AI Authenticity</label>
-          <strong class="text-emerald" id="modalAuth">96% Verified</strong>
-        </div>
       </div>
       <div class="modal-notice">
-        <i class="fa-solid fa-shield-halved"></i>
-        <span><strong>Dual-Evidence Audit Active:</strong> Work will be tracked publicly and requires citizen on-site verification before closure.</span>
+        <i class="fa-solid fa-circle-check"></i>
+        <span><strong>Your complaint is now visible in Track Issues.</strong> Real-time municipal GPS status and verification timeline are active.</span>
+      </div>
+      <div class="redirect-progress-bar">
+        <div class="redirect-progress-fill" id="redirectProgressFill"></div>
+      </div>
+      <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:4px; margin-bottom:10px;" id="redirectCountdownText">
+        Redirecting to Track Issues in 2s...
       </div>
       <div class="modal-actions">
         <button type="button" class="btn-track-go" id="modalTrackBtn">
-          <i class="fa-solid fa-location-crosshairs"></i> Track Complaint in Real-time
+          <i class="fa-solid fa-location-crosshairs"></i> Track My Complaint
         </button>
         <button type="button" class="btn-modal-close" id="modalCloseBtn">Submit Another Issue</button>
       </div>

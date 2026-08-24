@@ -306,6 +306,180 @@ const SEED_COMPLAINTS = [
       { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Emergency traffic waterlogging reported." },
       { step: "Mobile Dewatering Pump Deployed", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 8 * 3600000).toISOString(), notes: "Emergency pumping in progress." }
     ]
+  },
+  {
+    complaint_id: "CB-12480",
+    title: "Dangerous deep pothole cavity on Janpath Road",
+    description: "Large dangerous asphalt pothole near Ram Mandir / College Gate causing accidents and vehicle damage.",
+    category: "roads_potholes",
+    sub_category: "pothole",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 92 },
+    urgency_score: 92,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 38,
+    image_url: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.2961,
+    longitude: 85.8245,
+    ward: "Ward 12 (Janpath / College Gate)",
+    location: { ward_name: "Ward 12 (Janpath / College Gate)", address: "Janpath Road, near College Gate, Ward 12", latitude: 20.2961, longitude: 85.8245 },
+    location_point: { type: "Point", coordinates: [85.8245, 20.2961] },
+    department_name: "Roads & Works Department",
+    department_code: "ROADS_AND_POTHOLES",
+    user_uid: "CIT-12480",
+    timeline: [
+      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Grievance registered with verified GPS coordinates." },
+      { step: "AI Triage & Urgency Ranked", status: "ASSIGNED", timestamp: new Date(Date.now() - 18 * 3600000).toISOString(), notes: "Ranked CRITICAL (92/100). Routed to Ward 12 Road Cell." },
+      { step: "Field Team Dispatched", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 6 * 3600000).toISOString(), notes: "BMC Road maintenance squad dispatched on site." }
+    ]
+  },
+  {
+    complaint_id: "CB-12481",
+    title: "Overflowing Community Garbage Dump near Park",
+    description: "Garbage container spilling onto the walkway near Jayadev Vihar Community Park causing foul smell and health hazard.",
+    category: "garbage_sanitation",
+    sub_category: "overflowing_bin",
+    severity: "HIGH",
+    priority_level: "HIGH",
+    priority: { level: "HIGH", score: 84 },
+    urgency_score: 84,
+    status: "ASSIGNED",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 25,
+    image_url: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.3012,
+    longitude: 85.8234,
+    ward: "Ward 4 (Jayadev Vihar)",
+    location: { ward_name: "Ward 4 (Jayadev Vihar)", address: "Community Park Entrance, Jayadev Vihar, Ward 4", latitude: 20.3012, longitude: 85.8234 },
+    location_point: { type: "Point", coordinates: [85.8234, 20.3012] },
+    department_name: "Garbage & Sanitation Department",
+    department_code: "GARBAGE_AND_SANITATION",
+    user_uid: "CIT-12481",
+    timeline: [
+      { step: "Reported by Citizen", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Grievance submitted with photo evidence." },
+      { step: "Routed to Sanitation", status: "ASSIGNED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Assigned to Ward 4 Sanitation Truck Team." }
+    ]
+  },
+  {
+    complaint_id: "CB-12482",
+    title: "Main Water Supply Pipeline Leakage",
+    description: "High pressure potable water leaking onto street from cracked underground main line in Patia.",
+    category: "water_supply",
+    sub_category: "pipe_burst",
+    severity: "HIGH",
+    priority_level: "HIGH",
+    priority: { level: "HIGH", score: 86 },
+    urgency_score: 86,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 36,
+    upvotes: 31,
+    image_url: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.3548,
+    longitude: 85.8184,
+    ward: "Ward 2 (Patia Corridor)",
+    location: { ward_name: "Ward 2 (Patia Corridor)", address: "Near Infocity Square, Patia Corridor, Ward 2", latitude: 20.3548, longitude: 85.8184 },
+    location_point: { type: "Point", coordinates: [85.8184, 20.3548] },
+    department_name: "Water & Drainage Department",
+    department_code: "WATER_AND_DRAINAGE",
+    user_uid: "CIT-12482",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Leakage reported." },
+      { step: "Plumbing Crew on Site", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 10 * 3600000).toISOString(), notes: "Water supply line isolated for weld repair." }
+    ]
+  },
+  {
+    complaint_id: "CB-12483",
+    title: "Blocked Stormwater Drain near College Gate",
+    description: "Concrete culvert completely blocked with silt, threatening street flooding during rains.",
+    category: "drainage",
+    sub_category: "blocked_drain",
+    severity: "CRITICAL",
+    priority_level: "CRITICAL",
+    priority: { level: "CRITICAL", score: 90 },
+    urgency_score: 90,
+    status: "IN_PROGRESS",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 49,
+    image_url: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    latitude: 20.2961,
+    longitude: 85.8245,
+    ward: "Ward 12 (Janpath / College Gate)",
+    location: { ward_name: "Ward 12 (Janpath / College Gate)", address: "College Gate, Janpath, Ward 12", latitude: 20.2961, longitude: 85.8245 },
+    location_point: { type: "Point", coordinates: [85.8245, 20.2961] },
+    department_name: "Water & Drainage Department",
+    department_code: "WATER_AND_DRAINAGE",
+    user_uid: "CIT-12483",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 2 * 86400000).toISOString(), notes: "Reported drainage blockage." },
+      { step: "De-silting Crew Active", status: "IN_PROGRESS", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "JCB & manual de-silting crew clearing line." }
+    ]
+  },
+  {
+    complaint_id: "CB-12484",
+    title: "Flickering & Broken Streetlights on Infocity Road",
+    description: "3 consecutive LED streetlight poles non-functional near Infocity IT corridor.",
+    category: "streetlights",
+    sub_category: "broken_light",
+    severity: "MEDIUM",
+    priority_level: "MEDIUM",
+    priority: { level: "MEDIUM", score: 68 },
+    urgency_score: 68,
+    status: "SUBMITTED",
+    is_overdue: false,
+    sla_hours: 48,
+    upvotes: 12,
+    image_url: null,
+    created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    latitude: 20.3491,
+    longitude: 85.8082,
+    ward: "Ward 15 (Infocity Road)",
+    location: { ward_name: "Ward 15 (Infocity Road)", address: "Infocity Road, Ward 15", latitude: 20.3491, longitude: 85.8082 },
+    location_point: { type: "Point", coordinates: [85.8082, 20.3491] },
+    department_name: "Street Lighting & Electricity",
+    department_code: "STREET_LIGHTS_AND_ELECTRICITY",
+    user_uid: "CIT-12484",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Grievance logged by citizen." }
+    ]
+  },
+  {
+    complaint_id: "CB-12479",
+    title: "Dark Stretch — Non-functional High-Mast Light",
+    description: "High-mast tower at Market Corridor junction was dark for 2 days. Repaired and verified.",
+    category: "streetlights",
+    sub_category: "broken_light",
+    severity: "HIGH",
+    priority_level: "HIGH",
+    priority: { level: "HIGH", score: 78 },
+    urgency_score: 78,
+    status: "RESOLVED",
+    is_overdue: false,
+    sla_hours: 24,
+    upvotes: 27,
+    image_url: "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
+    latitude: 20.2741,
+    longitude: 85.8362,
+    ward: "Ward 8 (Market Corridor)",
+    location: { ward_name: "Ward 8 (Market Corridor)", address: "Market Corridor Square, Ward 8", latitude: 20.2741, longitude: 85.8362 },
+    location_point: { type: "Point", coordinates: [85.8362, 20.2741] },
+    department_name: "Street Lighting & Electricity",
+    department_code: "STREET_LIGHTS_AND_ELECTRICITY",
+    user_uid: "CIT-12479",
+    timeline: [
+      { step: "Reported", status: "SUBMITTED", timestamp: new Date(Date.now() - 3 * 86400000).toISOString(), notes: "Reported non-functional light." },
+      { step: "Repaired & Verified", status: "RESOLVED", timestamp: new Date(Date.now() - 1 * 86400000).toISOString(), notes: "Capacitor replaced. Verified operational by 2 residents." }
+    ]
   }
 ];
 
@@ -315,10 +489,24 @@ const ComplaintStore = {
   init() {
     try {
       const existing = localStorage.getItem("civicbuzz_complaints");
-      if (!existing || JSON.parse(existing).length === 0) {
-        localStorage.setItem("civicbuzz_complaints", JSON.stringify(SEED_COMPLAINTS));
-        localStorage.setItem("civicbuzz_registered_complaints", JSON.stringify(SEED_COMPLAINTS));
+      let list = [];
+      if (existing) {
+        try { list = JSON.parse(existing); } catch (_) { list = []; }
       }
+      if (!Array.isArray(list) || list.length === 0) {
+        list = [...SEED_COMPLAINTS];
+      } else {
+        const existingIds = new Set(list.map(c => String(c.complaint_id || c.id || '').replace('#', '').toLowerCase()));
+        SEED_COMPLAINTS.forEach(sc => {
+          const cleanScId = String(sc.complaint_id).replace('#', '').toLowerCase();
+          if (!existingIds.has(cleanScId)) {
+            list.push(sc);
+            existingIds.add(cleanScId);
+          }
+        });
+      }
+      localStorage.setItem("civicbuzz_complaints", JSON.stringify(list));
+      localStorage.setItem("civicbuzz_registered_complaints", JSON.stringify(list));
     } catch (_) {
       // Storage fallback
     }
@@ -341,6 +529,37 @@ const ComplaintStore = {
       }
     } catch (_) {}
     return [...SEED_COMPLAINTS];
+  },
+
+  getById(id) {
+    if (!id) return null;
+    const cleanId = String(id).trim().replace('#', '').toLowerCase();
+    const list = this.getAll();
+    
+    // 1. Direct exact or lowercase match
+    let found = list.find((c) => {
+      const cId = String(c.complaint_id || c.id || '').trim().replace('#', '').toLowerCase();
+      return cId === cleanId;
+    });
+    if (found) return found;
+
+    // 2. Suffix / sub-string match (e.g. 12480 in CB-12480 or CB-BHUB-12480)
+    found = list.find((c) => {
+      const cId = String(c.complaint_id || c.id || '').trim().replace('#', '').toLowerCase();
+      return cId.endsWith(cleanId) || cleanId.endsWith(cId);
+    });
+    if (found) return found;
+
+    // 3. Match within SEED_COMPLAINTS array directly as fallback
+    found = SEED_COMPLAINTS.find((c) => {
+      const cId = String(c.complaint_id || c.id || '').trim().replace('#', '').toLowerCase();
+      return cId === cleanId || cId.endsWith(cleanId) || cleanId.endsWith(cId);
+    });
+    return found || null;
+  },
+
+  get(id) {
+    return this.getById(id);
   },
 
   saveAll(list) {
@@ -1493,20 +1712,7 @@ const CivicBuzzSimulation = {
       };
     }
 
-    if (endpoint.startsWith("/complaints") && method === "POST") {
-      const newId = "CB-BHUB-" + Math.floor(1000 + Math.random() * 9000);
-      return {
-        success: true,
     // 4. Complaints & Grievance Simulation (Single Unified Store)
-    if (endpoint.startsWith("/complaints/nearby") || endpoint === "/public/complaints" || endpoint === "/complaints" || endpoint === "/complaints/my/list") {
-      const all = ComplaintStore.getAll();
-      return {
-        success: true,
-        message: "Fetched live civic complaints for Bhubaneswar",
-        data: all,
-      };
-    }
-
     if (endpoint.startsWith("/complaints/") && endpoint.includes("/upvote")) {
       const parts = endpoint.split("/");
       const cid = parts[2];
@@ -1518,12 +1724,39 @@ const CivicBuzzSimulation = {
       };
     }
 
+    if (endpoint.startsWith("/complaints/") && method === "GET") {
+      const parts = endpoint.split("/");
+      const cid = parts[2]?.split("?")[0];
+      const doc = ComplaintStore.getById(cid);
+      if (!doc) {
+        return {
+          success: false,
+          message: `Complaint ${cid} not found`,
+          data: null
+        };
+      }
+      return {
+        success: true,
+        message: "Complaint fetched",
+        data: doc,
+      };
+    }
+
     if (endpoint.startsWith("/complaints") && method === "POST") {
       const saved = ComplaintStore.add(body || {});
       return {
         success: true,
         message: "Complaint reported and registered successfully",
         data: saved,
+      };
+    }
+
+    if (endpoint.startsWith("/complaints/nearby") || endpoint === "/public/complaints" || endpoint === "/complaints" || endpoint === "/complaints/my/list") {
+      const all = ComplaintStore.getAll();
+      return {
+        success: true,
+        message: "Fetched live civic complaints for Bhubaneswar",
+        data: all,
       };
     }
 
@@ -1771,6 +2004,14 @@ const CivicBuzzAPI = {
 
   // 2. Complaints Module (Guaranteed local sync + backend persistence)
   complaints: {
+    async list(params = {}) {
+      try {
+        const query = new URLSearchParams(params).toString();
+        const res = await CivicBuzzAPI.request(`/complaints${query ? '?' + query : ''}`);
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) return res;
+      } catch (_) {}
+      return { data: ComplaintStore.getAll() };
+    },
     async create(data) {
       const localDoc = ComplaintStore.add(data);
       try {
@@ -1785,9 +2026,10 @@ const CivicBuzzAPI = {
     async upvote(complaintId) {
       const updated = ComplaintStore.upvote(complaintId);
       try {
-        await CivicBuzzAPI.request(`/complaints/${complaintId}/upvote`, {
+        const res = await CivicBuzzAPI.request(`/complaints/${complaintId}/upvote`, {
           method: "POST",
         });
+        if (res && res.data) return res;
       } catch (_) {}
       return { data: updated, message: "Upvote recorded." };
     },
@@ -1805,12 +2047,17 @@ const CivicBuzzAPI = {
       } catch (_) {}
       return { data: ComplaintStore.getAll() };
     },
+    async get(id) {
+      return this.getDetail(id);
+    },
     async getDetail(id) {
+      if (!id) return { data: null };
+      const cleanId = String(id).replace('#', '').trim();
       try {
-        const res = await CivicBuzzAPI.request(`/complaints/${id}`);
+        const res = await CivicBuzzAPI.request(`/complaints/${encodeURIComponent(cleanId)}`);
         if (res && res.data) return res;
       } catch (_) {}
-      const doc = ComplaintStore.getAll().find((c) => c.complaint_id === id || c.complaint_id === `#${id}`);
+      const doc = ComplaintStore.getById(cleanId);
       return { data: doc };
     },
     async verifyResolution(id, rating = 5, comments = "") {

@@ -52,13 +52,15 @@
     </div>
 
     <div class="filter-row" id="filterRow">
-      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip active" data-filter="all">All Priorities</button>
       <button class="filter-chip" data-filter="critical">Critical</button>
       <button class="filter-chip" data-filter="high">High</button>
       <button class="filter-chip" data-filter="medium">Medium</button>
       <button class="filter-chip" data-filter="low">Low</button>
       <span style="border-left:1px solid var(--border); margin:0 4px; height:18px; display:inline-block; vertical-align:middle;"></span>
-      <button class="filter-chip filter-status" data-status="ALL">All Statuses</button>
+      <button class="filter-chip filter-status active" data-status="ALL">All Statuses</button>
+      <button class="filter-chip filter-status" data-status="SUBMITTED">Reported</button>
+      <button class="filter-chip filter-status" data-status="ASSIGNED">Assigned</button>
       <button class="filter-chip filter-status" data-status="IN_PROGRESS">In Progress</button>
       <button class="filter-chip filter-status" data-status="RESOLVED">Resolved</button>
     </div>

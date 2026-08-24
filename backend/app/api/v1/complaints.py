@@ -208,6 +208,50 @@ async def get_complaint_detail(
     return APIResponse(data=doc)
 
 
+@router.post("/{complaint_id}/upvote", response_model=APIResponse[Dict[str, Any]])
+async def upvote_complaint(
+    complaint_id: str,
+    current_user: Optional[User] = Depends(get_optional_user),
+    mongo_db: AsyncIOMotorDatabase = Depends(get_mongo_db),
+):
+    """
+    Increment community upvotes for a civic grievance and boost priority calculation.
+    """
+    doc = await mongo_db.complaints.find_one({"complaint_id": complaint_id})
+    if not doc:
+        raise EntityNotFoundException("Complaint", complaint_id)
+
+    user_uid = current_user.user_uid if current_user else "ANON_CITIZEN"
+    voters = doc.get("upvoted_by", [])
+
+    if user_uid in voters and user_uid != "ANON_CITIZEN":
+        new_count = max(1, doc.get("upvotes", 1) - 1)
+        await mongo_db.complaints.update_one(
+            {"complaint_id": complaint_id},
+            {"$set": {"upvotes": new_count}, "$pull": {"upvoted_by": user_uid}}
+        )
+        return APIResponse(
+            message="Upvote removed.",
+            data={"complaint_id": complaint_id, "upvotes": new_count, "voted": False}
+        )
+
+    new_count = doc.get("upvotes", 1) + 1
+    current_urgency = doc.get("urgency_score") or doc.get("priority", {}).get("score", 75)
+    new_urgency = min(100, current_urgency + 2)
+
+    await mongo_db.complaints.update_one(
+        {"complaint_id": complaint_id},
+        {
+            "$set": {"upvotes": new_count, "urgency_score": new_urgency},
+            "$addToSet": {"upvoted_by": user_uid}
+        }
+    )
+    return APIResponse(
+        message=f"Complaint #{complaint_id} upvoted successfully.",
+        data={"complaint_id": complaint_id, "upvotes": new_count, "urgency_score": new_urgency, "voted": True}
+    )
+
+
 @router.patch("/{complaint_id}", response_model=APIResponse[Dict[str, Any]])
 async def update_complaint(
     complaint_id: str,

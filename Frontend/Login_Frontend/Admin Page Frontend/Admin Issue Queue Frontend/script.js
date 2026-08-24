@@ -2814,22 +2814,108 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 	/* =====================================================
+	   LIVE DATABASE & COMPLAINT STORE SYNCHRONIZATION
+	===================================================== */
+
+	function loadLiveComplaintsIntoAdminQueue() {
+		let liveComplaints = [];
+
+		if (window.CivicBuzzAPI?.store?.getAll) {
+			liveComplaints = window.CivicBuzzAPI.store.getAll();
+		} else if (window.ComplaintStore?.getAll) {
+			liveComplaints = window.ComplaintStore.getAll();
+		} else {
+			try {
+				liveComplaints = JSON.parse(localStorage.getItem("civicbuzz_complaints") || localStorage.getItem("civicbuzz_registered_complaints") || "[]");
+			} catch (_) {}
+		}
+
+		if (!Array.isArray(liveComplaints) || liveComplaints.length === 0 || !tableBody) return;
+
+		const existingRowIds = new Set();
+		tableBody.querySelectorAll("tr").forEach(tr => {
+			const strong = tr.querySelector("td strong");
+			if (strong) {
+				existingRowIds.add(strong.textContent.replace("#", "").trim());
+			}
+		});
+
+		liveComplaints.forEach(c => {
+			const cid = c.complaint_id;
+			if (!cid) return;
+
+			const catKey = (c.category || "road").toLowerCase().replace(/_/g, "");
+			const rawPriority = (c.priority_level || c.severity || "medium").toLowerCase();
+			const statusKey = (c.status || "pending").toLowerCase() === "submitted" ? "pending" : (c.status || "pending").toLowerCase();
+			const categoryIcon = catKey.includes("garbage") || catKey.includes("sanitation") ? "🗑️" : catKey.includes("light") ? "💡" : catKey.includes("water") ? "🚰" : catKey.includes("park") ? "🌳" : "🛣️";
+			const dateStr = new Date(c.created_at || Date.now()).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+			// Populate issueData
+			if (!issueData[cid]) {
+				issueData[cid] = {
+					id: cid,
+					title: c.title,
+					userId: c.is_anonymous ? "ANONYMOUS-CITIZEN" : (c.reporter_name || "USR-CITIZEN"),
+					date: dateStr,
+					location: c.ward_label || c.ward || c.address || "Bhubaneswar",
+					category: catKey.includes("garbage") ? "Garbage" : catKey.includes("light") ? "Lighting" : catKey.includes("water") ? "Water" : catKey.includes("park") ? "Parks" : "Road",
+					priority: rawPriority,
+					status: statusKey,
+					assigned: c.department_name || "Roads & Works Department",
+					description: c.description,
+					image: c.image_url || "",
+					urgency_score: c.urgency_score || 85,
+					verifications: [
+						{ userId: "USR-REPORTER", role: "Reporter", status: c.status === "RESOLVED" ? "verified" : "waiting" },
+						{ userId: "USR-INSPECTOR", role: "Ward Engineer", status: c.status === "RESOLVED" ? "verified" : "waiting" },
+						{ userId: "USR-CITIZEN-2", role: "Nearby Citizen", status: "waiting" }
+					]
+				};
+			}
+
+			// Prepend row to table if not existing
+			if (!existingRowIds.has(cid)) {
+				const tr = document.createElement("tr");
+				tr.dataset.status = statusKey;
+				tr.dataset.priority = rawPriority;
+				tr.dataset.category = catKey.includes("garbage") ? "garbage" : catKey.includes("light") ? "lighting" : catKey.includes("water") ? "water" : "road";
+
+				tr.innerHTML = `
+					<td><strong>#${cid}</strong></td>
+					<td>${c.title}</td>
+					<td>${c.is_anonymous ? '<span style="color:#64748b; font-style:italic;">Protected (Anonymous)</span>' : 'USR-CITIZEN'}</td>
+					<td><span class="category">${categoryIcon} ${c.category || 'Road'}</span></td>
+					<td><span class="priority ${rawPriority}">${rawPriority.charAt(0).toUpperCase() + rawPriority.slice(1)}</span></td>
+					<td>${dateStr}</td>
+					<td><span class="status ${statusKey}">${statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}</span></td>
+					<td><button class="view-issue-btn" type="button" data-issue-id="${cid}">👁</button></td>
+				`;
+				tableBody.insertBefore(tr, tableBody.firstChild);
+				existingRowIds.add(cid);
+			}
+		});
+
+		attachViewButtons();
+		filterIssues();
+	}
+
+	loadLiveComplaintsIntoAdminQueue();
+
+	window.addEventListener("civicbuzz_data_updated", () => {
+		loadLiveComplaintsIntoAdminQueue();
+	});
+
+	window.addEventListener("storage", (e) => {
+		if (e.key === "civicbuzz_complaints" || e.key === "civicbuzz_registered_complaints") {
+			loadLiveComplaintsIntoAdminQueue();
+		}
+	});
+
+	/* =====================================================
 	   INITIAL FILTER
 	===================================================== */
 
 	filterIssues();
-
-
-	/* =====================================================
-	   INITIAL VERIFICATION STATE
-	===================================================== */
-
-	/*
-	 * If a resolved issue is already opened,
-	 * the verification UI will show its
-	 * current citizen responses.
-	 */
-
 
 	console.log(
 		"CivicBuzz Track Issues loaded successfully."

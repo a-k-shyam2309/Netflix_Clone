@@ -205,10 +205,27 @@ async def get_complaint_by_id(
     current_user: Optional[User] = None,
 ) -> Dict[str, Any]:
     """
-    Fetch complaint by ID. If user is unauthorized or complaint is anonymous,
-    strips private identity fields according to the Privacy Model (Requirements 17 & 18).
+    Fetch complaint by ID. Supports flexible lookup by exact complaint_id,
+    with/without '#' prefix, case-insensitivity, numeric suffix, or MongoDB _id.
+    Strips private identity fields according to the Privacy Model (Requirements 17 & 18).
     """
-    doc = await mongo_db.complaints.find_one({"complaint_id": complaint_id})
+    clean_id = str(complaint_id).strip().lstrip("#")
+    
+    query_conditions: List[Dict[str, Any]] = [
+        {"complaint_id": complaint_id},
+        {"complaint_id": clean_id},
+        {"complaint_id": f"#{clean_id}"},
+        {"complaint_id": {"$regex": f"^{clean_id}$", "$options": "i"}},
+        {"complaint_id": {"$regex": f"{clean_id}$", "$options": "i"}},
+    ]
+    try:
+        from bson import ObjectId
+        if ObjectId.is_valid(clean_id):
+            query_conditions.append({"_id": ObjectId(clean_id)})
+    except Exception:
+        pass
+
+    doc = await mongo_db.complaints.find_one({"$or": query_conditions})
     if not doc:
         raise EntityNotFoundException("Complaint", complaint_id)
 

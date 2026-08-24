@@ -149,3 +149,34 @@ async def test_department_cannot_directly_set_resolved(client):
     # Must be rejected (401 or 403 or error)
     assert patch_resp.status_code in [400, 401, 403]
 
+
+@pytest.mark.asyncio
+async def test_upvote_complaint(client):
+    cit_login = await client.post("/api/v1/auth/login", json={
+        "email": "citizen@civicbuzz.in",
+        "password": "Citizen@123",
+        "role": "citizen",
+    })
+    cit_token = cit_login.json()["data"]["access_token"]
+
+    create_resp = await client.post(
+        "/api/v1/complaints",
+        json={
+            "description": "Dangerous pothole near hospital entrance needing urgent upvoting.",
+            "latitude": 20.2961,
+            "longitude": 85.8245,
+        },
+        headers={"Authorization": f"Bearer {cit_token}"},
+    )
+    cid = create_resp.json()["data"]["complaint_id"]
+
+    # Upvote
+    upvote_resp = await client.post(
+        f"/api/v1/complaints/{cid}/upvote",
+        headers={"Authorization": f"Bearer {cit_token}"},
+    )
+    assert upvote_resp.status_code == 200
+    assert upvote_resp.json()["data"]["upvotes"] >= 2
+    assert upvote_resp.json()["data"]["voted"] is True
+
+
